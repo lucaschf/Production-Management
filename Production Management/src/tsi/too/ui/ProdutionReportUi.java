@@ -22,46 +22,45 @@ public class ProdutionReportUi extends JDialog {
 	public ProdutionReportUi(Component parentComponent) {
 
 		JPanel filterPanel = new JPanel();
-		filterPanel.setBorder(new TitledBorder(null, "Per\u00EDodo de produ\u00E7\u00E3o", TitledBorder.LEADING,
+		filterPanel.setBorder(new TitledBorder(null, Constants.PRODUCTION_PERIOD, TitledBorder.LEADING,
 				TitledBorder.TOP, null, null));
 
-		JLabel lblStartDate = new JLabel("Data inicial:");
+		JLabel lblStartDate = new JLabel(String.format("%s:", Constants.START_DATE));
 
-		JFormattedTextField formattedTextField = new JFormattedTextField();
+		JFormattedTextField ftfStartDate = new JFormattedTextField();
+		lblStartDate.setLabelFor(ftfStartDate);
 
-		JLabel lblEndDate = new JLabel("Data final:");
+		JLabel lblEndDate = new JLabel(String.format("%s:", Constants.END_DATE));
 		lblEndDate.setHorizontalAlignment(SwingConstants.TRAILING);
 
-		JFormattedTextField formattedTextField_1 = new JFormattedTextField();
+		JFormattedTextField ftfEndDate = new JFormattedTextField();
+		lblEndDate.setLabelFor(ftfEndDate);
 
-		JButton btnNewButton = new JButton("Obter dados de producao");
+		JButton btnCreateReport = new JButton(Constants.GET_PRODUCTION_DATE);
 		GroupLayout gl_filterPanel = new GroupLayout(filterPanel);
 		gl_filterPanel.setHorizontalGroup(gl_filterPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_filterPanel.createSequentialGroup().addContainerGap().addComponent(lblStartDate)
 						.addPreferredGap(ComponentPlacement.RELATED)
-						.addComponent(formattedTextField, GroupLayout.PREFERRED_SIZE, 117, GroupLayout.PREFERRED_SIZE)
+						.addComponent(ftfStartDate, GroupLayout.PREFERRED_SIZE, 117, GroupLayout.PREFERRED_SIZE)
 						.addPreferredGap(ComponentPlacement.UNRELATED)
 						.addComponent(lblEndDate, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
 						.addPreferredGap(ComponentPlacement.RELATED)
-						.addComponent(formattedTextField_1, GroupLayout.PREFERRED_SIZE, 122, GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(ComponentPlacement.UNRELATED).addComponent(btnNewButton)
+						.addComponent(ftfEndDate, GroupLayout.PREFERRED_SIZE, 122, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.UNRELATED).addComponent(btnCreateReport)
 						.addContainerGap(569, Short.MAX_VALUE)));
-		gl_filterPanel
-				.setVerticalGroup(gl_filterPanel.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_filterPanel.createSequentialGroup().addContainerGap()
-								.addGroup(gl_filterPanel.createParallelGroup(Alignment.BASELINE)
-										.addComponent(lblStartDate)
-										.addComponent(formattedTextField, GroupLayout.PREFERRED_SIZE,
-												GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addComponent(lblEndDate)
-										.addComponent(formattedTextField_1, GroupLayout.PREFERRED_SIZE,
-												GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addComponent(btnNewButton))));
+		gl_filterPanel.setVerticalGroup(gl_filterPanel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_filterPanel.createSequentialGroup().addContainerGap()
+						.addGroup(gl_filterPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblStartDate)
+								.addComponent(ftfStartDate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblEndDate).addComponent(ftfEndDate, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(btnCreateReport))));
 		filterPanel.setLayout(gl_filterPanel);
 
 		JPanel tablePanel = new JPanel();
-		tablePanel.setBorder(new TitledBorder(null, "Dados da produ\u00E7\u00E3o", TitledBorder.LEADING,
-				TitledBorder.TOP, null, null));
+		tablePanel.setBorder(
+				new TitledBorder(null, Constants.PRODUCTION_DATA, TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		JScrollPane scrollPane = new JScrollPane();
 		GroupLayout gl_tablePanel = new GroupLayout(tablePanel);
@@ -92,7 +91,7 @@ public class ProdutionReportUi extends JDialog {
 						.addComponent(bottomPanel, GroupLayout.PREFERRED_SIZE, 28, Short.MAX_VALUE).addContainerGap()));
 		getContentPane().setLayout(groupLayout);
 		setMinimumSize(new Dimension(900, 600));
-//		pack();
+		pack();
 		setLocationRelativeTo(parentComponent);
 	}
 

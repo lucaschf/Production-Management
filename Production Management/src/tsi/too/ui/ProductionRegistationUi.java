@@ -30,7 +30,8 @@ public class ProductionRegistationUi extends JDialog {
 		setTitle(Constants.PRODUCTION_REGISTRATION);
 		initComponents();
 
-		BottomActionPanel bottomActionPanel = new BottomActionPanel("Cancelar", e -> onCancel(), "Gravar", e -> onOk());
+		BottomActionPanel bottomActionPanel = new BottomActionPanel(Constants.CANCEL, e -> onCancel(),
+				Constants.TO_RECORD, e -> onOk());
 
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(Alignment.LEADING,
@@ -79,16 +80,21 @@ public class ProductionRegistationUi extends JDialog {
 		lblTotalSaleValue.setHorizontalAlignment(SwingConstants.TRAILING);
 
 		tfProductName = new JTextField();
+		lblProductName.setLabelFor(tfProductName);
 		tfProductName.setColumns(10);
 
 		ftfProductionDate = new JFormattedTextField(UiUtils.createBrazilianDateMaskFormatter());
+		lblProductionDate.setLabelFor(ftfProductionDate);
 
 		ftfQuantityProduced = new JFormattedTextField();
+		lblQuantityProduced.setLabelFor(ftfQuantityProduced);
 
 		ftfProductionCost = new JFormattedTextField();
+		lblProductionCost.setLabelFor(ftfProductionCost);
 		ftfProductionCost.setFormatterFactory(UiUtils.createCurrencyFormatterFactory(0.0, Double.MAX_VALUE));
 
 		ftfTotalSaleValue = new JFormattedTextField();
+		lblTotalSaleValue.setLabelFor(ftfTotalSaleValue);
 		ftfTotalSaleValue.setFormatterFactory(UiUtils.createCurrencyFormatterFactory(0.0, Double.MAX_VALUE));
 
 		GroupLayout gl_formPanel = new GroupLayout(formPanel);

@@ -20,7 +20,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import tsi.too.Constants;
-import tsi.too.io.MessageDialog;
 import tsi.too.model.Product;
 
 @SuppressWarnings("serial")
@@ -66,6 +65,7 @@ public class PlaceOrderUi extends JDialog {
 		JLabel lblTotalOrderValue = new JLabel(String.format("%s:", Constants.TOTAL_ORDER_VALUE));
 
 		ftfTotalOrderValue = new JTextField();
+		lblTotalOrderValue.setLabelFor(ftfTotalOrderValue);
 		ftfTotalOrderValue.setEditable(false);
 		ftfTotalOrderValue.setColumns(10);
 
@@ -162,49 +162,48 @@ public class PlaceOrderUi extends JDialog {
 		JLabel lblNewLabel_3 = new JLabel(String.format("%s:", Constants.PRODUCT));
 		lblNewLabel_3.setHorizontalAlignment(SwingConstants.TRAILING);
 
-		JComboBox<Product> comboBox = new JComboBox<Product>();
+		JComboBox<Product> cbProduct = new JComboBox<Product>();
 
 		JLabel lblNewLabel_4 = new JLabel(String.format("%s:", Constants.QUANTITY));
 		lblNewLabel_4.setHorizontalAlignment(SwingConstants.TRAILING);
 
-		JSpinner spinner = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
+		JSpinner spQuantity = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
 
-		JButton btnNewButton = new JButton(Constants.ADD_TO_ORDER_ITEMS);
+		JButton btnAddItem = new JButton(Constants.ADD_TO_ORDER_ITEMS);
 		GroupLayout gl_productChooserPanel = new GroupLayout(productChooserPanel);
 		gl_productChooserPanel
 				.setHorizontalGroup(gl_productChooserPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_productChooserPanel.createSequentialGroup().addContainerGap()
 								.addGroup(gl_productChooserPanel.createParallelGroup(Alignment.LEADING)
-										.addGroup(Alignment.TRAILING, gl_productChooserPanel
-												.createSequentialGroup()
+										.addGroup(Alignment.TRAILING, gl_productChooserPanel.createSequentialGroup()
 												.addGroup(gl_productChooserPanel.createParallelGroup(Alignment.TRAILING)
 														.addComponent(lblNewLabel_3, GroupLayout.PREFERRED_SIZE, 50,
 																GroupLayout.PREFERRED_SIZE)
 														.addComponent(lblNewLabel_4))
 												.addPreferredGap(ComponentPlacement.RELATED)
 												.addGroup(gl_productChooserPanel.createParallelGroup(Alignment.LEADING)
-														.addComponent(comboBox, 0, 417, Short.MAX_VALUE)
-														.addComponent(spinner, GroupLayout.PREFERRED_SIZE, 80,
+														.addComponent(cbProduct, 0, 417, Short.MAX_VALUE)
+														.addComponent(spQuantity, GroupLayout.PREFERRED_SIZE, 80,
 																GroupLayout.PREFERRED_SIZE)))
-										.addComponent(btnNewButton, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 198,
+										.addComponent(btnAddItem, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 198,
 												GroupLayout.PREFERRED_SIZE))
 								.addContainerGap()));
 		gl_productChooserPanel.setVerticalGroup(gl_productChooserPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_productChooserPanel.createSequentialGroup().addContainerGap()
 						.addGroup(gl_productChooserPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+								.addComponent(cbProduct, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
 										GroupLayout.PREFERRED_SIZE)
 								.addComponent(lblNewLabel_3))
 						.addGroup(gl_productChooserPanel.createParallelGroup(Alignment.TRAILING)
 								.addGroup(gl_productChooserPanel.createSequentialGroup()
 										.addPreferredGap(ComponentPlacement.RELATED)
 										.addGroup(gl_productChooserPanel.createParallelGroup(Alignment.BASELINE)
-												.addComponent(lblNewLabel_4).addComponent(spinner,
+												.addComponent(lblNewLabel_4).addComponent(spQuantity,
 														GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
 														GroupLayout.PREFERRED_SIZE))
 										.addContainerGap(44, Short.MAX_VALUE))
 								.addGroup(gl_productChooserPanel.createSequentialGroup()
-										.addPreferredGap(ComponentPlacement.RELATED).addComponent(btnNewButton)
+										.addPreferredGap(ComponentPlacement.RELATED).addComponent(btnAddItem)
 										.addContainerGap()))));
 		productChooserPanel.setLayout(gl_productChooserPanel);
 		OrderPane.setLayout(gl_OrderPane);
@@ -214,7 +213,6 @@ public class PlaceOrderUi extends JDialog {
 	}
 
 	private void onOk() {
-		MessageDialog.showAlertDialog("Testew", "TESTING MNEMONIC");
 	}
 
 	private void onCancel() {

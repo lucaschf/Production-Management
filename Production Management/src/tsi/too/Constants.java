@@ -1,7 +1,5 @@
 package tsi.too;
 
-import javax.swing.Icon;
-
 public interface Constants {
 	String APP_NAME = "Gestão de produção";
 	String CANCEL = "Cancelar";
@@ -55,4 +53,15 @@ public interface Constants {
 	String SALES_CLASSIFICATION = "Classificação das vendas";
 	String BY_DATE = "Por data";
 	String BY_HOUR = "Por hora";
+	String PERIOD = "Período";
+	String EXPENSES = "Despesas";
+	String RECIPE = "Receita";
+	String BALANCE = "Saldo";
+	String TOTAL_NUMBER_OF_SALES = "Número total de vendas";
+	String TOTAL_VALUE_OF_INPUTS = "Valor total dos insumos";
+	String PRODUCTION_PERIOD = "Período de produção";
+	String START_DATE = "Data inicial";
+	String END_DATE = "Data final";
+	String GET_PRODUCTION_DATE = "Obter dados de producao";
+	String PRODUCTION_DATA = "Dados da produção";
 }

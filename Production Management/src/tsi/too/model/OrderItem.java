@@ -28,6 +28,10 @@ public class OrderItem {
 		return quantity * product.getPrice();
 	}
 	
+	public double getUnitaryPrice() {
+		return product.getPrice();
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

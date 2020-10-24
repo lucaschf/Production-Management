@@ -23,8 +23,8 @@ public class SalesReportUi extends JDialog {
 		periodPanel.setBorder(
 				new TitledBorder(null, Constants.SALES_PERIOD, TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
-		JPanel panel = new JPanel();
-		panel.setBorder(
+		JPanel tablePanel = new JPanel();
+		tablePanel.setBorder(
 				new TitledBorder(null, Constants.SALES_DATA, TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		BottomActionPanel bottomPanel = new BottomActionPanel(Constants.CANCEL, e -> onCancel(), Constants.OK,
@@ -34,7 +34,7 @@ public class SalesReportUi extends JDialog {
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout
 				.createSequentialGroup().addContainerGap()
 				.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 874, Short.MAX_VALUE)
+						.addComponent(tablePanel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 874, Short.MAX_VALUE)
 						.addComponent(periodPanel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 874, Short.MAX_VALUE)
 						.addComponent(bottomPanel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 874, Short.MAX_VALUE))
 				.addContainerGap()));
@@ -42,7 +42,7 @@ public class SalesReportUi extends JDialog {
 				.addGroup(groupLayout.createSequentialGroup().addContainerGap()
 						.addComponent(periodPanel, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
 						.addPreferredGap(ComponentPlacement.RELATED)
-						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
+						.addComponent(tablePanel, GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
 						.addPreferredGap(ComponentPlacement.RELATED)
 						.addComponent(bottomPanel, GroupLayout.PREFERRED_SIZE, 28, Short.MAX_VALUE).addContainerGap()));
 
@@ -50,81 +50,87 @@ public class SalesReportUi extends JDialog {
 
 		JLabel lblTotalSalesValue = new JLabel(String.format("%s:", Constants.TOTAL_SALES_VALUE));
 
-		JPanel panel_1 = new JPanel();
-		panel_1.setBorder(new TitledBorder(null, Constants.SALES_CLASSIFICATION, TitledBorder.LEADING,
+		JPanel classificationPanel = new JPanel();
+		classificationPanel.setBorder(new TitledBorder(null, Constants.SALES_CLASSIFICATION, TitledBorder.LEADING,
 				TitledBorder.TOP, null, null));
-		panel_1.setLayout(null);
+		classificationPanel.setLayout(null);
 
-		JButton btnOrderByDate = new JButton(Constants.BY_DATE);
-		btnOrderByDate.setBounds(20, 29, 180, 28);
-		panel_1.add(btnOrderByDate);
+		JButton btnDateClassification = new JButton(Constants.BY_DATE);
+		btnDateClassification.setBounds(20, 29, 180, 28);
+		classificationPanel.add(btnDateClassification);
 
-		JButton btnOrderByHour = new JButton(Constants.BY_HOUR);
-		btnOrderByHour.setBounds(212, 29, 180, 28);
-		panel_1.add(btnOrderByHour);
+		JButton btnHourClassification = new JButton(Constants.BY_HOUR);
+		btnHourClassification.setBounds(212, 29, 180, 28);
+		classificationPanel.add(btnHourClassification);
 
-		JFormattedTextField formattedTextField_2 = new JFormattedTextField();
-		GroupLayout gl_panel = new GroupLayout(panel);
-		gl_panel.setHorizontalGroup(
-				gl_panel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel.createSequentialGroup().addContainerGap()
-								.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-										.addGroup(gl_panel.createSequentialGroup()
+		JFormattedTextField ftfTotalSalesValue = new JFormattedTextField();
+		lblTotalSalesValue.setLabelFor(ftfTotalSalesValue);
+		GroupLayout gl_tablePanel = new GroupLayout(tablePanel);
+		gl_tablePanel
+				.setHorizontalGroup(gl_tablePanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_tablePanel.createSequentialGroup().addContainerGap()
+								.addGroup(gl_tablePanel.createParallelGroup(Alignment.LEADING)
+										.addGroup(gl_tablePanel.createSequentialGroup()
 												.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 832,
 														Short.MAX_VALUE)
 												.addContainerGap())
-										.addGroup(gl_panel.createSequentialGroup()
+										.addGroup(gl_tablePanel.createSequentialGroup()
 												.addComponent(lblTotalSalesValue, GroupLayout.PREFERRED_SIZE, 118,
 														GroupLayout.PREFERRED_SIZE)
 												.addPreferredGap(ComponentPlacement.RELATED)
-												.addComponent(formattedTextField_2, GroupLayout.PREFERRED_SIZE, 145,
+												.addComponent(ftfTotalSalesValue, GroupLayout.PREFERRED_SIZE, 145,
 														GroupLayout.PREFERRED_SIZE)
 												.addContainerGap(569, Short.MAX_VALUE))
-										.addGroup(gl_panel.createSequentialGroup()
-												.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 838, Short.MAX_VALUE)
-												.addGap(6)))));
-		gl_panel.setVerticalGroup(gl_panel.createParallelGroup(Alignment.TRAILING).addGroup(gl_panel
+										.addGroup(
+												gl_tablePanel
+														.createSequentialGroup().addComponent(classificationPanel,
+																GroupLayout.DEFAULT_SIZE, 838, Short.MAX_VALUE)
+														.addGap(6)))));
+		gl_tablePanel.setVerticalGroup(gl_tablePanel.createParallelGroup(Alignment.TRAILING).addGroup(gl_tablePanel
 				.createSequentialGroup().addGap(9)
 				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+				.addGroup(gl_tablePanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblTotalSalesValue, GroupLayout.PREFERRED_SIZE, 16, GroupLayout.PREFERRED_SIZE)
-						.addComponent(formattedTextField_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+						.addComponent(ftfTotalSalesValue, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
 								GroupLayout.PREFERRED_SIZE))
 				.addPreferredGap(ComponentPlacement.RELATED)
-				.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE).addContainerGap()));
-		panel.setLayout(gl_panel);
+				.addComponent(classificationPanel, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+				.addContainerGap()));
+		tablePanel.setLayout(gl_tablePanel);
 
 		JLabel lblStartDateTime = new JLabel(String.format("%s:", Constants.START_DATE_OR_TIME));
 
-		JFormattedTextField formattedTextField = new JFormattedTextField();
+		JFormattedTextField ftfStartDateTime = new JFormattedTextField();
+		lblStartDateTime.setLabelFor(ftfStartDateTime);
 
 		JLabel lblFinalDateTime = new JLabel(String.format("%s:", Constants.FINAL_DATE_OR_TIME));
 
-		JFormattedTextField formattedTextField_1 = new JFormattedTextField();
+		JFormattedTextField ftfFinalDateTime = new JFormattedTextField();
+		lblFinalDateTime.setLabelFor(ftfFinalDateTime);
 
-		JButton btnNewButton = new JButton(Constants.GET_SALES_DATA);
+		JButton btnCreateReport = new JButton(Constants.GET_SALES_DATA);
 		GroupLayout gl_periodPanel = new GroupLayout(periodPanel);
 		gl_periodPanel.setHorizontalGroup(gl_periodPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_periodPanel.createSequentialGroup().addContainerGap().addComponent(lblStartDateTime)
 						.addPreferredGap(ComponentPlacement.UNRELATED)
-						.addComponent(formattedTextField, GroupLayout.PREFERRED_SIZE, 102, GroupLayout.PREFERRED_SIZE)
+						.addComponent(ftfStartDateTime, GroupLayout.PREFERRED_SIZE, 102, GroupLayout.PREFERRED_SIZE)
 						.addPreferredGap(ComponentPlacement.UNRELATED).addComponent(lblFinalDateTime)
 						.addPreferredGap(ComponentPlacement.UNRELATED)
-						.addComponent(formattedTextField_1, GroupLayout.PREFERRED_SIZE, 100, GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(ComponentPlacement.UNRELATED).addComponent(btnNewButton)
+						.addComponent(ftfFinalDateTime, GroupLayout.PREFERRED_SIZE, 100, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.UNRELATED).addComponent(btnCreateReport)
 						.addContainerGap(181, Short.MAX_VALUE)));
 		gl_periodPanel
 				.setVerticalGroup(gl_periodPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_periodPanel.createSequentialGroup().addContainerGap()
 								.addGroup(gl_periodPanel.createParallelGroup(Alignment.BASELINE)
 										.addComponent(lblStartDateTime)
-										.addComponent(formattedTextField, GroupLayout.PREFERRED_SIZE,
+										.addComponent(ftfStartDateTime, GroupLayout.PREFERRED_SIZE,
 												GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 										.addComponent(lblFinalDateTime)
-										.addComponent(formattedTextField_1, GroupLayout.PREFERRED_SIZE,
+										.addComponent(ftfFinalDateTime, GroupLayout.PREFERRED_SIZE,
 												GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addComponent(btnNewButton))
+										.addComponent(btnCreateReport))
 								.addContainerGap(78, Short.MAX_VALUE)));
 		periodPanel.setLayout(gl_periodPanel);
 		setMinimumSize(new Dimension(900, 600));
