@@ -1,0 +1,58 @@
+package tsi.too;
+
+import javax.swing.Icon;
+
+public interface Constants {
+	String APP_NAME = "Gestão de produção";
+	String CANCEL = "Cancelar";
+	String TO_RECORD = "Gravar";
+	String OK = "OK";
+	String NAME = "Nome";
+	String UNITARY_PRICE = "Preço Unitário";
+	String UNITY = "Unidade";
+	String PRODUCT = "Produto";
+	String GRAM = "Grama";
+	String KILOGRAM = "Quilograma";
+	String LITER = "Litro";
+	String MILILITER = "Mililitro";
+	String REGISTER_PRODUCTION_INPUTS = "Cadastrar Insumos";
+	String PRODUCTION_INPUTS = "Insumos de produção";
+	String PROFIT_MARGIN = "Margem de lucro";
+	String PRODUCT_NAME = "Nome do produto";
+	String PRODUCTION_DATE = "Data de produção";
+	String QUANTITY_PRODUCED = "Quantidade produzida";
+	String PRODUCTION_COST = "Custo de produção";
+	String TOTAL_SALE_AMOUNT = "Valor total de venda";
+	String PRODUCTION = "Produção";
+	String CONCLUDE = "Concluir";
+	String REGISTRATION = "Cadastros";
+	String ORDERS = "Vendas";
+	String NEW_ORDER = "Nova venda";
+	String SALE = "Venda";
+	String ORDER_ITEMS = "Itens da venda";
+	String QUANTITY = "Quantidade";
+	String ADD_TO_ORDER_ITEMS = "Adicionar aos itens da venda";
+	String DATE = "Data";
+	String CODE = "Código";
+	String TOTAL_ORDER_VALUE = "Valor total da venda";
+	String SELLING_PRODUCTS = "Venda de produtos";
+	String PRODUCT_REGISTRATION = "Cadastro de produtos";
+	String PRODUCTION_REGISTRATION = "Registro de produção";
+	String REPORTS = "Relatórios";
+	String SALES = "Vendas";
+	String MONTH = "Mês";
+	String BUDGET = "Orçamento";
+	String CONSULTATIONS = "Consultas";
+	String SETTINGS = "Settings";
+	String SELECT_APPEARANCE = "Selecione a aparência";
+	String APPEARANCE = "Aparência";
+	String SALES_PERIOD = "Período de vendas";
+	String SALES_DATA = "Dados das vendas";
+	String START_DATE_OR_TIME = "Data ou hora inicial";
+	String FINAL_DATE_OR_TIME = "Data ou hora final";
+	String GET_SALES_DATA = "Obter dados das vendas";
+	String TOTAL_SALES_VALUE = "Valor total das vendas";
+	String SALES_CLASSIFICATION = "Classificação das vendas";
+	String BY_DATE = "Por data";
+	String BY_HOUR = "Por hora";
+}
