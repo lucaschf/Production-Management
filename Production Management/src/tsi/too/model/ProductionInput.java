@@ -3,13 +3,14 @@ package tsi.too.model;
 public class ProductionInput implements Cloneable{
 	private String name;
 	private int quantity;
+	private long code;
 	private double price;
 	
-	public ProductionInput(String name, int quantity, double price) {
+	public ProductionInput(String name, int quantity, long code, double price) {
 		super();
-	
 		this.name = name;
 		this.quantity = quantity;
+		this.code = code;
 		this.price = price;
 	}
 
@@ -41,6 +42,10 @@ public class ProductionInput implements Cloneable{
 		return price * quantity;
 	}
 	
+	public long getCode() {
+		return code;
+	}
+	
 	@Override
 	public String toString() {
 		return String.format(
@@ -53,6 +58,6 @@ public class ProductionInput implements Cloneable{
 	
 	@Override
 	protected ProductionInput clone() {
-		return new ProductionInput(name, quantity, price);
+		return new ProductionInput(name, quantity, code, price);
 	}
 }

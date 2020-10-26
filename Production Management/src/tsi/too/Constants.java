@@ -64,4 +64,7 @@ public interface Constants {
 	String END_DATE = "Data final";
 	String GET_PRODUCTION_DATE = "Obter dados de producao";
 	String PRODUCTION_DATA = "Dados da produção";
+	String UNIT_SIZE = "Tamanho da unidade";
+	String ADD = "Adicionar";
+	String PRODUCTION_INPUTS_SIZE_MESSAGE = "A quantidade de insumo é por tamanho de cada unidade do produto";
 }

@@ -16,11 +16,11 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import tsi.too.Constants;
+import java.awt.Toolkit;
 
 @SuppressWarnings("serial")
 public class ProdutionReportUi extends JDialog {
 	public ProdutionReportUi(Component parentComponent) {
-
 		JPanel filterPanel = new JPanel();
 		filterPanel.setBorder(new TitledBorder(null, Constants.PRODUCTION_PERIOD, TitledBorder.LEADING,
 				TitledBorder.TOP, null, null));
