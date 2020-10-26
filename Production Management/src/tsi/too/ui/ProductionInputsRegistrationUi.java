@@ -39,15 +39,15 @@ public class ProductionInputsRegistrationUi extends JDialog {
 	private JTable table;
 
 	public ProductionInputsRegistrationUi(Component parentComponent, List<Product> products) {
-		initComponent();
+		this(parentComponent);
 	}
+
 
 	/**
 	 * @wbp.parser.constructor
 	 */
 	public ProductionInputsRegistrationUi(Component parentComponent) {
 		initComponent();
-
 		pack();
 		setLocationRelativeTo(parentComponent);
 	}

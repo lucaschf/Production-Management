@@ -22,6 +22,6 @@ public class PriceEntry {
 
 	@Override
 	public String toString() {
-		return String.format("PriceEntry {price= %1.f, date= %s}", price, date);
+		return String.format("PriceEntry {price= %1.2f, date= %s}", price, date);
 	}
 }

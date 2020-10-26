@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class Product {
+public class Product {
+	public static final int MAX_NAME_LENGTH = 50;
+
 	private long code;
 	private String name;
 	private MeasureUnity measureUnity;
@@ -44,7 +46,10 @@ public abstract class Product {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		if (name != null && name.length() > MAX_NAME_LENGTH)
+			this.name = name.substring(0, MAX_NAME_LENGTH);
+		else
+			this.name = name;
 	}
 
 	public MeasureUnity getMeasureUnity() {

@@ -1,6 +1,8 @@
 package tsi.too.model;
 
 public class ProductionInput implements Cloneable{
+	public static final int MAX_NAME_LENGTH = 50;
+	
 	private String name;
 	private int quantity;
 	private long code;
