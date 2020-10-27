@@ -1,8 +1,6 @@
 package tsi.too.ui;
 
 import java.awt.Component;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.GroupLayout;
@@ -23,8 +21,10 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import tsi.too.Constants;
+import tsi.too.io.MessageDialog;
 import tsi.too.model.Product;
-import tsi.too.ui.table_model.ProductionInputsTableModel;
+import tsi.too.model.ProductionInput;
+import tsi.too.ui.table_model.ProductionInputTableModel;
 
 @SuppressWarnings("serial")
 public class ProductionInputsRegistrationUi extends JDialog {
@@ -37,13 +37,14 @@ public class ProductionInputsRegistrationUi extends JDialog {
 	private JButton btnAddInput;
 	private JScrollPane scrollPane;
 	private JTable table;
+	private ProductionInputTableModel tableModel;
 
 	public ProductionInputsRegistrationUi(Component parentComponent, List<Product> products) {
 		this(parentComponent);
 	}
 
-
 	/**
+	 * @param parentComponent 
 	 * @wbp.parser.constructor
 	 */
 	public ProductionInputsRegistrationUi(Component parentComponent) {
@@ -61,8 +62,8 @@ public class ProductionInputsRegistrationUi extends JDialog {
 		panel.setBorder(new TitledBorder(null, Constants.PRODUCTION_INPUTS, TitledBorder.LEADING, TitledBorder.TOP,
 				null, null));
 
-		BottomActionPanel bottomActionPanel = new BottomActionPanel(Constants.CANCEL, (ActionListener) null,
-				Constants.TO_RECORD, (ActionListener) null);
+		BottomActionPanel bottomActionPanel = new BottomActionPanel(Constants.CANCEL, e -> onCancel(),
+				Constants.TO_RECORD, e -> onOk());
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(groupLayout
 				.createSequentialGroup().addContainerGap()
@@ -100,10 +101,16 @@ public class ProductionInputsRegistrationUi extends JDialog {
 		lblProductionInputName.setLabelFor(tfProductionInputsName);
 		tfProductionInputsName.setColumns(10);
 
-		btnAddInput = new JButton(Constants.ADD);
-
 		scrollPane = new JScrollPane();
 
+		tableModel = new ProductionInputTableModel();
+		table = new JTable();
+		table.setModel(tableModel);
+		scrollPane.setViewportView(table);
+		
+		btnAddInput = new JButton(Constants.ADD);
+		btnAddInput.addActionListener(e -> tableModel.addRow(new ProductionInput("test", 1, 10, 28)));
+		
 		JLabel lblMessage = new JLabel(Constants.PRODUCTION_INPUTS_SIZE_MESSAGE);
 		lblMessage.setIcon(new ImageIcon(ProductionInputsRegistrationUi.class.getResource("/resources/ic_info.png")));
 		GroupLayout gl_panel = new GroupLayout(panel);
@@ -154,9 +161,6 @@ public class ProductionInputsRegistrationUi extends JDialog {
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE).addContainerGap()));
 		
-		table = new JTable();
-		table.setModel(new ProductionInputsTableModel(new ArrayList<>()));
-		scrollPane.setViewportView(table);
 		panel.setLayout(gl_panel);
 
 		JLabel lblUnitySize = new JLabel(String.format("%s:", Constants.UNIT_SIZE));
@@ -195,5 +199,15 @@ public class ProductionInputsRegistrationUi extends JDialog {
 						.addContainerGap()));
 		productPanel.setLayout(gl_productPanel);
 		getContentPane().setLayout(groupLayout);
+	}
+
+	private Object onOk() {
+		var itemInput =  table.getModel().getValueAt(0, 2);
+		MessageDialog.showAlertDialog("test", itemInput);
+		return null;
+	}
+	
+	private void onCancel() {
+		MessageDialog.showInformationDialog("Teste", tableModel.getValueAt(2));
 	}
 }

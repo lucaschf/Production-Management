@@ -5,14 +5,21 @@ public class ProductionInput implements Cloneable{
 	
 	private String name;
 	private int quantity;
-	private long code;
+	private long id;
 	private double price;
 	
 	public ProductionInput(String name, int quantity, long code, double price) {
 		super();
 		this.name = name;
 		this.quantity = quantity;
-		this.code = code;
+		this.id = code;
+		this.price = price;
+	}
+	
+	public ProductionInput(String name, int quantity, double price) {
+		super();
+		this.name = name;
+		this.quantity = quantity;
 		this.price = price;
 	}
 
@@ -44,8 +51,8 @@ public class ProductionInput implements Cloneable{
 		return price * quantity;
 	}
 	
-	public long getCode() {
-		return code;
+	public long getId() {
+		return id;
 	}
 	
 	@Override
@@ -60,6 +67,6 @@ public class ProductionInput implements Cloneable{
 	
 	@Override
 	protected ProductionInput clone() {
-		return new ProductionInput(name, quantity, code, price);
+		return new ProductionInput(name, quantity, id, price);
 	}
 }

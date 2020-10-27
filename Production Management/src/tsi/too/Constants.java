@@ -12,7 +12,7 @@ public interface Constants {
 	String GRAM = "Grama";
 	String KILOGRAM = "Quilograma";
 	String LITER = "Litro";
-	String MILILITER = "Mililitro";
+	String MILLILITER = "Mililitro";
 	String REGISTER_PRODUCTION_INPUTS = "Cadastrar Insumos";
 	String PRODUCTION_INPUTS = "Insumos de produção";
 	String PROFIT_MARGIN = "Margem de lucro";

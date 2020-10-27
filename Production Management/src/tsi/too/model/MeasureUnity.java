@@ -2,11 +2,18 @@ package tsi.too.model;
 
 import tsi.too.Constants;
 
+/**
+ * Represents all acceptable measure units
+ * 
+ * 
+ * @author Lucas Cristovam
+ *
+ */
 public enum MeasureUnity {
 	GRAM(0 ,Constants.GRAM, "g"),
 	KILOGRAM(1, Constants.KILOGRAM, "Kg"),
 	LITER(2, Constants.LITER, "L"),
-	MILILITER(3, Constants.MILILITER, "Ml");
+	MILLILITER(3, Constants.MILLILITER, "Ml");
 	
 	private String description;
 	private String initials;
@@ -40,6 +47,6 @@ public enum MeasureUnity {
 			if(mu.getCode() == code)
 				return mu;
 		
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException("No such unity");
 	}
 }

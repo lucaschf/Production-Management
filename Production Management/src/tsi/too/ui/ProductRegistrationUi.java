@@ -27,7 +27,8 @@ public class ProductRegistrationUi extends JDialog {
 	private JComboBox<MeasureUnity> cbUnity;
 	private JPanel fieldsPanel;
 	private JLabel lblName;
-	private JButton btnRegisterProductionInputs;
+	private JButton btnRegisterInputs;
+	private JSpinner spProfitmargin;
 
 	public ProductRegistrationUi(Component parentComponent) {
 		setTitle(Constants.PRODUCT_REGISTRATION);
@@ -38,9 +39,14 @@ public class ProductRegistrationUi extends JDialog {
 		setLocationRelativeTo(parentComponent);
 	}
 
+	private void initComponents() {
+		initFieldsPanel();
+		initContentGroupLayout();
+	}
+
 	private void initContentGroupLayout() {
 		BottomActionPanel bottomActionPanel = new BottomActionPanel(Constants.CANCEL, e -> onCancel(),
-				Constants.TO_RECORD, e -> onOk());
+				Constants.TO_RECORD, e -> registerProduct());
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(groupLayout
 				.createSequentialGroup()
@@ -58,19 +64,6 @@ public class ProductRegistrationUi extends JDialog {
 						.addContainerGap()));
 
 		getContentPane().setLayout(groupLayout);
-	}
-
-	private void onCancel() {
-		dispose();
-	}
-
-	private void onOk() {
-		// TODO Auto-generated method stub
-	}
-
-	private void initComponents() {
-		initFieldsPanel();
-		initContentGroupLayout();
 	}
 
 	private void initFieldsPanel() {
@@ -92,11 +85,12 @@ public class ProductRegistrationUi extends JDialog {
 		cbUnity = new JComboBox<MeasureUnity>(MeasureUnity.values());
 		lblUnity.setLabelFor(cbUnity);
 
-		JSpinner spProfitmargin = new JSpinner();
+		spProfitmargin = new JSpinner();
 		lblProfitMargin.setLabelFor(spProfitmargin);
 		spProfitmargin.setModel(new SpinnerNumberModel(0.0, 0.0, 100.0, 1.0));
 
-		btnRegisterProductionInputs = new JButton(Constants.REGISTER_PRODUCTION_INPUTS);
+		btnRegisterInputs = new JButton(Constants.REGISTER_PRODUCTION_INPUTS);
+		enableInputsButton();
 
 		GroupLayout gl_panel = new GroupLayout(fieldsPanel);
 		gl_panel.setHorizontalGroup(gl_panel.createParallelGroup(Alignment.LEADING)
@@ -113,8 +107,8 @@ public class ProductRegistrationUi extends JDialog {
 												.addComponent(spProfitmargin, GroupLayout.PREFERRED_SIZE, 66,
 														GroupLayout.PREFERRED_SIZE)
 												.addPreferredGap(ComponentPlacement.RELATED, 228, Short.MAX_VALUE)
-												.addComponent(btnRegisterProductionInputs, GroupLayout.PREFERRED_SIZE,
-														143, GroupLayout.PREFERRED_SIZE))
+												.addComponent(btnRegisterInputs, GroupLayout.PREFERRED_SIZE, 143,
+														GroupLayout.PREFERRED_SIZE))
 								.addComponent(tfName, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 435,
 										Short.MAX_VALUE))
 						.addContainerGap()));
@@ -133,7 +127,7 @@ public class ProductRegistrationUi extends JDialog {
 										GroupLayout.PREFERRED_SIZE))
 						.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 						.addGroup(gl_panel.createSequentialGroup().addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(btnRegisterProductionInputs).addContainerGap()))));
+								.addComponent(btnRegisterInputs).addContainerGap()))));
 
 		fieldsPanel.setLayout(gl_panel);
 	}
@@ -142,5 +136,36 @@ public class ProductRegistrationUi extends JDialog {
 		tfName = new JTextField();
 		lblName.setLabelFor(tfName);
 		tfName.setColumns(10);
+
+		tfName.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				enableInputsButton();
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				enableInputsButton();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				enableInputsButton();
+			}
+		});
 	}
+
+	public void enableInputsButton() {
+		btnRegisterInputs.setEnabled(!tfName.getText().isBlank());
+	}
+
+	private void onCancel() {
+		dispose();
+	}
+
+	private void registerProduct() {
+		
+	}
+
 }

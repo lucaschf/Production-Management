@@ -7,16 +7,16 @@ import java.util.stream.Collectors;
 public class Product {
 	public static final int MAX_NAME_LENGTH = 50;
 
-	private long code;
+	private long id;
 	private String name;
 	private MeasureUnity measureUnity;
 	private double percentageProfitMargin;
 
 	private ArrayList<ProductionInput> productionInputs = new ArrayList<>();
 
-	public Product(long code, String name, MeasureUnity measureUnity, double percentageProfitMargin) {
+	public Product(long id, String name, MeasureUnity measureUnity, double percentageProfitMargin) {
 		super();
-		this.code = code;
+		this.id = id;
 		this.name = name;
 		this.measureUnity = measureUnity;
 		this.percentageProfitMargin = percentageProfitMargin;
@@ -34,11 +34,11 @@ public class Product {
 	}
 
 	public long getCode() {
-		return code;
+		return id;
 	}
 
 	public void setCode(long code) {
-		this.code = code;
+		this.id = code;
 	}
 
 	public String getName() {
@@ -76,6 +76,6 @@ public class Product {
 	public String toString() {
 		return String.format(
 				"Product {code= %d, name= %s, measureUnity= %s, percentageProfitMargin= %1.2f, productionInputs= %s}",
-				code, name, measureUnity, percentageProfitMargin, productionInputs);
+				id, name, measureUnity, percentageProfitMargin, productionInputs);
 	}
 }

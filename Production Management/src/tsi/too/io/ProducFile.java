@@ -1,11 +1,33 @@
 package tsi.too.io;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import tsi.too.model.MeasureUnity;
 import tsi.too.model.Product;
 
 public class ProducFile extends BinaryFile<Product> {
+
+	private final static String NAME = "products.dat";
+
+	private static ProducFile instance;
+
+	private ProducFile() throws FileNotFoundException {
+		openFile(NAME, OpenMode.READ_WRITE);
+	}
+
+	public static ProducFile getInstance() throws FileNotFoundException {
+		synchronized (ProducFile.class) {
+			if(instance == null)
+				instance = new ProducFile();
+			
+			return instance;
+		}
+	}
+
+	public ProducFile(String name) throws FileNotFoundException {
+		openFile(name, OpenMode.READ_WRITE);
+	}
 
 	@Override
 	public int recordSize() {

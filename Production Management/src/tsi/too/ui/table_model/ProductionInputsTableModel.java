@@ -1,5 +1,6 @@
 package tsi.too.ui.table_model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
@@ -10,12 +11,12 @@ import tsi.too.model.ProductionInput;
 @SuppressWarnings("serial")
 public class ProductionInputsTableModel extends AbstractTableModel {
 
-	private final List<ProductionInput> items;
+	private final ArrayList<ProductionInput> items = new ArrayList<ProductionInput>();
 	private final String[] columns;
 
 	public ProductionInputsTableModel(List<ProductionInput> items) {
 		super();
-		this.items = items;
+		this.items.addAll(items);
 		this.columns = new String[] { Constants.NAME, Constants.QUANTITY, Constants.UNITARY_PRICE };
 	}
 
@@ -32,6 +33,10 @@ public class ProductionInputsTableModel extends AbstractTableModel {
 	@Override
 	public String getColumnName(int column) {
 		return columns[column];
+	}
+	
+	public boolean addItem(ProductionInput item) {
+		return items.add(item);
 	}
 	
 	@Override

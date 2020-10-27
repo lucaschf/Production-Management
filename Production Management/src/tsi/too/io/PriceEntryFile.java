@@ -13,18 +13,20 @@ public class PriceEntryFile extends BinaryFile<PriceEntry>{
 	@Override
 	public int recordSize() {
 		return Double.BYTES
+				+ Long.BYTES
 				+ Character.BYTES * DATE_TIME_PATTERN.length();
 	}
 
 	@Override
 	public void write(PriceEntry e) throws IOException {
+		file.writeLong(e.getItemCode());
 		file.writeDouble(e.getPrice());
 		writeLocalDateTime(e.getDate());
 	}
 
 	@Override
 	public PriceEntry read() throws IOException {
-		return new PriceEntry(file.readDouble(), readDateTime());
+		return new PriceEntry(file.readLong(), file.readDouble(), readDateTime());
 	}
 	
 	private void writeLocalDateTime(LocalDateTime date) throws IOException {
