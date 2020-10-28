@@ -1,7 +1,6 @@
 package tsi.too.ui;
 
 import java.awt.Component;
-import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -23,11 +22,11 @@ import javax.swing.border.TitledBorder;
 import tsi.too.Constants;
 import tsi.too.io.MessageDialog;
 import tsi.too.model.Product;
-import tsi.too.model.ProductionInput;
+import tsi.too.model.Input;
 import tsi.too.ui.table_model.ProductionInputTableModel;
 
 @SuppressWarnings("serial")
-public class ProductionInputsRegistrationUi extends JDialog {
+public class ProductionInputsAssociationUi extends JDialog {
 
 	private JTextField tfProductionInputsName;
 	private JComboBox<Product> cbProductName;
@@ -38,16 +37,21 @@ public class ProductionInputsRegistrationUi extends JDialog {
 	private JScrollPane scrollPane;
 	private JTable table;
 	private ProductionInputTableModel tableModel;
+	
+	Product product;
 
-	public ProductionInputsRegistrationUi(Component parentComponent, List<Product> products) {
+	public ProductionInputsAssociationUi(Component parentComponent, Product product) {
 		this(parentComponent);
+		this.product = product;
+		fillFields();
 	}
 
 	/**
-	 * @param parentComponent 
+	 * @param parentComponent
 	 * @wbp.parser.constructor
 	 */
-	public ProductionInputsRegistrationUi(Component parentComponent) {
+	public ProductionInputsAssociationUi(Component parentComponent) {
+		setModal(true);
 		initComponent();
 		pack();
 		setLocationRelativeTo(parentComponent);
@@ -107,12 +111,12 @@ public class ProductionInputsRegistrationUi extends JDialog {
 		table = new JTable();
 		table.setModel(tableModel);
 		scrollPane.setViewportView(table);
-		
+
 		btnAddInput = new JButton(Constants.ADD);
-		btnAddInput.addActionListener(e -> tableModel.addRow(new ProductionInput("test", 1, 10, 28)));
-		
+		btnAddInput.addActionListener(e -> tableModel.addRow(new Input("test", 1, 10, 28)));
+
 		JLabel lblMessage = new JLabel(Constants.PRODUCTION_INPUTS_SIZE_MESSAGE);
-		lblMessage.setIcon(new ImageIcon(ProductionInputsRegistrationUi.class.getResource("/resources/ic_info.png")));
+		lblMessage.setIcon(new ImageIcon(ProductionInputsAssociationUi.class.getResource("/resources/ic_info.png")));
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel.createSequentialGroup().addContainerGap()
@@ -160,7 +164,7 @@ public class ProductionInputsRegistrationUi extends JDialog {
 				.addPreferredGap(ComponentPlacement.UNRELATED).addComponent(btnAddInput)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE).addContainerGap()));
-		
+
 		panel.setLayout(gl_panel);
 
 		JLabel lblUnitySize = new JLabel(String.format("%s:", Constants.UNIT_SIZE));
@@ -202,12 +206,20 @@ public class ProductionInputsRegistrationUi extends JDialog {
 	}
 
 	private Object onOk() {
-		var itemInput =  table.getModel().getValueAt(0, 2);
+		var itemInput = table.getModel().getValueAt(0, 2);
 		MessageDialog.showAlertDialog("test", itemInput);
 		return null;
 	}
-	
+
 	private void onCancel() {
 		MessageDialog.showInformationDialog("Teste", tableModel.getValueAt(2));
+	}
+
+	private void fillFields() {
+		if (product == null)
+			return;
+
+		cbProductName.insertItemAt(product, 0);
+		cbProductName.setSelectedIndex(0);
 	}
 }

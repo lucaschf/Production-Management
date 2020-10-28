@@ -1,13 +1,14 @@
 package tsi.too.io;
 
-import static tsi.too.model.ProductionInput.MAX_NAME_LENGTH;
+import static tsi.too.model.Input.MAX_NAME_LENGTH;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import tsi.too.model.ProductionInput;
+import tsi.too.model.Input;
+import tsi.too.util.Pair;
 
-public class ProductionInputsFile extends BinaryFile<ProductionInput> {
+public class ProductionInputsFile extends BinaryFile<Input> {
 
 	private final static String NAME = "ProdctionInputs.dat";
 
@@ -36,17 +37,17 @@ public class ProductionInputsFile extends BinaryFile<ProductionInput> {
 	}
 
 	@Override
-	public void write(ProductionInput e) throws IOException {
+	public void write(Input e) throws IOException {
 		writeString(e.getName(), MAX_NAME_LENGTH);
 		file.writeInt(e.getQuantity());
 		file.writeLong(e.getId());
 		file.writeDouble(e.getPrice());
 	}
 	
-	public ProductionInput findById(long id) throws IOException {
+	public Input findById(long id) throws IOException {
 		long high = recordSize();
 		long low = 0;
-		ProductionInput current;
+		Input current;
 
 		while (low <= high) {
 			long middle = (low + high) / 2;
@@ -65,9 +66,33 @@ public class ProductionInputsFile extends BinaryFile<ProductionInput> {
 		
 		return null;
 	}
+	
+	public long getLastId() throws IOException {
+		var numberOfRecords = countRecords();
+
+		if (numberOfRecords == 0)
+			return 0;
+
+		return read(numberOfRecords - 1).getId();
+	}
 
 	@Override
-	public ProductionInput read() throws IOException {
-		return new ProductionInput(readString(MAX_NAME_LENGTH), file.readInt(), file.readLong(), file.readDouble());
+	public Input read() throws IOException {
+		return new Input(readString(MAX_NAME_LENGTH), file.readInt(), file.readLong(), file.readDouble());
+	}
+
+	public Pair<Input, Long> findByName(final String name) throws IOException {
+		seekRecord(0);
+		
+		Input product;
+		
+		for(long i = 0; i < countRecords(); i++) {
+			product = read();
+			
+			if(product.getName().equalsIgnoreCase(name))
+				return new Pair<Input, Long>(product, i);
+		}
+		
+		return null;
 	}
 }

@@ -14,10 +14,11 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import tsi.too.Constants;
+import tsi.too.model.Product;
 import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
-public class ProductionRegistationUi extends JDialog {
+public class ProductionRegistrationUi extends JDialog {
 	private JFormattedTextField ftfTotalSaleValue;
 	private JFormattedTextField ftfProductionCost;
 	private JTextField tfProductName;
@@ -25,14 +26,35 @@ public class ProductionRegistationUi extends JDialog {
 	private JFormattedTextField ftfQuantityProduced;
 	private JPanel formPanel;
 
-	public ProductionRegistationUi(Component pareComponent) {
-		setModal(true);
+	private Product product;
+	private Component parentComponent;
+	private BottomActionPanel bottomActionPanel;
+
+	public ProductionRegistrationUi(Component parentComponent) {
+		this.parentComponent = parentComponent;
+		setupWindow();
+	}
+
+	private void setupBottomActionPanel() {
+		var positiveText = product == null ? Constants.TO_RECORD : Constants.UPDATE;
+
+		bottomActionPanel = new BottomActionPanel(Constants.CANCEL, e -> onCancel(), positiveText, e -> onOk());
+	}
+
+	private void setupWindow() {
 		setTitle(Constants.PRODUCTION_REGISTRATION);
 		initComponents();
 
-		BottomActionPanel bottomActionPanel = new BottomActionPanel(Constants.CANCEL, e -> onCancel(),
-				Constants.TO_RECORD, e -> onOk());
+		setModal(true);
 
+		pack();
+		setLocationRelativeTo(parentComponent);
+	}
+
+	private void initComponents() {
+		initFieldsPanel();
+
+		setupBottomActionPanel();
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(Alignment.LEADING,
 				groupLayout.createSequentialGroup().addContainerGap()
@@ -50,13 +72,6 @@ public class ProductionRegistationUi extends JDialog {
 						.addContainerGap()));
 
 		getContentPane().setLayout(groupLayout);
-
-		pack();
-		setLocationRelativeTo(pareComponent);
-	}
-
-	private void initComponents() {
-		initFieldsPanel();
 	}
 
 	private void initFieldsPanel() {
@@ -153,6 +168,6 @@ public class ProductionRegistationUi extends JDialog {
 	}
 
 	private void onOk() {
-
+		
 	}
 }

@@ -4,8 +4,10 @@ public interface Constants {
 	String APP_NAME = "Gestão de produção";
 	String CANCEL = "Cancelar";
 	String TO_RECORD = "Gravar";
+	String UPDATE = "Atualizar";
 	String OK = "OK";
 	String NAME = "Nome";
+	String ID = "id";
 	String UNITARY_PRICE = "Preço Unitário";
 	String UNITY = "Unidade";
 	String PRODUCT = "Produto";
@@ -67,4 +69,23 @@ public interface Constants {
 	String UNIT_SIZE = "Tamanho da unidade";
 	String ADD = "Adicionar";
 	String PRODUCTION_INPUTS_SIZE_MESSAGE = "A quantidade de insumo é por tamanho de cada unidade do produto";
+	String PERSISTENCE_ERROR = "Erro de armazenamento";
+	String UNABLE_TO_OPEN_FILE = "Falha ao abrir arquivo";
+	String RECORD_SUCCESSFULY_INSERTED = "Registro inserido com sucesso";
+	String PRODUCT_ALREADY_REGISTERED = "Produto já cadastrado.";
+	String DO_YOU_WANT_TO_UPDATE_WITH_INFORMED_VALUES ="Deseja atualizar com os dados informados?";
+	String RECORD_SUCCESSFULY_UPDATED = "Registro atualizado com sucesso";
+	String UNIT_OF_MEASUREMENT = "Unidade de medida";
+	String FAILED_TO_UPDATE_RECORD = "Falha ao atualizar registro";
+	String FAILED_TO_INSERT_RECORD = "Falha ao inserir registro";
+	String NAME_IS_TO_SHORT = "Nome muito curto";
+	String NAME_CANNOT_BE_BLANK = "Nome não pode ser em branco";
+	String FAILED_TO_FETCH_DATA = "Falha ao recuperar dados";
+	String PRODUCT_LISTING = "Listagem de produtos";
+	String FILTERS = "Filtros";
+	String FETCH = "Buscar";
+	String EDIT = "Editar";
+	String LISTING = "Listagem";
+	String INPUTS_LISTING = "Listagem de insumos";
+	String INPUT_DATA = "Dados do insumo";
 }

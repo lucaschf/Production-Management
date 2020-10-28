@@ -45,11 +45,11 @@ public class DashboardUi extends JFrame {
 		mnRegister.add(mntmRegisterProduct);
 
 		JMenuItem mntmRegisterProduction = new JMenuItem(Constants.PRODUCTION);
-		mntmRegisterProduction.addActionListener(e -> new ProductionRegistationUi(this).setVisible(true));
+		mntmRegisterProduction.addActionListener(e -> new ProductionRegistrationUi(this).setVisible(true));
 		mnRegister.add(mntmRegisterProduction);
-		
+
 		JMenuItem mntmRegisterProductionInputs = new JMenuItem(Constants.PRODUCTION_INPUTS);
-		mntmRegisterProductionInputs.addActionListener(e -> new ProductionInputsRegistrationUi(this).setVisible(true));
+		mntmRegisterProductionInputs.addActionListener(e -> new InputsRegistrationUi(this).setVisible(true));
 		mnRegister.add(mntmRegisterProductionInputs);
 
 		JMenu mnOrder = new JMenu(Constants.ORDERS);
@@ -70,12 +70,20 @@ public class DashboardUi extends JFrame {
 		mntmSalesReport.addActionListener(e -> new SalesReportUi(this).setVisible(true));
 		mnReport.add(mntmSalesReport);
 
-		JMenu mnBudget = new JMenu(Constants.CONSULTATIONS);
-		menuBar.add(mnBudget);
+		JMenu mnConsultations = new JMenu(Constants.CONSULTATIONS);
+		menuBar.add(mnConsultations);
 
-		JMenuItem mntmConsultations = new JMenuItem(Constants.BUDGET);
-		mntmConsultations.addActionListener(e -> new BudgetUi(this).setVisible(true));
-		mnBudget.add(mntmConsultations);
+		JMenuItem mntmBudget = new JMenuItem(Constants.BUDGET);
+		mntmBudget.addActionListener(e -> new BudgetUi(this).setVisible(true));
+		mnConsultations.add(mntmBudget);
+
+		JMenuItem mntmProducts = new JMenuItem(Constants.PRODUCT);
+		mntmProducts.addActionListener(e -> new ProductListUI(this).setVisible(true));
+		mnConsultations.add(mntmProducts);
+		
+		JMenuItem mntmConsultationInputs= new JMenuItem(Constants.PRODUCTION_INPUTS);
+		mntmConsultationInputs.addActionListener(e -> new InputsListUI(this).setVisible(true));
+		mnConsultations.add(mntmConsultationInputs);
 
 		JMenu mnSettings = new JMenu(Constants.SETTINGS);
 		menuBar.add(mnSettings);

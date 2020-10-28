@@ -1,6 +1,21 @@
 package tsi.too.ui;
 
+import static tsi.too.Constants.DO_YOU_WANT_TO_UPDATE_WITH_INFORMED_VALUES;
+import static tsi.too.Constants.FAILED_TO_INSERT_RECORD;
+import static tsi.too.Constants.FAILED_TO_UPDATE_RECORD;
+import static tsi.too.Constants.PRODUCT_ALREADY_REGISTERED;
+import static tsi.too.Constants.PRODUCT_REGISTRATION;
+import static tsi.too.Constants.RECORD_SUCCESSFULY_INSERTED;
+import static tsi.too.Constants.RECORD_SUCCESSFULY_UPDATED;
+import static tsi.too.Constants.REGISTER_PRODUCTION_INPUTS;
+import static tsi.too.Constants.TO_RECORD;
+import static tsi.too.Constants.UPDATE;
+
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -19,7 +34,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import tsi.too.Constants;
+import tsi.too.controller.ProductController;
+import tsi.too.io.MessageDialog;
 import tsi.too.model.MeasureUnity;
+import tsi.too.model.Product;
+import tsi.too.util.Pair;
 
 @SuppressWarnings("serial")
 public class ProductRegistrationUi extends JDialog {
@@ -29,14 +48,48 @@ public class ProductRegistrationUi extends JDialog {
 	private JLabel lblName;
 	private JButton btnRegisterInputs;
 	private JSpinner spProfitmargin;
+	private BottomActionPanel bottomActionPanel;
 
+	private ProductController productController;
+
+	Component parentComponent;
+	Product product;
+
+	/**
+	 * @wbp.parser.constructor
+	 */
 	public ProductRegistrationUi(Component parentComponent) {
-		setTitle(Constants.PRODUCT_REGISTRATION);
+		this(parentComponent, null);
+	}
+
+	public ProductRegistrationUi(Component parentComponent, Product product) {
+		this.product = product == null ? null : product.clone();
+		this.parentComponent = parentComponent;
+
+		setupWindow();
+		fillFields();
+	}
+
+	private void setupWindow() {
+		initController();
+
+		setTitle(PRODUCT_REGISTRATION);
 		initComponents();
-		pack();
 		setResizable(false);
 		setModal(true);
+
+		pack();
+
 		setLocationRelativeTo(parentComponent);
+	}
+
+	private void initController() {
+		try {
+			productController = ProductController.getInstance();
+		} catch (FileNotFoundException e) {
+			MessageDialog.showAlertDialog(parentComponent, PRODUCT_REGISTRATION, Constants.UNABLE_TO_OPEN_FILE);
+			dispose();
+		}
 	}
 
 	private void initComponents() {
@@ -45,8 +98,7 @@ public class ProductRegistrationUi extends JDialog {
 	}
 
 	private void initContentGroupLayout() {
-		BottomActionPanel bottomActionPanel = new BottomActionPanel(Constants.CANCEL, e -> onCancel(),
-				Constants.TO_RECORD, e -> registerProduct());
+		setupBottomPanel();
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(groupLayout
 				.createSequentialGroup()
@@ -64,6 +116,12 @@ public class ProductRegistrationUi extends JDialog {
 						.addContainerGap()));
 
 		getContentPane().setLayout(groupLayout);
+	}
+
+	private void setupBottomPanel() {
+		var positiveText = product == null ? TO_RECORD : UPDATE;
+
+		bottomActionPanel = new BottomActionPanel(Constants.CANCEL, e -> onCancel(), positiveText, e -> onOk(e));
 	}
 
 	private void initFieldsPanel() {
@@ -89,8 +147,7 @@ public class ProductRegistrationUi extends JDialog {
 		lblProfitMargin.setLabelFor(spProfitmargin);
 		spProfitmargin.setModel(new SpinnerNumberModel(0.0, 0.0, 100.0, 1.0));
 
-		btnRegisterInputs = new JButton(Constants.REGISTER_PRODUCTION_INPUTS);
-		enableInputsButton();
+		initBtnInputRegistration();
 
 		GroupLayout gl_panel = new GroupLayout(fieldsPanel);
 		gl_panel.setHorizontalGroup(gl_panel.createParallelGroup(Alignment.LEADING)
@@ -132,13 +189,24 @@ public class ProductRegistrationUi extends JDialog {
 		fieldsPanel.setLayout(gl_panel);
 	}
 
+	private void initBtnInputRegistration() {
+		btnRegisterInputs = new JButton(REGISTER_PRODUCTION_INPUTS);
+		enableInputsButton();
+		btnRegisterInputs.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (product != null)
+					registerInputs(product);
+			}
+		});
+	}
+
 	private void setupNameTextField() {
 		tfName = new JTextField();
 		lblName.setLabelFor(tfName);
 		tfName.setColumns(10);
 
 		tfName.getDocument().addDocumentListener(new DocumentListener() {
-
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 				enableInputsButton();
@@ -164,8 +232,99 @@ public class ProductRegistrationUi extends JDialog {
 		dispose();
 	}
 
-	private void registerProduct() {
+	private void onOk(ActionEvent actionEvent) {
+		var name = tfName.getText();
+		var profitMargin = (double) spProfitmargin.getValue();
+		if (!productController.productNameValidator.isValid(name)) {
+			MessageDialog.showAlertDialog(this, getTitle(),
+					productController.productNameValidator.getErrorMessage(name));
+			return;
+		}
 		
+		if(profitMargin == 0) {
+			if(!MessageDialog.showConfirmationDialog(this, getTitle(), "Deseja registrar o produto sem margem de lucro?"))
+			{
+				spProfitmargin.requestFocus();
+				return;
+			}
+		}
+		
+		try {
+			var p = new Product(0, tfName.getText(), (MeasureUnity) cbUnity.getSelectedItem(),
+					(Double) spProfitmargin.getValue());
+
+			var target = productController.findByName(p.getName());
+
+			switch (actionEvent.getActionCommand()) {
+				case UPDATE:
+					update(p.withId(product.getId()), target);
+					break;
+				case TO_RECORD:
+					addProduct(p, target);
+					break;
+				default:
+					break;
+			}
+		} catch (IOException e) {
+			var message = actionEvent.getActionCommand() == UPDATE ? FAILED_TO_UPDATE_RECORD : FAILED_TO_INSERT_RECORD;
+			MessageDialog.showAlertDialog(this, getTitle(), message);
+		}
 	}
 
+	private void addProduct(Product p, Pair<Product, Long> target) {
+		try {
+			if (target == null) {
+				productController.insert(p);
+
+				if (MessageDialog.showConfirmationDialog(this, PRODUCT_REGISTRATION,
+						String.format("%s\n%s?", RECORD_SUCCESSFULY_INSERTED, REGISTER_PRODUCTION_INPUTS)))
+					registerInputs(p);
+				resetForm();
+			} else if (MessageDialog.showConfirmationDialog(this, PRODUCT_REGISTRATION,
+					String.format("%s\n%s", PRODUCT_ALREADY_REGISTERED, DO_YOU_WANT_TO_UPDATE_WITH_INFORMED_VALUES)))
+				update(p.withId(product.getId()), target);
+		} catch (IOException e) {
+			MessageDialog.showAlertDialog(this, UPDATE, FAILED_TO_INSERT_RECORD);
+		}
+	}
+
+	private void registerInputs(Product p) {
+		new ProductionInputsAssociationUi(this, p).setVisible(true);
+	}
+
+	private void update(Product p, Pair<Product, Long> target) {
+		try {
+			if (target == null)
+				target = productController.findByName(product.getName());
+
+			if (target.getFirst().getId() != p.getId()) {
+				MessageDialog.showAlertDialog(this, UPDATE, PRODUCT_ALREADY_REGISTERED);
+				return;
+			}
+
+			productController.update(target.getSecond(), p);
+			MessageDialog.showInformationDialog(this, PRODUCT_REGISTRATION, RECORD_SUCCESSFULY_UPDATED);
+			resetForm();
+			
+		} catch (IOException | NullPointerException e) {
+			MessageDialog.showAlertDialog(this, UPDATE, FAILED_TO_UPDATE_RECORD);
+		}
+	}
+
+	private void resetForm() {
+		tfName.setText("");
+		cbUnity.setSelectedIndex(0);
+		spProfitmargin.setValue(0.0);
+		bottomActionPanel.setPositiveText(TO_RECORD);
+		product = null;
+	}
+
+	private void fillFields() {
+		if (product == null)
+			return;
+
+		tfName.setText(product.getName());
+		cbUnity.setSelectedItem(product.getMeasureUnity());
+		spProfitmargin.setValue(product.getPercentageProfitMargin());
+	}
 }

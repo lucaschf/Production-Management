@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Product {
+public class Product implements Cloneable {
 	public static final int MAX_NAME_LENGTH = 50;
 
 	private long id;
@@ -12,7 +12,7 @@ public class Product {
 	private MeasureUnity measureUnity;
 	private double percentageProfitMargin;
 
-	private ArrayList<ProductionInput> productionInputs = new ArrayList<>();
+	private ArrayList<Input> productionInputs = new ArrayList<>();
 
 	public Product(long id, String name, MeasureUnity measureUnity, double percentageProfitMargin) {
 		super();
@@ -22,18 +22,18 @@ public class Product {
 		this.percentageProfitMargin = percentageProfitMargin;
 	}
 
-	public boolean addProductionInput(ProductionInput productionInput) throws IllegalArgumentException {
+	public boolean addProductionInput(Input productionInput) throws IllegalArgumentException {
 		if (productionInput == null)
 			throw new IllegalArgumentException();
 
 		return productionInputs.add(productionInput);
 	}
 
-	public List<ProductionInput> getProductionInputs() {
+	public List<Input> getProductionInputs() {
 		return productionInputs.stream().map(pi -> pi.clone()).collect(Collectors.toList());
 	}
 
-	public long getCode() {
+	public long getId() {
 		return id;
 	}
 
@@ -72,10 +72,21 @@ public class Product {
 		return productionInputs.stream().mapToDouble(pi -> pi.getPriceForQuantity()).sum();
 	}
 
+	public Product withId(long id) {
+		var p = clone();
+		p.id = id;
+
+		return p;
+	}
+
+	@Override
+	public Product clone() {
+		return new Product(id, name, measureUnity, percentageProfitMargin);
+	}
+
 	@Override
 	public String toString() {
-		return String.format(
-				"Product {code= %d, name= %s, measureUnity= %s, percentageProfitMargin= %1.2f, productionInputs= %s}",
-				id, name, measureUnity, percentageProfitMargin, productionInputs);
+		return name; // used for combobox
 	}
+
 }

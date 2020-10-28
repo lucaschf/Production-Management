@@ -46,4 +46,9 @@ public class BottomActionPanel extends JPanel {
 	public void setPositiveButtonMnemonic(char c) {
 		btnPositive.setMnemonic(c);
 	}
+	
+	public void setPositiveText(String text) {
+		btnPositive.setText(text);
+		setPositiveButtonMnemonic(text.charAt(0));
+	}
 }
