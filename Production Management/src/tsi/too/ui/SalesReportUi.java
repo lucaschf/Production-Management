@@ -15,7 +15,6 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.TitledBorder;
 
 import tsi.too.Constants;
-import java.awt.Toolkit;
 
 @SuppressWarnings("serial")
 public class SalesReportUi extends JDialog {

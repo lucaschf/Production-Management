@@ -1,30 +1,19 @@
 package tsi.too.ui.table_model;
 
-import java.util.Collection;
+import java.util.Objects;
 import java.util.Vector;
-
-import javax.swing.table.DefaultTableModel;
 
 import tsi.too.Constants;
 import tsi.too.model.MeasureUnity;
 import tsi.too.model.Product;
 
 @SuppressWarnings("serial")
-public class ProductTableModel2 extends DefaultTableModel {
+public class ProductTableModel extends CustomTableModel<Product>{
 	public static final String[] COLUMN_NAMES = { Constants.ID, Constants.NAME, Constants.UNIT_OF_MEASUREMENT,
 			Constants.PROFIT_MARGIN };
 
-	public ProductTableModel2() {
+	public ProductTableModel() {
 		super(COLUMN_NAMES, 0);
-	}
-
-	@Override
-	public Class<?> getColumnClass(int columnIndex) {
-		if (getRowCount() > 0 && getValueAt(0, columnIndex) != null) {
-			return getValueAt(0, columnIndex).getClass();
-		}
-
-		return super.getColumnClass(columnIndex);
 	}
 
 	@Override
@@ -32,10 +21,9 @@ public class ProductTableModel2 extends DefaultTableModel {
 		return false;
 	}
 
+	@Override
 	public void addRow(Product item) {
-		if (item == null) {
-			throw new IllegalArgumentException("item cannot be null");
-		}
+		Objects.requireNonNull(item);
 
 		Vector<Object> rowVector = new Vector<>();
 
@@ -46,16 +34,8 @@ public class ProductTableModel2 extends DefaultTableModel {
 
 		super.addRow(rowVector);
 	}
-
-	public void addRows(Collection<Product> items) {
-		items.forEach(i -> addRow(i));
-	}
-
-	public void clear() {
-		while (getRowCount() > 0)
-			removeRow(0);
-	}
-
+	
+	@Override
 	public Product getValueAt(int row) {
 		try {
 			var rowData = getDataVector().elementAt(row);

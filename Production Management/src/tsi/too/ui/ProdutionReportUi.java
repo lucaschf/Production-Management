@@ -16,7 +16,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import tsi.too.Constants;
-import java.awt.Toolkit;
 
 @SuppressWarnings("serial")
 public class ProdutionReportUi extends JDialog {

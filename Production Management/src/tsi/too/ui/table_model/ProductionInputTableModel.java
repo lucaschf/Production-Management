@@ -1,9 +1,7 @@
 package tsi.too.ui.table_model;
 
-import java.util.Collection;
+import java.util.Objects;
 import java.util.Vector;
-
-import javax.swing.table.DefaultTableModel;
 
 import tsi.too.Constants;
 import tsi.too.ext.NumberExt;
@@ -11,7 +9,7 @@ import tsi.too.ext.StringExt;
 import tsi.too.model.Input;
 
 @SuppressWarnings("serial")
-public class ProductionInputTableModel extends DefaultTableModel {
+public class ProductionInputTableModel extends CustomTableModel<Input> {
 	public static final String[] COLUMN_NAMES = { Constants.NAME, Constants.QUANTITY, Constants.UNITARY_PRICE };
 
 	public ProductionInputTableModel() {
@@ -19,23 +17,13 @@ public class ProductionInputTableModel extends DefaultTableModel {
 	}
 
 	@Override
-	public Class<?> getColumnClass(int columnIndex) {
-		if (getRowCount() > 0 && getValueAt(0, columnIndex) != null) {
-			return getValueAt(0, columnIndex).getClass();
-		}
-
-		return super.getColumnClass(columnIndex);
-	}
-
-	@Override
 	public boolean isCellEditable(int row, int column) {
 		return false;
 	}
 
+	@Override
 	public void addRow(Input item) {
-		if (item == null) {
-			throw new IllegalArgumentException("item cannot be null");
-		}
+		Objects.requireNonNull(item);
 
 		Vector<Object> rowVector = new Vector<>();
 
@@ -46,6 +34,7 @@ public class ProductionInputTableModel extends DefaultTableModel {
 		super.addRow(rowVector);
 	}
 
+	@Override
 	public Input getValueAt(int row) {
 		try {
 			var rowData = getDataVector().elementAt(row);
@@ -58,14 +47,5 @@ public class ProductionInputTableModel extends DefaultTableModel {
 		} catch (Exception e) {
 			return null;
 		}
-	}
-
-	public void addRows(Collection<Input> items) {
-		items.forEach(i -> addRow(i));
-	}
-
-	public void clear() {
-		while (getRowCount() > 0)
-			removeRow(0);
-	}
+	}	
 }

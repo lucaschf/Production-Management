@@ -27,7 +27,7 @@ import tsi.too.controller.ProductController;
 import tsi.too.io.MessageDialog;
 import tsi.too.model.Product;
 import tsi.too.ui.helper.TableMouseListener;
-import tsi.too.ui.table_model.ProductTableModel2;
+import tsi.too.ui.table_model.ProductTableModel;
 
 @SuppressWarnings("serial")
 public class ProductListUI extends JFrame {
@@ -36,7 +36,7 @@ public class ProductListUI extends JFrame {
 	private JButton btnFilter;
 
 	private final TableRowSorter<AbstractTableModel> sorter = new TableRowSorter<AbstractTableModel>();
-	private final ProductTableModel2 tableModel = new ProductTableModel2();
+	private final ProductTableModel tableModel = new ProductTableModel();
 	
 	private Component parentComponent;
 	private ProductController controler;
