@@ -3,7 +3,7 @@ package tsi.too.ui;
 import static tsi.too.Constants.DO_YOU_WANT_TO_UPDATE_WITH_INFORMED_VALUES;
 import static tsi.too.Constants.FAILED_TO_INSERT_RECORD;
 import static tsi.too.Constants.FAILED_TO_UPDATE_RECORD;
-import static tsi.too.Constants.PRODUCT_ALREADY_REGISTERED;
+import static tsi.too.Constants.AN_ITEM_WITH_THIS_NAME_ALREADY_REGISTERED;
 import static tsi.too.Constants.PRODUCT_REGISTRATION;
 import static tsi.too.Constants.RECORD_SUCCESSFULY_INSERTED;
 import static tsi.too.Constants.RECORD_SUCCESSFULY_UPDATED;
@@ -56,6 +56,7 @@ public class ProductRegistrationUi extends JDialog {
 	Product product;
 
 	/**
+	 * @param parentComponent 
 	 * @wbp.parser.constructor
 	 */
 	public ProductRegistrationUi(Component parentComponent) {
@@ -281,8 +282,8 @@ public class ProductRegistrationUi extends JDialog {
 					registerInputs(p);
 				resetForm();
 			} else if (MessageDialog.showConfirmationDialog(this, PRODUCT_REGISTRATION,
-					String.format("%s\n%s", PRODUCT_ALREADY_REGISTERED, DO_YOU_WANT_TO_UPDATE_WITH_INFORMED_VALUES)))
-				update(p.withId(product.getId()), target);
+					String.format("%s\n%s", AN_ITEM_WITH_THIS_NAME_ALREADY_REGISTERED, DO_YOU_WANT_TO_UPDATE_WITH_INFORMED_VALUES)))
+				update(p.withId(target.getFirst().getId()), target);
 		} catch (IOException e) {
 			MessageDialog.showAlertDialog(this, UPDATE, FAILED_TO_INSERT_RECORD);
 		}
@@ -298,7 +299,7 @@ public class ProductRegistrationUi extends JDialog {
 				target = productController.findByName(product.getName());
 
 			if (target.getFirst().getId() != p.getId()) {
-				MessageDialog.showAlertDialog(this, UPDATE, PRODUCT_ALREADY_REGISTERED);
+				MessageDialog.showAlertDialog(this, UPDATE, AN_ITEM_WITH_THIS_NAME_ALREADY_REGISTERED);
 				return;
 			}
 

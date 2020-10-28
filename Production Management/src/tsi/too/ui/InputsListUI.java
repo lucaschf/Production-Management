@@ -20,10 +20,11 @@ import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
 import tsi.too.Constants;
-import tsi.too.controller.InputsController;
+import tsi.too.controller.InputController;
 import tsi.too.io.MessageDialog;
 import tsi.too.model.Input;
 import tsi.too.ui.helper.TableMouseListener;
@@ -37,25 +38,25 @@ public class InputsListUI extends JFrame {
 
 	private final TableRowSorter<AbstractTableModel> sorter = new TableRowSorter<AbstractTableModel>();
 	private final ProductionInputTableModel tableModel = new ProductionInputTableModel();
-	
+
 	private Component parentComponent;
-	private InputsController controler;
-	
+	private InputController controler;
+
 	public InputsListUI(Component parentComponent) {
 		this.parentComponent = parentComponent;
 		setTitle(Constants.INPUTS_LISTING);
-		
+
 		initComponent();
 		setupWindow();
-		
+
 		initController();
 		fetchData();
 	}
-	
+
 	private void initComponent() {
 		JPanel productPanel = new JPanel();
 		productPanel.setBorder(
-				new TitledBorder(null, Constants.PRODUCT, TitledBorder.LEADING, TitledBorder.TOP, null, null));
+				new TitledBorder(null, Constants.PRODUCTION_INPUTS, TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(null, Constants.FILTERS, TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -83,7 +84,7 @@ public class InputsListUI extends JFrame {
 
 		btnFilter = new JButton(Constants.FETCH);
 		btnFilter.addActionListener(e -> filterData());
-		
+
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 				gl_panel.createParallelGroup(Alignment.TRAILING)
@@ -115,7 +116,6 @@ public class InputsListUI extends JFrame {
 				.addGroup(gl_productPanel.createSequentialGroup().addContainerGap()
 						.addComponent(scroll, GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE).addContainerGap()));
 
-		
 		productPanel.setLayout(gl_productPanel);
 		getContentPane().setLayout(groupLayout);
 	}
@@ -124,30 +124,39 @@ public class InputsListUI extends JFrame {
 		tbinputs = new JTable();
 		tbinputs.setModel(tableModel);
 		tbinputs.addMouseListener(new TableMouseListener(tbinputs));
+		tbinputs.removeColumn(tbinputs.getColumnModel().getColumn(2));
 		tbinputs.removeColumn(tbinputs.getColumnModel().getColumn(1));
+
+		DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) tbinputs.getTableHeader().getDefaultRenderer();
+		renderer.setHorizontalAlignment(JLabel.LEADING);
 		
 		setupPopupMenu();
 	}
-	
+
 	private void setupPopupMenu() {
 		final JPopupMenu popupMenu = new JPopupMenu();
-		
+
 		JMenuItem editItem = new JMenuItem(Constants.EDIT);
 		editItem.addActionListener(e -> edit());
 		popupMenu.add(editItem);
+		
+		JMenuItem checkInItem = new JMenuItem(Constants.CHECK_IN);
+		checkInItem.addActionListener(e -> checkIn());
+		popupMenu.add(checkInItem);
 
 		tbinputs.setComponentPopupMenu(popupMenu);
 	}
+
 
 	private void setupWindow() {
 		pack();
 		setLocationRelativeTo(parentComponent);
 	}
-	
+
 	private void initController() {
 		try {
-			controler = InputsController.getInstance();
-		}catch (Exception e) {
+			controler = InputController.getInstance();
+		} catch (Exception e) {
 			MessageDialog.showAlertDialog(parentComponent, getTitle(), Constants.FAILED_TO_FETCH_DATA);
 			dispose();
 		}
@@ -155,6 +164,7 @@ public class InputsListUI extends JFrame {
 
 	private void filterData() {
 		String text = tfName.getText().trim();
+		
 		try {
 			tbinputs.setRowSorter(sorter);
 			sorter.setRowFilter(RowFilter.regexFilter(text, 0));
@@ -179,6 +189,12 @@ public class InputsListUI extends JFrame {
 	}
 
 	private void edit() {
-		
+		new InputsRegistrationUi(this, getSelectedItem()).setVisible(true);
+		fetchData();
+		filterData();
+	}
+
+	private void checkIn() {
+		// TODO
 	}
 }

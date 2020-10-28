@@ -1,5 +1,7 @@
 package tsi.too;
 
+import javax.swing.Icon;
+
 public interface Constants {
 	String APP_NAME = "Gestão de produção";
 	String CANCEL = "Cancelar";
@@ -72,7 +74,7 @@ public interface Constants {
 	String PERSISTENCE_ERROR = "Erro de armazenamento";
 	String UNABLE_TO_OPEN_FILE = "Falha ao abrir arquivo";
 	String RECORD_SUCCESSFULY_INSERTED = "Registro inserido com sucesso";
-	String PRODUCT_ALREADY_REGISTERED = "Produto já cadastrado.";
+	String AN_ITEM_WITH_THIS_NAME_ALREADY_REGISTERED = "Um item com esse nome já foi cadastrado.";
 	String DO_YOU_WANT_TO_UPDATE_WITH_INFORMED_VALUES ="Deseja atualizar com os dados informados?";
 	String RECORD_SUCCESSFULY_UPDATED = "Registro atualizado com sucesso";
 	String UNIT_OF_MEASUREMENT = "Unidade de medida";
@@ -88,4 +90,5 @@ public interface Constants {
 	String LISTING = "Listagem";
 	String INPUTS_LISTING = "Listagem de insumos";
 	String INPUT_DATA = "Dados do insumo";
+	String CHECK_IN = "Dar entrada";
 }

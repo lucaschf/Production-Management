@@ -16,6 +16,10 @@ public class Input implements Cloneable {
 		this.price = price;
 	}
 
+	public Input(String name) {
+		this(name,  0, 0);
+	}
+	
 	public Input(String name, int quantity, double price) {
 		super();
 		this.name = name;
@@ -61,7 +65,7 @@ public class Input implements Cloneable {
 	}
 
 	@Override
-	protected Input clone() {
+	public Input clone() {
 		return new Input(name, quantity, id, price);
 	}
 

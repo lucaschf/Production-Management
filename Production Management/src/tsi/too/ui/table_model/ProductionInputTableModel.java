@@ -8,7 +8,6 @@ import javax.swing.table.DefaultTableModel;
 import tsi.too.Constants;
 import tsi.too.ext.NumberExt;
 import tsi.too.ext.StringExt;
-import tsi.too.model.Product;
 import tsi.too.model.Input;
 
 @SuppressWarnings("serial")
@@ -26,6 +25,11 @@ public class ProductionInputTableModel extends DefaultTableModel {
 		}
 
 		return super.getColumnClass(columnIndex);
+	}
+
+	@Override
+	public boolean isCellEditable(int row, int column) {
+		return false;
 	}
 
 	public void addRow(Input item) {
@@ -55,13 +59,13 @@ public class ProductionInputTableModel extends DefaultTableModel {
 			return null;
 		}
 	}
-	
+
 	public void addRows(Collection<Input> items) {
 		items.forEach(i -> addRow(i));
 	}
-	
+
 	public void clear() {
-		while(getRowCount() > 0)
+		while (getRowCount() > 0)
 			removeRow(0);
 	}
 }
