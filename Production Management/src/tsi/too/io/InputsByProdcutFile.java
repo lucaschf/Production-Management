@@ -8,22 +8,22 @@ import java.util.List;
 import tsi.too.model.ProductInputRelation;
 import tsi.too.util.Pair;
 
-public class ProductInputsRelationFile extends BinaryFile<ProductInputRelation> {
+public class InputsByProdcutFile extends BinaryFile<ProductInputRelation> {
 
 	private static final String NAME = "ProductInputsRelation.dat";
 
-	private static ProductInputsRelationFile instance;
+	private static InputsByProdcutFile instance;
 
-	public static ProductInputsRelationFile getInstance() throws FileNotFoundException {
-		synchronized (ProductInputsRelationFile.class) {
+	public static InputsByProdcutFile getInstance() throws FileNotFoundException {
+		synchronized (InputsByProdcutFile.class) {
 			if (instance == null)
-				instance = new ProductInputsRelationFile();
+				instance = new InputsByProdcutFile();
 
 			return instance;
 		}
 	}
 
-	public ProductInputsRelationFile() throws FileNotFoundException {
+	public InputsByProdcutFile() throws FileNotFoundException {
 		openFile(NAME, OpenMode.READ_WRITE);
 	}
 
@@ -50,7 +50,7 @@ public class ProductInputsRelationFile extends BinaryFile<ProductInputRelation> 
 		seekRecord(0);
 
 		for (long i = 0; i < recordSize(); i++) {
-			item = read(i);
+			item = read();
 
 			if (item.getProductId() == productId)
 				items.add(item);
@@ -73,7 +73,6 @@ public class ProductInputsRelationFile extends BinaryFile<ProductInputRelation> 
 	}
 	
 	public void updateQuantity(ProductInputRelation p) {
-		
-		
+			
 	}
 }

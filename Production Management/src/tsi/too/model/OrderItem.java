@@ -25,11 +25,11 @@ public class OrderItem {
 	}
 	
 	public double getPriceForQuantity() {
-		return quantity * product.getPrice();
+		return quantity * product.getManufacturingCost();
 	}
 	
 	public double getUnitaryPrice() {
-		return product.getPrice();
+		return product.getManufacturingCost();
 	}
 	
 	@Override

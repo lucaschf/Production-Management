@@ -111,12 +111,12 @@ public class InputsRegistrationUi extends JDialog {
 		}
 
 		try {
-			var item = new Input(name).withId(input.getId());
+			var item = new Input(name);
 			var target = inputController.findByName(name);
 
 			switch (actionEvent.getActionCommand()) {
 				case UPDATE:
-					update(item, target);
+					update(item.withId(input.getId()), target);
 					break;
 				case TO_RECORD:
 					addProduct(item, target);

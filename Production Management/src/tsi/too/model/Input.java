@@ -57,11 +57,11 @@ public class Input implements Cloneable {
 
 	public long getId() {
 		return id;
-	}
+	}	
 
 	@Override
 	public String toString() {
-		return String.format("ProductionInputs {name= %s, quantity= %d, price= %1.2f}", name, quantity, price);
+		return String.format("Input {name= %s, quantity= %d, id= %d, price= %f}", name, quantity, id, price);
 	}
 
 	@Override
@@ -73,6 +73,8 @@ public class Input implements Cloneable {
 		var p = clone();
 		p.id = id;
 
+		System.out.println(p);
+		
 		return p;
 	}
 }

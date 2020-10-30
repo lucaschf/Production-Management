@@ -10,7 +10,7 @@ import tsi.too.model.Input;
 
 @SuppressWarnings("serial")
 public class ProductionInputTableModel extends CustomTableModel<Input> {
-	public static final String[] COLUMN_NAMES = { Constants.NAME, Constants.QUANTITY, Constants.UNITARY_PRICE };
+	public static final String[] COLUMN_NAMES = {Constants.ID, Constants.NAME, Constants.QUANTITY, Constants.UNITARY_PRICE };
 
 	public ProductionInputTableModel() {
 		super(COLUMN_NAMES, 0);
@@ -23,15 +23,20 @@ public class ProductionInputTableModel extends CustomTableModel<Input> {
 
 	@Override
 	public void addRow(Input item) {
+		super.addRow(createRow(item));
+	}
+	
+	protected Vector<Object> createRow(Input item){
 		Objects.requireNonNull(item);
 
 		Vector<Object> rowVector = new Vector<>();
 
+		rowVector.add(item.getId());
 		rowVector.add(item.getName());
 		rowVector.add(item.getQuantity());
 		rowVector.add(NumberExt.toBrazilianCurrency(item.getPrice()));
-
-		super.addRow(rowVector);
+		
+		return rowVector;
 	}
 
 	@Override
@@ -39,11 +44,12 @@ public class ProductionInputTableModel extends CustomTableModel<Input> {
 		try {
 			var rowData = getDataVector().elementAt(row);
 
-			var productId = rowData.get(0).toString();
-			var quantity = StringExt.toInt(rowData.get(1).toString());
-			var inputsid = StringExt.fromBraziliaCurrencyString(rowData.get(2).toString()).doubleValue();
+			var productId = (long) rowData.get(0);
+			var name = (String) rowData.get(1);
+			var quantity = (int) rowData.get(2);
+			var inputsid = StringExt.fromBraziliaCurrencyString(rowData.get(3).toString()).doubleValue();
 
-			return new Input(productId, quantity, inputsid);
+			return new Input(name, quantity, productId, inputsid);
 		} catch (Exception e) {
 			return null;
 		}

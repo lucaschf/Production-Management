@@ -91,4 +91,20 @@ public interface Constants {
 	String INPUTS_LISTING = "Listagem de insumos";
 	String INPUT_DATA = "Dados do insumo";
 	String CHECK_IN = "Dar entrada";
+	String PRODUCT_DATA = "Dados do produto";
+	String LINK = "Vincular";
+	String UNLINK = "Desvincular";
+	String UNLINK_ALL = "Desvincular todos";
+	String LINKED = "Vinculado";
+	String NEW = "Novo";
+	String UNLINKED = "Desvinculado";
+	String LINKING_SUCCESS = "Vinculação realizada com sucesso";
+	String LINKING_FAILURE = "Vinculação finalizada com erros";
+	String UNLINKING_SUCCESS = "Desvinculação realizada com sucesso";
+	String UNLINKING_FAILURE = "Desvinculação finalizada com erros";
+	String THE_SELECTED_PRODUCT_HAS_NO_INPUTS_DO_YOU_WANT_TO_ASSOCIATE = "O produto selecionado não possui insumos relacionados à ele.\nDeseja associar agora?";
+	String EDIT_QUANTITY = "Alterar quantidade";
+	String QUANTITY_MUST_BE_GREATER_THAN_ZERO = "Quantidade deve ser maior que zero";
+	String QUANTITY_SUCCESSFUL_CHANGED = "Quantidade atualizada com sucesso";
+	String QUANTITY_CHANGE_FAILURE = "Falha ao atualizar quantidade";
 }

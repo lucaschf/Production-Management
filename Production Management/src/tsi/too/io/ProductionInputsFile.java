@@ -82,17 +82,6 @@ public class ProductionInputsFile extends BinaryFile<Input> {
 	}
 
 	public Pair<Input, Long> findByName(final String name) throws IOException {
-		seekRecord(0);
-		
-		Input input;
-		
-		for(long i = 0; i < countRecords(); i++) {
-			input = read();
-			
-			if(input.getName().equalsIgnoreCase(name))
-				return new Pair<Input, Long>(input, i);
-		}
-		
-		return null;
+		return fetch( p -> p.getName().equalsIgnoreCase(name));
 	}
 }

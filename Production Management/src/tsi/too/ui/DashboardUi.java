@@ -51,6 +51,10 @@ public class DashboardUi extends JFrame {
 		JMenuItem mntmRegisterProductionInputs = new JMenuItem(Constants.PRODUCTION_INPUTS);
 		mntmRegisterProductionInputs.addActionListener(e -> new InputsRegistrationUi(this).setVisible(true));
 		mnRegister.add(mntmRegisterProductionInputs);
+		
+		JMenuItem mntmAssociateProductInputs = new JMenuItem(Constants.PRODUCTION_INPUTS);
+		mntmAssociateProductInputs.addActionListener(e -> new AssociateInputToProdutUI(this).setVisible(true));
+		mnRegister.add(mntmAssociateProductInputs);
 
 		JMenu mnOrder = new JMenu(Constants.ORDERS);
 		menuBar.add(mnOrder);

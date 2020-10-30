@@ -1,7 +1,9 @@
 package tsi.too.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Product implements Cloneable {
@@ -22,11 +24,17 @@ public class Product implements Cloneable {
 		this.percentageProfitMargin = percentageProfitMargin;
 	}
 
-	public boolean addProductionInput(Input productionInput) throws IllegalArgumentException {
+	public boolean addProductionInput(Input productionInput) {
+		Objects.requireNonNull(productionInput);
+		
+		return productionInputs.add(productionInput.clone());
+	}
+	
+	public boolean addProductionInput(Collection<Input> productionInput) throws IllegalArgumentException {
 		if (productionInput == null)
 			throw new IllegalArgumentException();
 
-		return productionInputs.add(productionInput);
+		return productionInputs.addAll(productionInput.stream().map( input -> input.clone()).collect(Collectors.toList()));
 	}
 
 	public List<Input> getProductionInputs() {
@@ -68,7 +76,7 @@ public class Product implements Cloneable {
 		this.percentageProfitMargin = percentageProfitMargin;
 	}
 
-	public double getPrice() {
+	public double getManufacturingCost() {
 		return productionInputs.stream().mapToDouble(pi -> pi.getPriceForQuantity()).sum();
 	}
 

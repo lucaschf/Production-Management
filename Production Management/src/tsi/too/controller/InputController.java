@@ -16,7 +16,6 @@ public class InputController {
 	private static InputController instance;
 
 	public final InputValidator<String> nameValidator = new InputValidator<String>() {
-
 		@Override
 		public String getErrorMessage(String input) {
 			if (input.isBlank())
@@ -46,6 +45,10 @@ public class InputController {
 
 	public Pair<Input, Long> findByName(final String name) throws IOException {
 		return inputsFile.findByName(name);
+	}
+	
+	public Pair<Input, Long> findById(final long id) throws IOException {
+		return inputsFile.fetch(p -> p.getId() == id);
 	}
 
 	public void insert(Input p) throws IOException {

@@ -3,6 +3,7 @@ package tsi.too.controller;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Vector;
 
 import tsi.too.Constants;
 import tsi.too.io.ProductFile;
@@ -38,6 +39,10 @@ public class ProductController {
 
 	public List<Product> fetchProducts() throws IOException {
 		return productFile.readAllFile();
+	}
+	
+	public Vector<Product> fetchProductsAsVector() throws IOException {
+		return productFile.ReadAllFile();
 	}
 
 	public Pair<Product, Long> findByName(final String name) throws IOException {

@@ -1,5 +1,7 @@
 package tsi.too.io;
 
+import static tsi.too.Patterns.BRAZILIAN_DATE_TIME_PATTERN;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -8,13 +10,11 @@ import tsi.too.model.PriceEntry;
 
 public class PriceEntryFile extends BinaryFile<PriceEntry>{
 
-	private final String DATE_TIME_PATTERN = "dd/MM/yyyy HH:mm:ss";
-	
 	@Override
 	public int recordSize() {
 		return Double.BYTES
 				+ Long.BYTES
-				+ Character.BYTES * DATE_TIME_PATTERN.length();
+				+ Character.BYTES * BRAZILIAN_DATE_TIME_PATTERN.length();
 	}
 
 	@Override
@@ -30,12 +30,12 @@ public class PriceEntryFile extends BinaryFile<PriceEntry>{
 	}
 	
 	private void writeLocalDateTime(LocalDateTime date) throws IOException {
-		var target = date.format(DateTimeFormatter.ofPattern(DATE_TIME_PATTERN));
-		writeString(target, DATE_TIME_PATTERN.length());
+		var target = date.format(DateTimeFormatter.ofPattern(BRAZILIAN_DATE_TIME_PATTERN));
+		writeString(target, BRAZILIAN_DATE_TIME_PATTERN.length());
 	}
 	
 	private LocalDateTime readDateTime() throws IOException {
-		var strDate = readString(DATE_TIME_PATTERN.length());
-		return LocalDateTime.parse(strDate, DateTimeFormatter.ofPattern(DATE_TIME_PATTERN));
+		var strDate = readString(BRAZILIAN_DATE_TIME_PATTERN.length());
+		return LocalDateTime.parse(strDate, DateTimeFormatter.ofPattern(BRAZILIAN_DATE_TIME_PATTERN));
 	}
 }

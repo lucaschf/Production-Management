@@ -21,8 +21,8 @@ import javax.swing.border.TitledBorder;
 
 import tsi.too.Constants;
 import tsi.too.io.MessageDialog;
-import tsi.too.model.Product;
 import tsi.too.model.Input;
+import tsi.too.model.Product;
 import tsi.too.ui.table_model.ProductionInputTableModel;
 
 @SuppressWarnings("serial")
