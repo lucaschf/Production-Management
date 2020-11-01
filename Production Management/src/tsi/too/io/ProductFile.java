@@ -71,7 +71,7 @@ public class ProductFile extends BinaryFile<Product> {
 			product = read();
 			
 			if(product.getName().equalsIgnoreCase(name))
-				return new Pair<Product, Long>(product, i);
+				return new Pair<>(product, i);
 		}
 		
 		return null;

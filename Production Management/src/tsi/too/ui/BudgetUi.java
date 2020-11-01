@@ -158,7 +158,7 @@ public class BudgetUi extends JDialog {
 
 		JLabel lblMonth = new JLabel(String.format("%s:", Constants.MONTH));
 
-		JComboBox<Month> cbMonth = new JComboBox<Month>(Month.values());
+		JComboBox<Month> cbMonth = new JComboBox<>(Month.values());
 		lblMonth.setLabelFor(cbMonth);
 		GroupLayout gl_filterPanel = new GroupLayout(filterPanel);
 		gl_filterPanel.setHorizontalGroup(gl_filterPanel.createParallelGroup(Alignment.LEADING)

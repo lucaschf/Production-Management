@@ -1,15 +1,15 @@
 package tsi.too.controller;
 
+import tsi.too.Constants;
+import tsi.too.io.InputDialog.InputValidator;
+import tsi.too.io.ProductFile;
+import tsi.too.model.Product;
+import tsi.too.util.Pair;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
-
-import tsi.too.Constants;
-import tsi.too.io.ProductFile;
-import tsi.too.io.InputDialog.InputValidator;
-import tsi.too.model.Product;
-import tsi.too.util.Pair;
 
 public class ProductController {
 	ProductFile productFile;
@@ -42,7 +42,7 @@ public class ProductController {
 	}
 	
 	public Vector<Product> fetchProductsAsVector() throws IOException {
-		return productFile.ReadAllFile();
+		return productFile.readAllFileAsVector();
 	}
 
 	public Pair<Product, Long> findByName(final String name) throws IOException {

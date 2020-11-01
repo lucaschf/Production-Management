@@ -37,8 +37,40 @@ public class DashboardUi extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
+		menuBar.add(createRegistrationMenu());
+
+		menuBar.add(createOrdersMenu());
+		menuBar.add(createReportMenu());
+		menuBar.add(createConsultationMenu());
+		menuBar.add(createSettingsMenu());
+	}
+
+	private JMenu createOrdersMenu() {
+		JMenu mnOrder = new JMenu(Constants.ORDERS);
+
+		JMenuItem mntmPlaceOrder = new JMenuItem(Constants.NEW_ORDER);
+		mntmPlaceOrder.addActionListener(e -> new PlaceOrderUi(this).setVisible(true));
+		mnOrder.add(mntmPlaceOrder);
+		
+		return mnOrder;
+	}
+
+	private JMenu createReportMenu() {
+		JMenu mnReport = new JMenu(Constants.REPORTS);
+
+		JMenuItem mntmProductionReport = new JMenuItem(Constants.PRODUCTION);
+		mntmProductionReport.addActionListener(e -> new ProdutionReportUi(this).setVisible(true));
+		mnReport.add(mntmProductionReport);
+
+		JMenuItem mntmSalesReport = new JMenuItem(Constants.SALES);
+		mntmSalesReport.addActionListener(e -> new SalesReportUi(this).setVisible(true));
+		mnReport.add(mntmSalesReport);
+
+		return mnReport;
+	}
+
+	private JMenu createRegistrationMenu() {
 		JMenu mnRegister = new JMenu(Constants.REGISTRATION);
-		menuBar.add(mnRegister);
 
 		JMenuItem mntmRegisterProduct = new JMenuItem(Constants.PRODUCT);
 		mntmRegisterProduct.addActionListener(e -> new ProductRegistrationUi(this).setVisible(true));
@@ -51,31 +83,26 @@ public class DashboardUi extends JFrame {
 		JMenuItem mntmRegisterProductionInputs = new JMenuItem(Constants.PRODUCTION_INPUTS);
 		mntmRegisterProductionInputs.addActionListener(e -> new InputsRegistrationUi(this).setVisible(true));
 		mnRegister.add(mntmRegisterProductionInputs);
-		
+
 		JMenuItem mntmAssociateProductInputs = new JMenuItem(Constants.PRODUCTION_INPUTS);
-		mntmAssociateProductInputs.addActionListener(e -> new AssociateInputToProdutUI(this).setVisible(true));
+		mntmAssociateProductInputs.addActionListener(e -> new AssociateInputToProductUI(this).setVisible(true));
 		mnRegister.add(mntmAssociateProductInputs);
 
-		JMenu mnOrder = new JMenu(Constants.ORDERS);
-		menuBar.add(mnOrder);
+		return mnRegister;
+	}
 
-		JMenuItem mntmPlaceOrder = new JMenuItem(Constants.NEW_ORDER);
-		mntmPlaceOrder.addActionListener(e -> new PlaceOrderUi(this).setVisible(true));
-		mnOrder.add(mntmPlaceOrder);
+	private JMenu createSettingsMenu() {
+		JMenu mnSettings = new JMenu(Constants.SETTINGS);
 
-		JMenu mnReport = new JMenu(Constants.REPORTS);
-		menuBar.add(mnReport);
+		JMenuItem mntmAppearance = new JMenuItem(Constants.APPEARANCE);
+		mntmAppearance.addActionListener(e -> changeLookAndFeel());
+		mnSettings.add(mntmAppearance);
 
-		JMenuItem mntmProductionReport = new JMenuItem(Constants.PRODUCTION);
-		mntmProductionReport.addActionListener(e -> new ProdutionReportUi(this).setVisible(true));
-		mnReport.add(mntmProductionReport);
+		return mnSettings;
+	}
 
-		JMenuItem mntmSalesReport = new JMenuItem(Constants.SALES);
-		mntmSalesReport.addActionListener(e -> new SalesReportUi(this).setVisible(true));
-		mnReport.add(mntmSalesReport);
-
+	private JMenu createConsultationMenu() {
 		JMenu mnConsultations = new JMenu(Constants.CONSULTATIONS);
-		menuBar.add(mnConsultations);
 
 		JMenuItem mntmBudget = new JMenuItem(Constants.BUDGET);
 		mntmBudget.addActionListener(e -> new BudgetUi(this).setVisible(true));
@@ -84,17 +111,16 @@ public class DashboardUi extends JFrame {
 		JMenuItem mntmProducts = new JMenuItem(Constants.PRODUCT);
 		mntmProducts.addActionListener(e -> new ProductListUI(this).setVisible(true));
 		mnConsultations.add(mntmProducts);
-		
-		JMenuItem mntmConsultationInputs= new JMenuItem(Constants.PRODUCTION_INPUTS);
+
+		JMenuItem mntmConsultationInputs = new JMenuItem(Constants.PRODUCTION_INPUTS);
 		mntmConsultationInputs.addActionListener(e -> new InputsListUI(this).setVisible(true));
 		mnConsultations.add(mntmConsultationInputs);
 
-		JMenu mnSettings = new JMenu(Constants.SETTINGS);
-		menuBar.add(mnSettings);
+		JMenuItem mntmConsultationInputsPrices = new JMenuItem(Constants.PRODUCTION_INPUTS_PRICES_CHANGES);
+		mntmConsultationInputsPrices.addActionListener(e -> new InputsPriceChangesListUi(this).setVisible(true));
+		mnConsultations.add(mntmConsultationInputsPrices);
 
-		JMenuItem mntmAppearance = new JMenuItem(Constants.APPEARANCE);
-		mntmAppearance.addActionListener(e -> changeLookAndFeel());
-		mnSettings.add(mntmAppearance);
+		return mnConsultations;
 	}
 
 	public void changeLookAndFeel() {

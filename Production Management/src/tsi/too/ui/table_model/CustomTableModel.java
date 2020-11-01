@@ -2,7 +2,6 @@ package tsi.too.ui.table_model;
 
 import java.util.Collection;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -62,7 +61,7 @@ public abstract class CustomTableModel<E> extends DefaultTableModel {
 	public void addRows(Collection<E> items) {
 		Objects.requireNonNull(items);
 
-		items.forEach(i -> addRow(i));
+		items.forEach(this::addRow);
 	}
 
 	/**

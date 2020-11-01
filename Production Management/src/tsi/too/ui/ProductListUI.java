@@ -20,38 +20,39 @@ import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import tsi.too.Constants;
 import tsi.too.controller.ProductController;
 import tsi.too.io.MessageDialog;
 import tsi.too.model.Product;
-import tsi.too.ui.helper.TableMouseListener;
+import tsi.too.ui.helper.TableMouseSelectionListener;
 import tsi.too.ui.table_model.ProductTableModel;
+import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
 public class ProductListUI extends JFrame {
 	private JTable tbProduct;
-	private JTextField tfproductName;
-	private JButton btnFilter;
+	private JTextField tfName;
 
-	private final TableRowSorter<AbstractTableModel> sorter = new TableRowSorter<AbstractTableModel>();
+	private final TableRowSorter<AbstractTableModel> sorter = new TableRowSorter<>();
 	private final ProductTableModel tableModel = new ProductTableModel();
-	
-	private Component parentComponent;
-	private ProductController controler;
-	
+
+	private final Component parentComponent;
+	private ProductController controller;
+
 	public ProductListUI(Component parentComponent) {
 		this.parentComponent = parentComponent;
 		setTitle(Constants.PRODUCT_LISTING);
-		
+
 		initComponent();
 		setupWindow();
-		
+
 		initController();
 		fetchData();
 	}
-	
+
 	private void initComponent() {
 		JPanel productPanel = new JPanel();
 		productPanel.setBorder(
@@ -75,22 +76,22 @@ public class ProductListUI extends JFrame {
 						.addComponent(productPanel, GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE).addContainerGap()));
 
 		JLabel lblProductName = new JLabel(String.format("%s:", Constants.NAME));
-		lblProductName.setLabelFor(tfproductName);
+		lblProductName.setLabelFor(tfName);
 		lblProductName.setHorizontalAlignment(SwingConstants.TRAILING);
 
-		tfproductName = new JTextField();
-		tfproductName.setColumns(10);
+		tfName = new JTextField();
+		tfName.setColumns(10);
 
-		btnFilter = new JButton(Constants.FETCH);
+		JButton btnFilter = new JButton(Constants.FETCH);
 		btnFilter.addActionListener(e -> filterData());
-		
+
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 				gl_panel.createParallelGroup(Alignment.TRAILING)
 						.addGroup(Alignment.LEADING,
 								gl_panel.createSequentialGroup().addContainerGap().addComponent(lblProductName)
 										.addPreferredGap(ComponentPlacement.RELATED)
-										.addComponent(tfproductName, GroupLayout.PREFERRED_SIZE, 395,
+										.addComponent(tfName, GroupLayout.PREFERRED_SIZE, 395,
 												GroupLayout.PREFERRED_SIZE)
 										.addContainerGap(403, Short.MAX_VALUE))
 						.addGroup(gl_panel.createSequentialGroup().addContainerGap(747, Short.MAX_VALUE)
@@ -99,7 +100,7 @@ public class ProductListUI extends JFrame {
 		gl_panel.setVerticalGroup(gl_panel.createParallelGroup(Alignment.LEADING).addGroup(gl_panel
 				.createSequentialGroup().addContainerGap()
 				.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblProductName).addComponent(
-						tfproductName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						tfName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 				.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 				.addComponent(btnFilter).addContainerGap()));
 		panel.setLayout(gl_panel);
@@ -115,7 +116,6 @@ public class ProductListUI extends JFrame {
 				.addGroup(gl_productPanel.createSequentialGroup().addContainerGap()
 						.addComponent(scroll, GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE).addContainerGap()));
 
-		
 		productPanel.setLayout(gl_productPanel);
 		getContentPane().setLayout(groupLayout);
 	}
@@ -123,15 +123,23 @@ public class ProductListUI extends JFrame {
 	private void setupTable() {
 		tbProduct = new JTable();
 		tbProduct.setModel(tableModel);
-		tbProduct.addMouseListener(new TableMouseListener(tbProduct));
+		tbProduct.addMouseListener(new TableMouseSelectionListener(tbProduct));
 		tbProduct.removeColumn(tbProduct.getColumnModel().getColumn(0));
-		
+
+		UiUtils.setHorizontalAlignment(tbProduct, SwingConstants.LEFT);
+
+		TableColumnModel columnModel = tbProduct.getColumnModel();
+
+		columnModel.getColumn(0).setPreferredWidth(5);
+		columnModel.getColumn(1).setPreferredWidth(400);
+		columnModel.getColumn(2).setPreferredWidth(5);
+
 		setupPopupMenu();
 	}
-	
+
 	private void setupPopupMenu() {
 		final JPopupMenu popupMenu = new JPopupMenu();
-		
+
 		JMenuItem editItem = new JMenuItem(Constants.EDIT);
 		editItem.addActionListener(e -> edit());
 		popupMenu.add(editItem);
@@ -147,18 +155,18 @@ public class ProductListUI extends JFrame {
 		pack();
 		setLocationRelativeTo(parentComponent);
 	}
-	
+
 	private void initController() {
 		try {
-			controler = ProductController.getInstance();
-		}catch (Exception e) {
+			controller = ProductController.getInstance();
+		} catch (Exception e) {
 			MessageDialog.showAlertDialog(parentComponent, Constants.PRODUCT_LISTING, Constants.FAILED_TO_FETCH_DATA);
 			dispose();
 		}
 	}
 
 	private void filterData() {
-		String text = tfproductName.getText().trim();
+		String text = tfName.getText().trim();
 		try {
 			tbProduct.setRowSorter(sorter);
 			sorter.setRowFilter(RowFilter.regexFilter(text, 1));
@@ -172,7 +180,7 @@ public class ProductListUI extends JFrame {
 			sorter.setModel(tableModel);
 			sorter.setSortsOnUpdates(true);
 			tableModel.clear();
-			tableModel.addRows(controler.fetchProducts());
+			tableModel.addRows(controller.fetchProducts());
 		} catch (IOException e) {
 			MessageDialog.showAlertDialog(Constants.PRODUCT, Constants.FAILED_TO_FETCH_DATA);
 		}

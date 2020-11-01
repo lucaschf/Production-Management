@@ -2,14 +2,17 @@ package tsi.too.io;
 
 import static tsi.too.Patterns.BRAZILIAN_DATE_TIME_PATTERN;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import tsi.too.model.PriceEntry;
 
 public class PriceEntryFile extends BinaryFile<PriceEntry>{
 
+	public PriceEntryFile(String fileName) throws FileNotFoundException {
+		openFile(fileName, OpenMode.READ_WRITE);
+	}
+	
 	@Override
 	public int recordSize() {
 		return Double.BYTES
@@ -19,23 +22,14 @@ public class PriceEntryFile extends BinaryFile<PriceEntry>{
 
 	@Override
 	public void write(PriceEntry e) throws IOException {
-		file.writeLong(e.getItemCode());
+		file.writeLong(e.getItemId());
 		file.writeDouble(e.getPrice());
-		writeLocalDateTime(e.getDate());
+		writeLocalDateTime(e.getDate(), BRAZILIAN_DATE_TIME_PATTERN);
 	}
 
 	@Override
 	public PriceEntry read() throws IOException {
-		return new PriceEntry(file.readLong(), file.readDouble(), readDateTime());
+		return new PriceEntry(file.readLong(), file.readDouble(), readDateTime(BRAZILIAN_DATE_TIME_PATTERN));
 	}
 	
-	private void writeLocalDateTime(LocalDateTime date) throws IOException {
-		var target = date.format(DateTimeFormatter.ofPattern(BRAZILIAN_DATE_TIME_PATTERN));
-		writeString(target, BRAZILIAN_DATE_TIME_PATTERN.length());
-	}
-	
-	private LocalDateTime readDateTime() throws IOException {
-		var strDate = readString(BRAZILIAN_DATE_TIME_PATTERN.length());
-		return LocalDateTime.parse(strDate, DateTimeFormatter.ofPattern(BRAZILIAN_DATE_TIME_PATTERN));
-	}
 }

@@ -2,7 +2,6 @@ package tsi.too.ui;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,15 +16,12 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 
 import tsi.too.Constants;
@@ -36,21 +32,20 @@ import tsi.too.io.MessageDialog;
 import tsi.too.model.Input;
 import tsi.too.model.Product;
 import tsi.too.model.ProductInputRelation;
-import tsi.too.ui.helper.TableMouseListener;
+import tsi.too.ui.helper.TableMouseSelectionListener;
 import tsi.too.ui.table_model.ProductionInputTableModel;
+import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
-public class AssociateInputToProdutUI extends JFrame {
-	private static final String VINCULATION_INFO_MESSAGE = "<html>Ao vincular um insumo, insira a quantidade desejada atraves da coluna quantidade na tabela de insumos desvinculados. Insumos cuja quantidade esteja com 0, serão adicionados com a quantide 1.<br/> \u00C9 possivel realizar a altera\u00E7\u00E3o da quantidade, atrav\u00E9s do menu de contexto da tabela de insumos vinculados.</html>";
+public class AssociateInputToProductUI extends JFrame {
+	private static final String LINKING_INFO_MESSAGE = "<html>Ao vincular um insumo, insira a quantidade desejada atraves da coluna quantidade na tabela de insumos desvinculados. Insumos cuja quantidade esteja com 0, serão adicionados com a quantide 1.<br/> \u00C9 possivel realizar a altera\u00E7\u00E3o da quantidade, atrav\u00E9s do menu de contexto da tabela de insumos vinculados.</html>";
 	private JTable tbUnlinked;
 	private JTable tbLinked;
-	private JButton btnUnlink;
-	private JButton btnLink;
-	private JButton btnNewInput;
-	private JScrollPane scroUnlinked;
+
+	private JScrollPane scrollUnlinked;
 	private JScrollPane scrollLinked;
 
-	private Component parentComponent;
+	private final Component parentComponent;
 
 	private final LinkingInputTableModel unlinkedTableModel = new LinkingInputTableModel();
 	private final ProductionInputTableModel linkedTableModel = new ProductionInputTableModel();
@@ -58,16 +53,16 @@ public class AssociateInputToProdutUI extends JFrame {
 	private ProductController productController;
 	private InputsByProductController inputsByProductController;
 	private JComboBox<Product> cbProduct;
-	private JLabel lblNewLabel;
 
 	/**
+	 * @param parentComponent 
 	 * @wbp.parser.constructor
 	 */
-	public AssociateInputToProdutUI(Component parentComponent) {
+	public AssociateInputToProductUI(Component parentComponent) {
 		this(parentComponent, null);
 	}
 
-	public AssociateInputToProdutUI(Component parentComponent, Product product) {
+	public AssociateInputToProductUI(Component parentComponent, Product product) {
 		this.parentComponent = parentComponent;
 		initControllers();
 
@@ -112,10 +107,10 @@ public class AssociateInputToProdutUI extends JFrame {
 				new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)),
 				Constants.UNLINKED, TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 
-		btnLink = new JButton(Constants.LINK);
+		JButton btnLink = new JButton(Constants.LINK);
 		btnLink.addActionListener(e -> link());
 
-		btnNewInput = new JButton(Constants.NEW);
+		JButton btnNewInput = new JButton(Constants.NEW);
 		btnNewInput.addActionListener(e -> newInput());
 
 		JPanel linkedPanel = new JPanel();
@@ -123,13 +118,13 @@ public class AssociateInputToProdutUI extends JFrame {
 				new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)),
 				Constants.LINKED, TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 
-		btnUnlink = new JButton(Constants.UNLINK);
+		JButton btnUnlink = new JButton(Constants.UNLINK);
 		btnUnlink.addActionListener(e -> unlink());
 
-		lblNewLabel = new JLabel(
-				VINCULATION_INFO_MESSAGE);
+		JLabel lblNewLabel = new JLabel(
+				LINKING_INFO_MESSAGE);
 		lblNewLabel.setAutoscrolls(true);
-		lblNewLabel.setIcon(new ImageIcon(AssociateInputToProdutUI.class.getResource("/resources/ic_info.png")));
+		lblNewLabel.setIcon(new ImageIcon(AssociateInputToProductUI.class.getResource("/resources/ic_info.png")));
 		lblNewLabel.setIconTextGap(10);
 
 		GroupLayout gl_inputsPanel = new GroupLayout(inputsPanel);
@@ -182,14 +177,14 @@ public class AssociateInputToProdutUI extends JFrame {
 		linkedPanel.setLayout(gl_linkedPanel);
 		linkedPanel.setLayout(gl_linkedPanel);
 
-		scroUnlinked = new JScrollPane();
+		scrollUnlinked = new JScrollPane();
 		GroupLayout gl_unlinkedPanel = new GroupLayout(unlinkedPanel);
 		gl_unlinkedPanel.setHorizontalGroup(gl_unlinkedPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(Alignment.TRAILING, gl_unlinkedPanel.createSequentialGroup().addContainerGap()
-						.addComponent(scroUnlinked, GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE).addContainerGap()));
+						.addComponent(scrollUnlinked, GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE).addContainerGap()));
 		gl_unlinkedPanel.setVerticalGroup(gl_unlinkedPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_unlinkedPanel.createSequentialGroup().addContainerGap()
-						.addComponent(scroUnlinked, GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE).addContainerGap()));
+						.addComponent(scrollUnlinked, GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE).addContainerGap()));
 
 		initUnlinkedTable();
 		unlinkedPanel.setLayout(gl_unlinkedPanel);
@@ -318,11 +313,11 @@ public class AssociateInputToProdutUI extends JFrame {
 		tbLinked.removeColumn(tbLinked.getColumnModel().getColumn(0));
 		tbLinked.setColumnSelectionAllowed(true);
 		tbLinked.setFillsViewportHeight(true);
-		tbLinked.addMouseListener(new TableMouseListener(tbLinked));
+		tbLinked.addMouseListener(new TableMouseSelectionListener(tbLinked));
+		
 		scrollLinked.setViewportView(tbLinked);
 
-		DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) tbLinked.getTableHeader().getDefaultRenderer();
-		renderer.setHorizontalAlignment(SwingConstants.LEFT);
+		UiUtils.setHorizontalAlignment(tbLinked, SwingConstants.LEFT);
 
 		setupLinkedPopupMenu();
 	}
@@ -351,7 +346,7 @@ public class AssociateInputToProdutUI extends JFrame {
 			target.setQuantity(quantity);
 
 			try {
-				var pos = inputsByProductController.fetchByPordutAndInput(product.getId(), target.getId());
+				var pos = inputsByProductController.fetchByProductAndInput(product.getId(), target.getId());
 
 				inputsByProductController.update(pos.getSecond(),
 						new ProductInputRelation(product.getId(), target.getId(), target.getQuantity()));
@@ -372,12 +367,11 @@ public class AssociateInputToProdutUI extends JFrame {
 		tbUnlinked.setModel(unlinkedTableModel);
 		tbUnlinked.removeColumn(tbUnlinked.getColumnModel().getColumn(3));
 		tbUnlinked.removeColumn(tbUnlinked.getColumnModel().getColumn(0));
-
 		tbUnlinked.setFillsViewportHeight(true);
-		scroUnlinked.setViewportView(tbUnlinked);
+		
+		scrollUnlinked.setViewportView(tbUnlinked);
 
-		DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) tbUnlinked.getTableHeader().getDefaultRenderer();
-		renderer.setHorizontalAlignment(SwingConstants.LEFT);
+		UiUtils.setHorizontalAlignment(tbUnlinked, SwingConstants.LEFT);
 	}
 
 	private void setupWindow() {
@@ -438,7 +432,7 @@ public class AssociateInputToProdutUI extends JFrame {
 		}
 	}
 
-	private class LinkingInputTableModel extends ProductionInputTableModel {
+	private static class LinkingInputTableModel extends ProductionInputTableModel {
 		@Override
 		public boolean isCellEditable(int row, int column) {
 			return getRowCount() > 0 && getColumnName(column).equals(Constants.QUANTITY);

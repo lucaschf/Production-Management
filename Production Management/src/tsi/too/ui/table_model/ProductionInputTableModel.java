@@ -47,9 +47,9 @@ public class ProductionInputTableModel extends CustomTableModel<Input> {
 			var productId = (long) rowData.get(0);
 			var name = (String) rowData.get(1);
 			var quantity = (int) rowData.get(2);
-			var inputsid = StringExt.fromBraziliaCurrencyString(rowData.get(3).toString()).doubleValue();
+			var inputsId = StringExt.fromBraziliaCurrencyString(rowData.get(3).toString()).doubleValue();
 
-			return new Input(name, quantity, productId, inputsid);
+			return new Input(name, quantity, productId, inputsId);
 		} catch (Exception e) {
 			return null;
 		}

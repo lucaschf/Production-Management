@@ -14,7 +14,7 @@ public class Product implements Cloneable {
 	private MeasureUnity measureUnity;
 	private double percentageProfitMargin;
 
-	private ArrayList<Input> productionInputs = new ArrayList<>();
+	private final ArrayList<Input> productionInputs = new ArrayList<>();
 
 	public Product(long id, String name, MeasureUnity measureUnity, double percentageProfitMargin) {
 		super();
@@ -24,17 +24,17 @@ public class Product implements Cloneable {
 		this.percentageProfitMargin = percentageProfitMargin;
 	}
 
-	public boolean addProductionInput(Input productionInput) {
-		Objects.requireNonNull(productionInput);
-		
-		return productionInputs.add(productionInput.clone());
+	public boolean addProductionInput(Input input) {
+		Objects.requireNonNull(input);
+
+		return productionInputs.add(input.clone());
 	}
-	
-	public boolean addProductionInput(Collection<Input> productionInput) throws IllegalArgumentException {
-		if (productionInput == null)
+
+	public boolean addProductionInput(Collection<Input> inputs) throws IllegalArgumentException {
+		if (inputs == null)
 			throw new IllegalArgumentException();
 
-		return productionInputs.addAll(productionInput.stream().map( input -> input.clone()).collect(Collectors.toList()));
+		return productionInputs.addAll(inputs.stream().map(input -> input.clone()).collect(Collectors.toList()));
 	}
 
 	public List<Input> getProductionInputs() {
@@ -80,21 +80,51 @@ public class Product implements Cloneable {
 		return productionInputs.stream().mapToDouble(pi -> pi.getPriceForQuantity()).sum();
 	}
 
+	public double getSaleValue() {
+		var manufacturingCost = getManufacturingCost();
+		var profit = (percentageProfitMargin * manufacturingCost) / 100;
+	
+		return manufacturingCost + profit;
+	}
+
+	/**
+	 * Creates a copy with the given id
+	 * 
+	 * @param id
+	 * @return a copy with a new id.
+	 */
 	public Product withId(long id) {
 		var p = clone();
 		p.id = id;
 
 		return p;
 	}
+	
+	/**
+	 * Creates a copy with the given inputs
+	 * 
+	 * @param inputs
+	 * @return a copy with new inputs.
+	 */
+	public Product with(Collection<Input> inputs) {
+		var p = clone();
+		p.productionInputs.clear();
+		p.addProductionInput(inputs);
+		
+		return p;
+	}
 
 	@Override
 	public Product clone() {
-		return new Product(id, name, measureUnity, percentageProfitMargin);
+		try {
+			return (Product) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException("Something goes wrong");
+		}
 	}
 
 	@Override
 	public String toString() {
 		return name; // used for combobox
 	}
-
 }

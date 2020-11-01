@@ -20,27 +20,27 @@ import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import tsi.too.Constants;
 import tsi.too.controller.InputController;
 import tsi.too.io.MessageDialog;
 import tsi.too.model.Input;
-import tsi.too.ui.helper.TableMouseListener;
+import tsi.too.ui.helper.TableMouseSelectionListener;
 import tsi.too.ui.table_model.ProductionInputTableModel;
+import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
 public class InputsListUI extends JFrame {
-	private JTable tbinputs;
+	private JTable tbInputs;
 	private JTextField tfName;
-	private JButton btnFilter;
 
-	private final TableRowSorter<AbstractTableModel> sorter = new TableRowSorter<AbstractTableModel>();
+	private final TableRowSorter<AbstractTableModel> sorter = new TableRowSorter<>();
 	private final ProductionInputTableModel tableModel = new ProductionInputTableModel();
 
-	private Component parentComponent;
-	private InputController controler;
+	private final Component parentComponent;
+	private InputController controller;
 
 	public InputsListUI(Component parentComponent) {
 		this.parentComponent = parentComponent;
@@ -55,8 +55,8 @@ public class InputsListUI extends JFrame {
 
 	private void initComponent() {
 		JPanel productPanel = new JPanel();
-		productPanel.setBorder(
-				new TitledBorder(null, Constants.PRODUCTION_INPUTS, TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		productPanel.setBorder(new TitledBorder(null, Constants.PRODUCTION_INPUTS, TitledBorder.LEADING,
+				TitledBorder.TOP, null, null));
 
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(null, Constants.FILTERS, TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -82,7 +82,7 @@ public class InputsListUI extends JFrame {
 		tfName = new JTextField();
 		tfName.setColumns(10);
 
-		btnFilter = new JButton(Constants.FETCH);
+		JButton btnFilter = new JButton(Constants.FETCH);
 		btnFilter.addActionListener(e -> filterData());
 
 		GroupLayout gl_panel = new GroupLayout(panel);
@@ -106,7 +106,7 @@ public class InputsListUI extends JFrame {
 		panel.setLayout(gl_panel);
 
 		setupTable();
-		JScrollPane scroll = new JScrollPane(tbinputs);
+		JScrollPane scroll = new JScrollPane(tbInputs);
 
 		GroupLayout gl_productPanel = new GroupLayout(productPanel);
 		gl_productPanel.setHorizontalGroup(gl_productPanel.createParallelGroup(Alignment.LEADING)
@@ -121,15 +121,19 @@ public class InputsListUI extends JFrame {
 	}
 
 	private void setupTable() {
-		tbinputs = new JTable();
-		tbinputs.setModel(tableModel);
-		tbinputs.addMouseListener(new TableMouseListener(tbinputs));
-		tbinputs.removeColumn(tbinputs.getColumnModel().getColumn(2));
-		tbinputs.removeColumn(tbinputs.getColumnModel().getColumn(1));
+		tbInputs = new JTable();
+		tbInputs.setModel(tableModel);
+		tbInputs.addMouseListener(new TableMouseSelectionListener(tbInputs));
+		tbInputs.removeColumn(tbInputs.getColumnModel().getColumn(2));
 
-		DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) tbinputs.getTableHeader().getDefaultRenderer();
-		renderer.setHorizontalAlignment(JLabel.LEADING);
-		
+		UiUtils.setHorizontalAlignment(tbInputs, SwingConstants.LEFT);
+
+		TableColumnModel columnModel = tbInputs.getColumnModel();
+
+		columnModel.getColumn(0).setPreferredWidth(5);
+		columnModel.getColumn(1).setPreferredWidth(400);
+		columnModel.getColumn(2).setPreferredWidth(5);
+
 		setupPopupMenu();
 	}
 
@@ -139,14 +143,13 @@ public class InputsListUI extends JFrame {
 		JMenuItem editItem = new JMenuItem(Constants.EDIT);
 		editItem.addActionListener(e -> edit());
 		popupMenu.add(editItem);
-		
+
 		JMenuItem checkInItem = new JMenuItem(Constants.CHECK_IN);
 		checkInItem.addActionListener(e -> checkIn());
 		popupMenu.add(checkInItem);
 
-		tbinputs.setComponentPopupMenu(popupMenu);
+		tbInputs.setComponentPopupMenu(popupMenu);
 	}
-
 
 	private void setupWindow() {
 		pack();
@@ -155,7 +158,7 @@ public class InputsListUI extends JFrame {
 
 	private void initController() {
 		try {
-			controler = InputController.getInstance();
+			controller = InputController.getInstance();
 		} catch (Exception e) {
 			MessageDialog.showAlertDialog(parentComponent, getTitle(), Constants.FAILED_TO_FETCH_DATA);
 			dispose();
@@ -164,10 +167,10 @@ public class InputsListUI extends JFrame {
 
 	private void filterData() {
 		String text = tfName.getText().trim();
-		
+
 		try {
-			tbinputs.setRowSorter(sorter);
-			sorter.setRowFilter(RowFilter.regexFilter(text, 0));
+			tbInputs.setRowSorter(sorter);
+			sorter.setRowFilter(RowFilter.regexFilter(text, 1));
 		} catch (PatternSyntaxException pse) {
 			pse.printStackTrace();
 		}
@@ -178,14 +181,14 @@ public class InputsListUI extends JFrame {
 			sorter.setModel(tableModel);
 			sorter.setSortsOnUpdates(true);
 			tableModel.clear();
-			tableModel.addRows(controler.fetchInputs());
+			tableModel.addRows(controller.fetchInputs());
 		} catch (IOException e) {
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.FAILED_TO_FETCH_DATA);
 		}
 	}
 
 	private Input getSelectedItem() {
-		return tableModel.getValueAt(tbinputs.convertRowIndexToModel(tbinputs.getSelectedRow()));
+		return tableModel.getValueAt(tbInputs.convertRowIndexToModel(tbInputs.getSelectedRow()));
 	}
 
 	private void edit() {

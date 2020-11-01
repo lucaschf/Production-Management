@@ -1,40 +1,68 @@
 package tsi.too.model;
 
+import java.time.LocalDate;
+
 public class Production {
-	private Product product;
-	private int quantity;
+	private long productId;
+	private double quantity;
+	private LocalDate date;
+	private double totalManufacturingCost;
+	private double totalSaleValue;
 	
-	public Production(Product p, int quantity) {
+	public Production(long productId, double quantity, LocalDate date, double manufacturingCost,
+			double totalSaleValue) {
 		super();
-		setProduct(p);
-		setQuantity(quantity);
+		this.productId = productId;
+		this.quantity = quantity;
+		this.date = date;
+		this.totalManufacturingCost = manufacturingCost;
+		this.totalSaleValue = totalSaleValue;
 	}
-		
-	public Product getProduct() {
-		return product.clone();
+
+	public long getProductId() {
+		return productId;
 	}
-	
-	public void setProduct(Product product) {
-		this.product = product.clone();
+
+	public void setProductId(long productId) {
+		this.productId = productId;
 	}
-	
-	public int getQuantity() {
+
+	public double getQuantity() {
 		return quantity;
 	}
-	
-	public void setQuantity(int quantity) {
-		if(quantity < 1)
-			throw new IllegalArgumentException("Quantity must be greater than zero");
-			
+
+	public void setQuantity(double quantity) {
 		this.quantity = quantity;
 	}
-	
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
 	public double getManufacturingCost() {
-		return product.getManufacturingCost() * quantity;
+		return totalManufacturingCost;
+	}
+
+	public void setManufacturingCost(double manufacturingCost) {
+		this.totalManufacturingCost = manufacturingCost;
+	}
+
+	public double getTotalSaleValue() {
+		return totalSaleValue;
+	}
+
+	public void setTotalSaleValue(double totalSaleValue) {
+		this.totalSaleValue = totalSaleValue;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Production {p= %s, quantity= %d}", product, quantity);
+		return String.format(
+				"Production {productId= %d, quantity= %1.2f, date= %s, manufacturingCost= %f, totalSaleValue= %f}",
+				productId, quantity, date, totalManufacturingCost, totalSaleValue);
 	}
 }

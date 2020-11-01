@@ -1,44 +1,24 @@
 package tsi.too.ui;
 
-import static tsi.too.Constants.DO_YOU_WANT_TO_UPDATE_WITH_INFORMED_VALUES;
-import static tsi.too.Constants.FAILED_TO_INSERT_RECORD;
-import static tsi.too.Constants.FAILED_TO_UPDATE_RECORD;
-import static tsi.too.Constants.AN_ITEM_WITH_THIS_NAME_ALREADY_REGISTERED;
-import static tsi.too.Constants.PRODUCT_REGISTRATION;
-import static tsi.too.Constants.RECORD_SUCCESSFULY_INSERTED;
-import static tsi.too.Constants.RECORD_SUCCESSFULY_UPDATED;
-import static tsi.too.Constants.REGISTER_PRODUCTION_INPUTS;
-import static tsi.too.Constants.TO_RECORD;
-import static tsi.too.Constants.UPDATE;
-
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
 import tsi.too.Constants;
 import tsi.too.controller.ProductController;
 import tsi.too.io.MessageDialog;
 import tsi.too.model.MeasureUnity;
 import tsi.too.model.Product;
 import tsi.too.util.Pair;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import static tsi.too.Constants.*;
 
 @SuppressWarnings("serial")
 public class ProductRegistrationUi extends JDialog {
@@ -122,7 +102,7 @@ public class ProductRegistrationUi extends JDialog {
 	private void setupBottomPanel() {
 		var positiveText = product == null ? TO_RECORD : UPDATE;
 
-		bottomActionPanel = new BottomActionPanel(Constants.CANCEL, e -> onCancel(), positiveText, e -> onOk(e));
+		bottomActionPanel = new BottomActionPanel(Constants.CANCEL, e -> onCancel(), positiveText, this::onOk);
 	}
 
 	private void initFieldsPanel() {
@@ -141,7 +121,7 @@ public class ProductRegistrationUi extends JDialog {
 
 		setupNameTextField();
 
-		cbUnity = new JComboBox<MeasureUnity>(MeasureUnity.values());
+		cbUnity = new JComboBox<>(MeasureUnity.values());
 		lblUnity.setLabelFor(cbUnity);
 
 		spProfitmargin = new JSpinner();
@@ -193,12 +173,9 @@ public class ProductRegistrationUi extends JDialog {
 	private void initBtnInputRegistration() {
 		btnRegisterInputs = new JButton(REGISTER_PRODUCTION_INPUTS);
 		enableInputsButton();
-		btnRegisterInputs.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (product != null)
-					registerInputs(product);
-			}
+		btnRegisterInputs.addActionListener(e -> {
+			if (product != null)
+				registerInputs(product);
 		});
 	}
 
@@ -267,7 +244,7 @@ public class ProductRegistrationUi extends JDialog {
 					break;
 			}
 		} catch (IOException e) {
-			var message = actionEvent.getActionCommand() == UPDATE ? FAILED_TO_UPDATE_RECORD : FAILED_TO_INSERT_RECORD;
+			var message = actionEvent.getActionCommand().equals(UPDATE) ? FAILED_TO_UPDATE_RECORD : FAILED_TO_INSERT_RECORD;
 			MessageDialog.showAlertDialog(this, getTitle(), message);
 		}
 	}
@@ -278,7 +255,7 @@ public class ProductRegistrationUi extends JDialog {
 				productController.insert(p);
 
 				if (MessageDialog.showConfirmationDialog(this, PRODUCT_REGISTRATION,
-						String.format("%s\n%s?", RECORD_SUCCESSFULY_INSERTED, REGISTER_PRODUCTION_INPUTS)))
+						String.format("%s\n%s?", RECORD_SUCCESSFULLY_INSERTED, REGISTER_PRODUCTION_INPUTS)))
 					registerInputs(p);
 				resetForm();
 			} else if (MessageDialog.showConfirmationDialog(this, PRODUCT_REGISTRATION,
@@ -304,7 +281,7 @@ public class ProductRegistrationUi extends JDialog {
 			}
 
 			productController.update(target.getSecond(), p);
-			MessageDialog.showInformationDialog(this, PRODUCT_REGISTRATION, RECORD_SUCCESSFULY_UPDATED);
+			MessageDialog.showInformationDialog(this, PRODUCT_REGISTRATION, RECORD_SUCCESSFULLY_UPDATED);
 			resetForm();
 			
 		} catch (IOException | NullPointerException e) {

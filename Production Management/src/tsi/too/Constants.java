@@ -1,7 +1,5 @@
 package tsi.too;
 
-import javax.swing.Icon;
-
 public interface Constants {
 	String APP_NAME = "Gestão de produção";
 	String CANCEL = "Cancelar";
@@ -73,10 +71,10 @@ public interface Constants {
 	String PRODUCTION_INPUTS_SIZE_MESSAGE = "A quantidade de insumo é por tamanho de cada unidade do produto";
 	String PERSISTENCE_ERROR = "Erro de armazenamento";
 	String UNABLE_TO_OPEN_FILE = "Falha ao abrir arquivo";
-	String RECORD_SUCCESSFULY_INSERTED = "Registro inserido com sucesso";
+	String RECORD_SUCCESSFULLY_INSERTED = "Registro inserido com sucesso";
 	String AN_ITEM_WITH_THIS_NAME_ALREADY_REGISTERED = "Um item com esse nome já foi cadastrado.";
 	String DO_YOU_WANT_TO_UPDATE_WITH_INFORMED_VALUES ="Deseja atualizar com os dados informados?";
-	String RECORD_SUCCESSFULY_UPDATED = "Registro atualizado com sucesso";
+	String RECORD_SUCCESSFULLY_UPDATED = "Registro atualizado com sucesso";
 	String UNIT_OF_MEASUREMENT = "Unidade de medida";
 	String FAILED_TO_UPDATE_RECORD = "Falha ao atualizar registro";
 	String FAILED_TO_INSERT_RECORD = "Falha ao inserir registro";
@@ -107,4 +105,12 @@ public interface Constants {
 	String QUANTITY_MUST_BE_GREATER_THAN_ZERO = "Quantidade deve ser maior que zero";
 	String QUANTITY_SUCCESSFUL_CHANGED = "Quantidade atualizada com sucesso";
 	String QUANTITY_CHANGE_FAILURE = "Falha ao atualizar quantidade";
+	String PRICE = "preço";
+	String PRICE_MUST_BE_GREATER_THAN_ZERO = "Preço deve ser maior que zero";
+	String FAILED_TO_LOG_PRICE_ENTRY = "Falha ao salvar log de preço";
+	String PRODUCTION_INPUTS_PRICES_CHANGES = "Alteração de preços de insumos";
+	String FAILED_TO_CALCULATE_VALUES = "Falha ao calcular valores";
+	String CALCUTATING = "Calculando";
+	String DATE_CANNOT_BE_A_FUCTURE_DATE = "Data não pode ser uma data futura";
+	String PRODUCTION_WITHOUT_INPUTS_MESSAGE = "Esta produção esta sendo gerada sem custo/lucro. Provavelmente não há nenhum insumo associado ao produto selecionado.\nDeseja continuar?";
 }

@@ -3,7 +3,7 @@ package tsi.too.model;
 import java.time.LocalDateTime;
 
 public class PriceEntry {
-	private long itemCode;
+	private long itemId;
 	private double price;
 	private LocalDateTime date;
 
@@ -11,7 +11,14 @@ public class PriceEntry {
 		super();
 		this.price = price;
 		this.date = date;
-		this.itemCode = itemCode;
+		this.itemId = itemCode;
+	}
+	
+	public PriceEntry(long itemCode, double price) {
+		super();
+		this.price = price;
+		this.date = LocalDateTime.now();
+		this.itemId = itemCode;
 	}
 
 	public double getPrice() {
@@ -22,12 +29,12 @@ public class PriceEntry {
 		return date;
 	}
 	
-	public long getItemCode() {
-		return itemCode;
+	public long getItemId() {
+		return itemId;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("PriceEntry {itemCode= %d, price= %f, date= %s}", itemCode, price, date);
+		return String.format("PriceEntry {itemId= %d, price= %f, date= %s}", itemId, price, date);
 	}
 }
