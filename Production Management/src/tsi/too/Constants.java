@@ -64,7 +64,7 @@ public interface Constants {
 	String PRODUCTION_PERIOD = "Período de produção";
 	String START_DATE = "Data inicial";
 	String END_DATE = "Data final";
-	String GET_PRODUCTION_DATE = "Obter dados de producao";
+	String GET_PRODUCTION_DATA = "Obter dados de produção";
 	String PRODUCTION_DATA = "Dados da produção";
 	String UNIT_SIZE = "Tamanho da unidade";
 	String ADD = "Adicionar";
@@ -113,4 +113,7 @@ public interface Constants {
 	String CALCUTATING = "Calculando";
 	String DATE_CANNOT_BE_A_FUCTURE_DATE = "Data não pode ser uma data futura";
 	String PRODUCTION_WITHOUT_INPUTS_MESSAGE = "Esta produção esta sendo gerada sem custo/lucro. Provavelmente não há nenhum insumo associado ao produto selecionado.\nDeseja continuar?";
+	String INVALID_PRODUCTION_DATE = "Data de produção inválida";
+	String INVALID_PRODUCTION_DATA = "Dados de produção inválidos";
+	String PRODUCTION_REPORT = "Relatório de produção";
 }

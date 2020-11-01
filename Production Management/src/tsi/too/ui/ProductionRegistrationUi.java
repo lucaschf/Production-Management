@@ -31,6 +31,7 @@ import tsi.too.controller.InputsByProductController;
 import tsi.too.controller.ProductController;
 import tsi.too.controller.ProductionController;
 import tsi.too.ext.NumberExt;
+import tsi.too.io.InputDialog.InputValidator;
 import tsi.too.io.MessageDialog;
 import tsi.too.model.Product;
 import tsi.too.model.Production;
@@ -244,7 +245,7 @@ public class ProductionRegistrationUi extends JDialog {
 		ftfProductionDate = new JFormattedTextField(UiUtils.createBrazilianDateMaskFormatter());
 		lblProductionDate.setLabelFor(ftfProductionDate);
 		ftfProductionDate.setText(
-				LocalDate.now().plusDays(-1).format(DateTimeFormatter.ofPattern(Patterns.BRAZILIAN_DATE_PATTERN)));
+				LocalDate.now().format(DateTimeFormatter.ofPattern(Patterns.BRAZILIAN_DATE_PATTERN)));
 
 		ftfProductionDate.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
@@ -285,8 +286,10 @@ public class ProductionRegistrationUi extends JDialog {
 		ftfProductionCost.setText("");
 		ftfTotalSaleValue.setText("");
 
-		if (date == null || product == null)
+		if (date == null || product == null) {
+			target = null;
 			return;
+		}
 
 		setInProgress(true);
 		try {
@@ -303,8 +306,7 @@ public class ProductionRegistrationUi extends JDialog {
 			target = new Production(product.getId(), (double) spQuantity.getValue(), date, manufacturingCost,
 					totalSaleValue);
 		} catch (Exception ex) {
-			ex.printStackTrace();
-
+			target = null;
 			lblError.setVisible(true);
 		} finally {
 			setInProgress(false);
@@ -331,8 +333,24 @@ public class ProductionRegistrationUi extends JDialog {
 	}
 
 	private void onOk() {
-		if (target.getDate().isAfter(LocalDate.now())) {
-			MessageDialog.showAlertDialog(this, getTitle(), Constants.DATE_CANNOT_BE_A_FUCTURE_DATE);
+		var date = getDate();
+
+		var dateValidator = (InputValidator<LocalDate>) input -> {
+			if (input == null)
+				return Constants.INVALID_PRODUCTION_DATE;
+			if (input.isAfter(LocalDate.now())) {
+				return Constants.DATE_CANNOT_BE_A_FUCTURE_DATE;
+			}
+			return null;
+		};
+
+		if (!dateValidator.isValid(date)) { // date is not informed or not valid
+			MessageDialog.showAlertDialog(this, getTitle(), dateValidator.getErrorMessage(date));
+			return;
+		}
+
+		if (target == null) { // there is no product selected
+			MessageDialog.showAlertDialog(getTitle(), Constants.INVALID_PRODUCTION_DATA);
 			return;
 		}
 

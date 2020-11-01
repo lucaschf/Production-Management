@@ -2,6 +2,7 @@ package tsi.too.ui;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.io.FileNotFoundException;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -16,10 +17,25 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import tsi.too.Constants;
+import tsi.too.controller.ProductionController;
+import tsi.too.io.MessageDialog;
 
 @SuppressWarnings("serial")
 public class ProdutionReportUi extends JDialog {
+	private ProductionController controller;
+	
+	private final Component parentComponent;
+	
 	public ProdutionReportUi(Component parentComponent) {
+		this.parentComponent = parentComponent;
+		
+		initController();
+		
+		initComponent();
+		setupWindow();
+	}
+
+	private void initComponent() {
 		JPanel filterPanel = new JPanel();
 		filterPanel.setBorder(new TitledBorder(null, Constants.PRODUCTION_PERIOD, TitledBorder.LEADING,
 				TitledBorder.TOP, null, null));
@@ -35,7 +51,7 @@ public class ProdutionReportUi extends JDialog {
 		JFormattedTextField ftfEndDate = new JFormattedTextField();
 		lblEndDate.setLabelFor(ftfEndDate);
 
-		JButton btnCreateReport = new JButton(Constants.GET_PRODUCTION_DATE);
+		JButton btnCreateReport = new JButton(Constants.GET_PRODUCTION_DATA);
 		GroupLayout gl_filterPanel = new GroupLayout(filterPanel);
 		gl_filterPanel.setHorizontalGroup(gl_filterPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_filterPanel.createSequentialGroup().addContainerGap().addComponent(lblStartDate)
@@ -89,16 +105,28 @@ public class ProdutionReportUi extends JDialog {
 						.addPreferredGap(ComponentPlacement.RELATED)
 						.addComponent(bottomPanel, GroupLayout.PREFERRED_SIZE, 28, Short.MAX_VALUE).addContainerGap()));
 		getContentPane().setLayout(groupLayout);
+	}
+
+	private void initController() {
+		try {
+			controller = ProductionController.getInstance();
+		} catch (FileNotFoundException e) {
+			MessageDialog.showErrorDialog(this, getTitle(), Constants.UNABLE_TO_OPEN_FILE);
+		}
+	}
+	
+	private void setupWindow() {
+		setTitle(Constants.PRODUCTION_REPORT);
 		setMinimumSize(new Dimension(900, 600));
 		pack();
 		setLocationRelativeTo(parentComponent);
 	}
-
+	
 	private void onCancel() {
 		dispose();
 	}
 
 	private void onOk() {
-		dispose();
+		
 	}
 }
