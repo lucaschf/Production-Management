@@ -26,20 +26,24 @@ public class BottomActionPanel extends JPanel {
         btnPositive.addActionListener(positiveAction);
 
         GroupLayout groupLayout = new GroupLayout(this);
-        groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-                .addGroup(groupLayout.createSequentialGroup().addContainerGap(256, Short.MAX_VALUE)
-                        .addComponent(btnPositive, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(btnNegative, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
-                        .addGap(1)));
-        groupLayout
-                .setVerticalGroup(
-                        groupLayout.createParallelGroup(Alignment.TRAILING)
-                                .addGroup(
-                                        groupLayout.createSequentialGroup().addGap(1)
-                                                .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE, false)
-                                                        .addComponent(btnNegative).addComponent(btnPositive))
-                                                .addGap(3)));
+        groupLayout.setHorizontalGroup(
+        	groupLayout.createParallelGroup(Alignment.TRAILING)
+        		.addGroup(groupLayout.createSequentialGroup()
+        			.addContainerGap(256, Short.MAX_VALUE)
+        			.addComponent(btnPositive)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addComponent(btnNegative)
+        			.addGap(1))
+        );
+        groupLayout.setVerticalGroup(
+        	groupLayout.createParallelGroup(Alignment.TRAILING)
+        		.addGroup(groupLayout.createSequentialGroup()
+        			.addGap(1)
+        			.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(btnNegative)
+        				.addComponent(btnPositive))
+        			.addGap(3))
+        );
         setLayout(groupLayout);
     }
 

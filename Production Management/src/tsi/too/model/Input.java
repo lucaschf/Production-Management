@@ -16,8 +16,8 @@ public class Input implements Cloneable {
 		this.price = price;
 	}
 
-	public Input(String name, double price) {
-		this(name, 0, price);
+	public Input(String name) {
+		this(name, 0, 0);
 	}
 
 	public Input(String name, int quantity, double price) {

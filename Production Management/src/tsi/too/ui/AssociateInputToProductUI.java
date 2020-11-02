@@ -38,7 +38,9 @@ import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
 public class AssociateInputToProductUI extends JFrame {
-	private static final String LINKING_INFO_MESSAGE = "<html>Ao vincular um insumo, insira a quantidade desejada atraves da coluna quantidade na tabela de insumos desvinculados. Insumos cuja quantidade esteja com 0, serão adicionados com a quantide 1.<br/> \u00C9 possivel realizar a altera\u00E7\u00E3o da quantidade, atrav\u00E9s do menu de contexto da tabela de insumos vinculados.</html>";
+	private static final String LINKING_INFO_MESSAGE = "<html>Ao vincular um insumo, insira a quantidade desejada atraves da coluna quantidade " +
+			"na tabela de insumos desvinculados. Insumos cuja quantidade esteja com 0, serï¿½o adicionados com a quantide 1.<br/> \u00C9 possivel " +
+			"realizar a altera\u00E7\u00E3o da quantidade, atrav\u00E9s do menu de contexto da tabela de insumos vinculados.</html>";
 	private JTable tbUnlinked;
 	private JTable tbLinked;
 

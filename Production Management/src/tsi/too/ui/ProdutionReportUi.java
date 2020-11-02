@@ -79,12 +79,20 @@ public class ProdutionReportUi extends JDialog {
 
 		JScrollPane scrollPane = new JScrollPane();
 		GroupLayout gl_tablePanel = new GroupLayout(tablePanel);
-		gl_tablePanel.setHorizontalGroup(gl_tablePanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_tablePanel.createSequentialGroup().addContainerGap()
-						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 1079, Short.MAX_VALUE).addContainerGap()));
-		gl_tablePanel.setVerticalGroup(gl_tablePanel.createParallelGroup(Alignment.LEADING).addGroup(Alignment.TRAILING,
-				gl_tablePanel.createSequentialGroup()
-						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 521, Short.MAX_VALUE).addContainerGap()));
+		gl_tablePanel.setHorizontalGroup(
+			gl_tablePanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_tablePanel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 832, Short.MAX_VALUE)
+					.addContainerGap())
+		);
+		gl_tablePanel.setVerticalGroup(
+			gl_tablePanel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_tablePanel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
+					.addContainerGap())
+		);
 		tablePanel.setLayout(gl_tablePanel);
 
 		BottomActionPanel bottomPanel = new BottomActionPanel(Constants.CANCEL, e -> onCancel(), Constants.OK,

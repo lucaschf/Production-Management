@@ -116,4 +116,8 @@ public interface Constants {
 	String INVALID_PRODUCTION_DATE = "Data de produção inválida";
 	String INVALID_PRODUCTION_DATA = "Dados de produção inválidos";
 	String PRODUCTION_REPORT = "Relatório de produção";
+	String PRODUCTION_INPUT = "Insumo";
+	String ENTRY = "Lançamento";
+	String INPUT_ENTRY = "Lançamento de insumos";
+	String INVALID_DATE = "Data inválida";
 }

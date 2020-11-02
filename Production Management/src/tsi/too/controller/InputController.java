@@ -9,6 +9,7 @@ import tsi.too.util.Pair;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Vector;
 
 public class InputController {
 	private final ProductionInputsFile inputsFile;
@@ -45,6 +46,10 @@ public class InputController {
 
 	public List<Input> fetchInputs() throws IOException {
 		return inputsFile.readAllFile();
+	}
+
+	public Vector<Input> fetchInputsAsVector() throws IOException {
+		return inputsFile.readAllFileAsVector();
 	}
 
 	public Pair<Input, Long> findByName(final String name) throws IOException {

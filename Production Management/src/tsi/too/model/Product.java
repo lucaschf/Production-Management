@@ -54,7 +54,9 @@ public class Product implements Cloneable {
 	}
 
 	public void setName(String name) {
-		if (name != null && name.length() > MAX_NAME_LENGTH)
+		Objects.requireNonNull(name);
+		
+		if (name.length() > MAX_NAME_LENGTH)
 			this.name = name.substring(0, MAX_NAME_LENGTH);
 		else
 			this.name = name;

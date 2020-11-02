@@ -42,7 +42,18 @@ public class DashboardUi extends JFrame {
 		menuBar.add(createOrdersMenu());
 		menuBar.add(createReportMenu());
 		menuBar.add(createConsultationMenu());
+		menuBar.add(createEntryMeny());
 		menuBar.add(createSettingsMenu());
+	}
+
+	private JMenu createEntryMeny() {
+		JMenu mnEntry = new JMenu(Constants.ENTRY);
+
+		JMenuItem mntmInputEntry = new JMenuItem(Constants.PRODUCTION_INPUTS);
+		mntmInputEntry.addActionListener(e -> new AddInputToStockUi(this).setVisible(true));
+		mnEntry.add(mntmInputEntry);
+		
+		return mnEntry;
 	}
 
 	private JMenu createOrdersMenu() {
