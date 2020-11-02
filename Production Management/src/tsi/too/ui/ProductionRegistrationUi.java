@@ -244,8 +244,7 @@ public class ProductionRegistrationUi extends JDialog {
 
 		ftfProductionDate = new JFormattedTextField(UiUtils.createBrazilianDateMaskFormatter());
 		lblProductionDate.setLabelFor(ftfProductionDate);
-		ftfProductionDate.setText(
-				LocalDate.now().format(DateTimeFormatter.ofPattern(Patterns.BRAZILIAN_DATE_PATTERN)));
+		ftfProductionDate.setText(LocalDate.now().format(DateTimeFormatter.ofPattern(Patterns.BRAZILIAN_DATE_PATTERN)));
 
 		ftfProductionDate.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
@@ -293,9 +292,9 @@ public class ProductionRegistrationUi extends JDialog {
 
 		setInProgress(true);
 		try {
-			product = product.with(inputsByProductController.fetchLinkedInputsWithPrice(product.getId(), date));
-
 			var quantity = (Double) spQuantity.getValue();
+			product = product
+					.with(inputsByProductController.fetchLinkedInputsWithPrice(product.getId(),  date, quantity));
 
 			var manufacturingCost = product.getManufacturingCost() * quantity;
 			var totalSaleValue = product.getSaleValue() * quantity;

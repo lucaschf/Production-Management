@@ -29,19 +29,22 @@ public class InputsByProdcutFile extends BinaryFile<ProductInputRelation> {
 
 	@Override
 	public int recordSize() {
-		return Long.BYTES * 2 + Integer.BYTES;
+		return Long.BYTES * 2 // ids
+				+ Double.BYTES * 2 // quantity
+				;  
 	}
 
 	@Override
 	public void write(ProductInputRelation e) throws IOException {
 		file.writeLong(e.getProductId());
+		file.writeDouble(e.getAmountProduced());
 		file.writeLong(e.getInputId());
-		file.writeInt(e.getQuantity());
+		file.writeDouble(e.getInputQuantity());
 	}
 
 	@Override
 	public ProductInputRelation read() throws IOException {
-		return new ProductInputRelation(file.readLong(), file.readLong(), file.readInt());
+		return new ProductInputRelation(file.readLong(), file.readDouble(), file.readLong(), file.readDouble());
 	}
 
 	public List<ProductInputRelation> findByProductId(long productId) throws IOException {
@@ -70,9 +73,5 @@ public class InputsByProdcutFile extends BinaryFile<ProductInputRelation> {
 		}
 
 		return null;
-	}
-	
-	public void updateQuantity(ProductInputRelation p) {
-			
 	}
 }

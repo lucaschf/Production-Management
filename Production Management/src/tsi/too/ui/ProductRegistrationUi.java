@@ -267,7 +267,7 @@ public class ProductRegistrationUi extends JDialog {
 	}
 
 	private void registerInputs(Product p) {
-		new ProductionInputsAssociationUi(this, p).setVisible(true);
+		new AssociateInputToProductUI(this, p).setVisible(true);
 	}
 
 	private void update(Product p, Pair<Product, Long> target) {

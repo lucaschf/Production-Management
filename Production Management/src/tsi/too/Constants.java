@@ -120,4 +120,6 @@ public interface Constants {
 	String ENTRY = "Lançamento";
 	String INPUT_ENTRY = "Lançamento de insumos";
 	String INVALID_DATE = "Data inválida";
+	String INVALID_QUANTITY = "Quantidade invalida";
+	String INVALID_PRODUCT_QUANTITY = "Informe uma quantidade do produto válida";
 }

@@ -17,7 +17,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
@@ -38,9 +40,9 @@ import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
 public class AssociateInputToProductUI extends JFrame {
-	private static final String LINKING_INFO_MESSAGE = "<html>Ao vincular um insumo, insira a quantidade desejada atraves da coluna quantidade " +
-			"na tabela de insumos desvinculados. Insumos cuja quantidade esteja com 0, ser�o adicionados com a quantide 1.<br/> \u00C9 possivel " +
-			"realizar a altera\u00E7\u00E3o da quantidade, atrav\u00E9s do menu de contexto da tabela de insumos vinculados.</html>";
+	private static final String LINKING_INFO_MESSAGE = "<html>Ao vincular um insumo, insira a quantidade desejada atraves da coluna quantidade "
+			+ "na tabela de insumos desvinculados. Insumos cuja quantidade esteja com 0, ser�o adicionados com a quantide 1.<br/> \u00C9 possivel "
+			+ "realizar a altera\u00E7\u00E3o da quantidade, atrav\u00E9s do menu de contexto da tabela de insumos vinculados.</html>";
 	private JTable tbUnlinked;
 	private JTable tbLinked;
 
@@ -55,9 +57,11 @@ public class AssociateInputToProductUI extends JFrame {
 	private ProductController productController;
 	private InputsByProductController inputsByProductController;
 	private JComboBox<Product> cbProduct;
+	private JLabel lblQuantity;
+	private JSpinner spQuantity;
 
 	/**
-	 * @param parentComponent 
+	 * @param parentComponent
 	 * @wbp.parser.constructor
 	 */
 	public AssociateInputToProductUI(Component parentComponent) {
@@ -85,24 +89,19 @@ public class AssociateInputToProductUI extends JFrame {
 		inputsPanel.setBorder(new TitledBorder(null, Constants.PRODUCTION_INPUTS, TitledBorder.LEADING,
 				TitledBorder.TOP, null, null));
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addComponent(inputsPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(productPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 868, Short.MAX_VALUE))
-					.addContainerGap())
-		);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(productPanel, GroupLayout.PREFERRED_SIZE, 76, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(inputsPanel, GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE)
-					.addContainerGap())
-		);
+		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(groupLayout.createSequentialGroup().addContainerGap()
+						.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+								.addComponent(inputsPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(productPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 868,
+										Short.MAX_VALUE))
+						.addContainerGap()));
+		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(Alignment.LEADING,
+				groupLayout.createSequentialGroup().addContainerGap()
+						.addComponent(productPanel, GroupLayout.PREFERRED_SIZE, 76, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(inputsPanel, GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE).addContainerGap()));
 
 		JPanel unlinkedPanel = new JPanel();
 		unlinkedPanel.setBorder(new TitledBorder(
@@ -123,47 +122,37 @@ public class AssociateInputToProductUI extends JFrame {
 		JButton btnUnlink = new JButton(Constants.UNLINK);
 		btnUnlink.addActionListener(e -> unlink());
 
-		JLabel lblNewLabel = new JLabel(
-				LINKING_INFO_MESSAGE);
+		JLabel lblNewLabel = new JLabel(LINKING_INFO_MESSAGE);
 		lblNewLabel.setAutoscrolls(true);
 		lblNewLabel.setIcon(new ImageIcon(AssociateInputToProductUI.class.getResource("/resources/ic_info.png")));
 		lblNewLabel.setIconTextGap(10);
 
 		GroupLayout gl_inputsPanel = new GroupLayout(inputsPanel);
-		gl_inputsPanel.setHorizontalGroup(
-			gl_inputsPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_inputsPanel.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_inputsPanel.createParallelGroup(Alignment.LEADING)
+		gl_inputsPanel.setHorizontalGroup(gl_inputsPanel.createParallelGroup(Alignment.LEADING).addGroup(gl_inputsPanel
+				.createSequentialGroup().addContainerGap()
+				.addGroup(gl_inputsPanel.createParallelGroup(Alignment.LEADING)
 						.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 834, Short.MAX_VALUE)
 						.addGroup(gl_inputsPanel.createSequentialGroup()
-							.addComponent(unlinkedPanel, GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_inputsPanel.createParallelGroup(Alignment.LEADING, false)
-								.addComponent(btnNewInput, GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
-								.addComponent(btnLink, GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
-								.addComponent(btnUnlink, GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE))
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(linkedPanel, GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE)))
-					.addContainerGap())
-		);
-		gl_inputsPanel.setVerticalGroup(
-			gl_inputsPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_inputsPanel.createSequentialGroup()
-					.addGroup(gl_inputsPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(linkedPanel, 0, 0, Short.MAX_VALUE)
-						.addGroup(gl_inputsPanel.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(btnLink)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnNewInput)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnUnlink))
-						.addComponent(unlinkedPanel, GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
-		);
+								.addComponent(unlinkedPanel, GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(gl_inputsPanel.createParallelGroup(Alignment.LEADING, false)
+										.addComponent(btnNewInput, GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+										.addComponent(btnLink, GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+										.addComponent(btnUnlink, GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(linkedPanel, GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE)))
+				.addContainerGap()));
+		gl_inputsPanel
+				.setVerticalGroup(gl_inputsPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_inputsPanel.createSequentialGroup().addGroup(gl_inputsPanel
+								.createParallelGroup(Alignment.LEADING).addComponent(linkedPanel, 0, 0, Short.MAX_VALUE)
+								.addGroup(gl_inputsPanel.createSequentialGroup().addContainerGap().addComponent(btnLink)
+										.addPreferredGap(ComponentPlacement.RELATED).addComponent(btnNewInput)
+										.addPreferredGap(ComponentPlacement.RELATED).addComponent(btnUnlink))
+								.addComponent(unlinkedPanel, GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE)
+								.addContainerGap()));
 
 		scrollLinked = new JScrollPane();
 		GroupLayout gl_linkedPanel = new GroupLayout(linkedPanel);
@@ -181,12 +170,15 @@ public class AssociateInputToProductUI extends JFrame {
 
 		scrollUnlinked = new JScrollPane();
 		GroupLayout gl_unlinkedPanel = new GroupLayout(unlinkedPanel);
-		gl_unlinkedPanel.setHorizontalGroup(gl_unlinkedPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_unlinkedPanel.createSequentialGroup().addContainerGap()
-						.addComponent(scrollUnlinked, GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE).addContainerGap()));
+		gl_unlinkedPanel
+				.setHorizontalGroup(gl_unlinkedPanel.createParallelGroup(Alignment.LEADING).addGroup(Alignment.TRAILING,
+						gl_unlinkedPanel.createSequentialGroup().addContainerGap()
+								.addComponent(scrollUnlinked, GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+								.addContainerGap()));
 		gl_unlinkedPanel.setVerticalGroup(gl_unlinkedPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_unlinkedPanel.createSequentialGroup().addContainerGap()
-						.addComponent(scrollUnlinked, GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE).addContainerGap()));
+						.addComponent(scrollUnlinked, GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
+						.addContainerGap()));
 
 		initUnlinkedTable();
 		unlinkedPanel.setLayout(gl_unlinkedPanel);
@@ -197,17 +189,30 @@ public class AssociateInputToProductUI extends JFrame {
 
 		initProductsCombobox();
 
+		lblQuantity = new JLabel(String.format("%s:", Constants.QUANTITY));
+
+		spQuantity = new JSpinner(new SpinnerNumberModel(0.0, 0.0, null, 0.5));
+		spQuantity.addChangeListener(e -> loadInputs(getProductSelected().getId(), getQuantity()));
+		lblQuantity.setLabelFor(spQuantity);
+
 		GroupLayout gl_productPanel = new GroupLayout(productPanel);
 		gl_productPanel.setHorizontalGroup(gl_productPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_productPanel.createSequentialGroup().addContainerGap().addComponent(lblProduct)
 						.addPreferredGap(ComponentPlacement.UNRELATED)
 						.addComponent(cbProduct, GroupLayout.PREFERRED_SIZE, 386, GroupLayout.PREFERRED_SIZE)
-						.addContainerGap(413, Short.MAX_VALUE)));
-		gl_productPanel.setVerticalGroup(gl_productPanel.createParallelGroup(Alignment.LEADING).addGroup(gl_productPanel
-				.createSequentialGroup().addContainerGap()
-				.addGroup(gl_productPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblProduct).addComponent(
-						cbProduct, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-				.addContainerGap(46, Short.MAX_VALUE)));
+						.addPreferredGap(ComponentPlacement.UNRELATED)
+						.addComponent(lblQuantity, GroupLayout.DEFAULT_SIZE, 76, Short.MAX_VALUE)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(spQuantity, GroupLayout.PREFERRED_SIZE, 133, GroupLayout.PREFERRED_SIZE)
+						.addGap(166)));
+		gl_productPanel.setVerticalGroup(gl_productPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_productPanel.createSequentialGroup().addContainerGap()
+						.addGroup(gl_productPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblProduct)
+								.addComponent(cbProduct, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblQuantity).addComponent(spQuantity, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addContainerGap(24, Short.MAX_VALUE)));
 		productPanel.setLayout(gl_productPanel);
 		getContentPane().setLayout(groupLayout);
 	}
@@ -217,12 +222,19 @@ public class AssociateInputToProductUI extends JFrame {
 			cbProduct = new JComboBox<>(productController.fetchProductsAsVector());
 			cbProduct.addItemListener(e -> {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					loadInputs(((Product) e.getItem()).getId());
+					var p = ((Product) e.getItem());
+					loadInputs(p.getId(), getQuantity());
+					try {
+						lblQuantity.setText(
+								String.format("%s(%s):", Constants.QUANTITY, p.getMeasureUnity().getInitials()));
+					} catch (Exception ez) {
+						lblQuantity.setText(String.format("%s:", Constants.QUANTITY));
+					}
 				}
 			});
 
-			loadInputs(getProductSelected().getId());
-		} catch (IOException e) {
+			loadInputs(getProductSelected().getId(), getQuantity());
+		} catch (NullPointerException | IOException e) {
 			MessageDialog.showErrorDialog(this, getTitle(), Constants.FAILED_TO_FETCH_DATA);
 			// TODO lock form
 		}
@@ -247,20 +259,28 @@ public class AssociateInputToProductUI extends JFrame {
 
 		try {
 			for (int i : selected) {
-				inputsByProductController.unLink(product.getId(), linkedTableModel.getValueAt(i).getId());
+				inputsByProductController.unLink(product.getId(), linkedTableModel.getValueAt(i).getId(), getQuantity());
 			}
 
 			MessageDialog.showInformationDialog(this, getTitle(), Constants.UNLINKING_SUCCESS);
 		} catch (IOException e) {
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.UNLINKING_FAILURE);
 		} finally {
-			loadInputs(product.getId());
+			loadInputs(product.getId(), getQuantity());
 		}
 	}
 
 	private void newInput() {
 		new InputsRegistrationUi(this).setVisible(true);
-		loadInputs(getProductSelected().getId());
+		loadInputs(getProductSelected().getId(), getQuantity());
+	}
+
+	private double getQuantity() {
+		try {
+			return (Double) spQuantity.getValue();
+		} catch (Exception e) {
+			return 0;
+		}
 	}
 
 	/**
@@ -280,18 +300,33 @@ public class AssociateInputToProductUI extends JFrame {
 		if (selected.length == 0)
 			return;
 
+		var q = getQuantity();
+		if (q == 0) {
+			MessageDialog.showAlertDialog(getTitle(), Constants.INVALID_QUANTITY);
+			return;
+		}
+
 		try {
 			for (int i : selected) {
 				var target = unlinkedTableModel.getValueAt(i);
-				inputsByProductController.link(new ProductInputRelation(product.getId(), target.getId(),
-						target.getQuantity() > 0 ? target.getQuantity() : 1));
+				
+				System.out.println(target);
+
+				var quantity =  target.getQuantity();
+				
+				System.out.println(quantity);
+				
+				var relation = new ProductInputRelation(product.getId(), q, target.getId(),
+						target.getQuantity() > 0 ? target.getQuantity() : 1.0);
+
+				inputsByProductController.link(relation);
 			}
 
 			MessageDialog.showInformationDialog(this, getTitle(), Constants.LINKING_SUCCESS);
-		} catch (IOException e) {
+		} catch (NullPointerException | IOException e) {
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.LINKING_FAILURE);
 		} finally {
-			loadInputs(product.getId());
+			loadInputs(product.getId(), getQuantity());
 		}
 	}
 
@@ -316,7 +351,7 @@ public class AssociateInputToProductUI extends JFrame {
 		tbLinked.setColumnSelectionAllowed(true);
 		tbLinked.setFillsViewportHeight(true);
 		tbLinked.addMouseListener(new TableMouseSelectionListener(tbLinked));
-		
+
 		scrollLinked.setViewportView(tbLinked);
 
 		UiUtils.setHorizontalAlignment(tbLinked, SwingConstants.LEFT);
@@ -347,20 +382,27 @@ public class AssociateInputToProductUI extends JFrame {
 		if (quantity != null && quantity != target.getQuantity()) {
 			target.setQuantity(quantity);
 
+			double amountProduced;
+			try {
+				amountProduced = (Double) spQuantity.getValue();
+			} catch (Exception e) {
+				MessageDialog.showAlertDialog(getTitle(), Constants.INVALID_PRODUCT_QUANTITY);
+				return;
+			}
+
 			try {
 				var pos = inputsByProductController.fetchByProductAndInput(product.getId(), target.getId());
 
-				inputsByProductController.update(pos.getSecond(),
-						new ProductInputRelation(product.getId(), target.getId(), target.getQuantity()));
+				inputsByProductController.update(pos.getSecond(), new ProductInputRelation(product.getId(),
+						amountProduced, target.getId(), target.getQuantity()));
 
 				MessageDialog.showInformationDialog(this, getTitle(), Constants.QUANTITY_SUCCESSFUL_CHANGED);
 			} catch (IOException e) {
 				MessageDialog.showInformationDialog(this, getTitle(), Constants.QUANTITY_CHANGE_FAILURE);
 			} finally {
-				loadInputs(product.getId());
+				loadInputs(product.getId(), getQuantity());
 			}
 		}
-
 	}
 
 	private void initUnlinkedTable() {
@@ -370,7 +412,7 @@ public class AssociateInputToProductUI extends JFrame {
 		tbUnlinked.removeColumn(tbUnlinked.getColumnModel().getColumn(3));
 		tbUnlinked.removeColumn(tbUnlinked.getColumnModel().getColumn(0));
 		tbUnlinked.setFillsViewportHeight(true);
-		
+
 		scrollUnlinked.setViewportView(tbUnlinked);
 
 		UiUtils.setHorizontalAlignment(tbUnlinked, SwingConstants.LEFT);
@@ -397,9 +439,9 @@ public class AssociateInputToProductUI extends JFrame {
 	 * 
 	 * @param productId the target product id.
 	 */
-	private void loadInputs(long productId) {
-		loadLinkedInputs(productId);
-		loadUnlinkedInputs(productId);
+	private void loadInputs(long productId, double quantity) {
+		loadLinkedInputs(productId, quantity);
+		loadUnlinkedInputs(productId, quantity);
 	}
 
 	/**
@@ -408,10 +450,10 @@ public class AssociateInputToProductUI extends JFrame {
 	 * 
 	 * @param productId the target product id.
 	 */
-	private void loadLinkedInputs(long productId) {
+	private void loadLinkedInputs(long productId, double quantity) {
 		try {
 			linkedTableModel.clear();
-			var s = inputsByProductController.fetchLinkedInputs(productId);
+			var s = inputsByProductController.fetchLinkedInputs(productId, quantity);
 			linkedTableModel.addRows(s);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -424,10 +466,10 @@ public class AssociateInputToProductUI extends JFrame {
 	 * 
 	 * @param productId the target product id.
 	 */
-	private void loadUnlinkedInputs(long productId) {
+	private void loadUnlinkedInputs(long productId, double quantity) {
 		try {
 			unlinkedTableModel.clear();
-			var s = inputsByProductController.fetchUnlinkedInputs(productId);
+			var s = inputsByProductController.fetchUnlinkedInputs(productId, quantity);
 			unlinkedTableModel.addRows(s);
 		} catch (IOException e) {
 			e.printStackTrace();

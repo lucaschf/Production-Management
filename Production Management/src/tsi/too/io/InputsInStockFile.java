@@ -26,7 +26,7 @@ public class InputsInStockFile extends BinaryFile<Pair<Input, LocalDateTime>> {
 	@Override
 	public void write(Pair<Input, LocalDateTime> e) throws IOException {
 		writeString(e.getFirst().getName(), MAX_NAME_LENGTH);
-		file.writeInt(e.getFirst().getQuantity());
+		file.writeDouble(e.getFirst().getQuantity());
 		file.writeLong(e.getFirst().getId());
 		file.writeDouble(e.getFirst().getPrice());
 		writeString(e.getSecond().format(DateTimeFormatter.ofPattern(BRAZILIAN_DATE_TIME_PATTERN)),

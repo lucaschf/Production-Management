@@ -4,11 +4,11 @@ public class Input implements Cloneable {
 	public static final int MAX_NAME_LENGTH = 50;
 
 	private String name;
-	private int quantity;
+	private double quantity;
 	private long id;
 	private double price;
 
-	public Input(String name, int quantity, long code, double price) {
+	public Input(String name, double quantity, long code, double price) {
 		super();
 		this.name = name;
 		this.quantity = quantity;
@@ -20,7 +20,7 @@ public class Input implements Cloneable {
 		this(name, 0, 0);
 	}
 
-	public Input(String name, int quantity, double price) {
+	public Input(String name, double quantity, double price) {
 		super();
 		this.name = name;
 		this.quantity = quantity;
@@ -35,11 +35,11 @@ public class Input implements Cloneable {
 		this.name = name;
 	}
 
-	public int getQuantity() {
+	public double getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(int quantity) {
+	public void setQuantity(double quantity) {
 		this.quantity = quantity;
 	}
 
@@ -80,10 +80,9 @@ public class Input implements Cloneable {
 			throw new RuntimeException("Something goes wrong");
 		}
 	}
-	
+
 	@Override
 	public String toString() {
-		return String.format("Input {name= %s, quantity= %d, id= %d, price= %f}", name, quantity, id, price);
+		return String.format("Input {name= %s, quantity= %f, id= %d, price= %f}", name, quantity, id, price);
 	}
-
 }
