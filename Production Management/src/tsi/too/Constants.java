@@ -122,4 +122,19 @@ public interface Constants {
 	String INVALID_DATE = "Data inválida";
 	String INVALID_QUANTITY = "Quantidade invalida";
 	String INVALID_PRODUCT_QUANTITY = "Informe uma quantidade do produto válida";
+	String INCOME = "Entrada";
+	String IN_STOCK = "Em estoque";
+	String SIZE = "Tamanho";
+	String INVALID_SIZE = "Tamanho inválido";
+	String LINKING_INFO_MESSAGE = "<html>Ao vincular um insumo, insira a quantidade desejada atraves da coluna quantidade "
+			+ "na tabela de insumos desvinculados. Insumos cuja quantidade esteja com 0, serão adicionados com a quantidade 1.<br/> \u00C9 possivel "
+			+ "realizar a altera\u00E7\u00E3o da quantidade, atrav\u00E9s do menu de contexto da tabela de insumos vinculados.</html>";
+	String AMOUNT_PRODUCED = "Quantidade produzida";
+	String PRODUCT_ID = "Id do produto";
+	String UNITARY_MANUFACTURING_COST ="Custo de fabricação unitário";
+	String UNITARY_SALE_VALUE = "Custo de venda unitário";
+	String TOTAL_MANUFACTURING_COST = "Custo total de produção";
+	String TOTAL_SALE_VALUE = "Custo total de venda";
+	String INPUT_ID = "Id do insumo";
+	String THERE_IS_NO_ENOUGH_INPUTS_FOR_THIS_PRODUCTION = "Não há insumos suficientes para essa produção";
 }

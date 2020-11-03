@@ -4,9 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import tsi.too.Patterns;
-import tsi.too.model.InputStock;
+import tsi.too.model.InputEntry;
 
-public class InputStockFile extends BinaryFile<InputStock> {
+public class InputStockFile extends BinaryFile<InputEntry> {
 
 	public InputStockFile(String fileName) throws FileNotFoundException {
 		openFile(fileName, OpenMode.READ_WRITE);
@@ -14,7 +14,9 @@ public class InputStockFile extends BinaryFile<InputStock> {
 
 	@Override
 	public int recordSize() {
-		return Long.BYTES + // inputId
+		return
+				Long.BYTES + // entryid
+				Long.BYTES + // inputId
 				Double.BYTES + // incoming
 				Double.BYTES + // price
 				Double.BYTES + // available
@@ -23,7 +25,8 @@ public class InputStockFile extends BinaryFile<InputStock> {
 	}
 
 	@Override
-	public void write(InputStock e) throws IOException {
+	public void write(InputEntry e) throws IOException {
+		file.writeLong(e.getId());
 		file.writeLong(e.getInputId());
 		file.writeDouble(e.getPrice());
 		file.writeDouble(e.getIncoming());
@@ -32,13 +35,23 @@ public class InputStockFile extends BinaryFile<InputStock> {
 	}
 
 	@Override
-	public InputStock read() throws IOException {
-		var inputId = file.readInt();
+	public InputEntry read() throws IOException {
+		var id = file.readLong();
+		var inputId = file.readLong();
 		var price = file.readDouble();
 		var incoming = file.readDouble();
 		var available = file.readDouble();
 		var date = readDate(Patterns.BRAZILIAN_DATE_PATTERN);
 
-		return new InputStock(inputId, incoming, price, available, date);
+		return new InputEntry(id, inputId, incoming, price, available, date);
+	}
+	
+	public long getLastId() throws IOException {
+		var numberOfRecords = countRecords();
+
+		if (numberOfRecords == 0)
+			return 0;
+
+		return read(numberOfRecords - 1).getId();
 	}
 }

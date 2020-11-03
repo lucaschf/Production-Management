@@ -8,9 +8,9 @@ import tsi.too.model.MeasureUnity;
 import tsi.too.model.Product;
 
 @SuppressWarnings("serial")
-public class ProductTableModel extends CustomTableModel<Product>{
+public class ProductTableModel extends CustomTableModel<Product> {
 	public static final String[] COLUMN_NAMES = { Constants.ID, Constants.NAME, Constants.UNIT_OF_MEASUREMENT,
-			Constants.PROFIT_MARGIN };
+			Constants.PROFIT_MARGIN, Constants.UNIT_SIZE };
 
 	public ProductTableModel() {
 		super(COLUMN_NAMES, 0);
@@ -31,10 +31,11 @@ public class ProductTableModel extends CustomTableModel<Product>{
 		rowVector.add(item.getName());
 		rowVector.add(item.getMeasureUnity());
 		rowVector.add(item.getPercentageProfitMargin());
+		rowVector.add(item.getSize());
 
 		super.addRow(rowVector);
 	}
-	
+
 	@Override
 	public Product getValueAt(int row) {
 		try {
@@ -44,8 +45,9 @@ public class ProductTableModel extends CustomTableModel<Product>{
 			var name = (String) rowData.get(1);
 			var unity = (MeasureUnity) rowData.get(2);
 			var profit = (double) rowData.get(3);
+			var size = (double) rowData.get(4);
 
-			return new Product(productId, name, unity, profit);
+			return new Product(productId, name, unity, profit, size);
 		} catch (Exception e) {
 			return null;
 		}

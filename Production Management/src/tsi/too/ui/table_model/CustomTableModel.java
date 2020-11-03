@@ -65,8 +65,7 @@ public abstract class CustomTableModel<E> extends DefaultTableModel {
 	}
 
 	/**
-	/**
-	 * Removes all rows of this {@link TableModel}
+	 * /** Removes all rows of this {@link TableModel}
 	 * 
 	 * @since 0.1
 	 */

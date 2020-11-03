@@ -26,15 +26,15 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import tsi.too.Constants;
 import tsi.too.Patterns;
 import tsi.too.controller.InputController;
-import tsi.too.controller.InputStockController;
+import tsi.too.controller.InputEntryController;
 import tsi.too.ext.StringExt;
 import tsi.too.io.MessageDialog;
 import tsi.too.model.Input;
-import tsi.too.model.InputStock;
+import tsi.too.model.InputEntry;
 import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
-public class AddInputToStockUi extends JDialog {
+public class InputEntryUi extends JDialog {
 	private JFormattedTextField ftfprice;
 	private JComboBox<Input> cbInput;
 	private JSpinner spQuantity;
@@ -42,10 +42,10 @@ public class AddInputToStockUi extends JDialog {
 	private Component parentComponent;
 
 	private InputController inputController;
-	private InputStockController inputStockController;
+	private InputEntryController inputEntryController;
 	private JFormattedTextField ftfDate;
 
-	public AddInputToStockUi(Component parentComponent) {
+	public InputEntryUi(Component parentComponent) {
 		this.parentComponent = parentComponent;
 
 		initController();
@@ -59,7 +59,7 @@ public class AddInputToStockUi extends JDialog {
 	private void initController() {
 		try {
 			inputController = InputController.getInstance();
-			inputStockController = InputStockController.getInstance();
+			inputEntryController = InputEntryController.getInstance();
 		} catch (FileNotFoundException e) {
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.UNABLE_TO_OPEN_FILE);
 			dispose();
@@ -103,7 +103,7 @@ public class AddInputToStockUi extends JDialog {
 		JLabel lblInput = new JLabel(String.format("%s:", Constants.PRODUCTION_INPUT));
 		lblInput.setHorizontalAlignment(SwingConstants.TRAILING);
 
-		JLabel lblPrice = new JLabel(String.format("%s:", Constants.PRICE));
+		JLabel lblPrice = new JLabel("pre\u00E7o unit\u00E1rio:");
 		lblPrice.setHorizontalAlignment(SwingConstants.TRAILING);
 
 		try {
@@ -192,9 +192,15 @@ public class AddInputToStockUi extends JDialog {
 
 		try {
 			price = StringExt.toDouble(ftfprice.getText());
-			InputStock iStock = new InputStock(input.getId(), quantity, price, date);
+			
+			if (price  == 0.0) {
+				MessageDialog.showAlertDialog(getTitle(), "Informe o valor de entrada");
+				return;
+			}
+			
+			InputEntry iStock = new InputEntry(input.getId(), quantity, price, date);
 
-			inputStockController.insert(iStock);
+			inputEntryController.insert(iStock);
 			MessageDialog.showInformationDialog(this, getTitle(), Constants.RECORD_SUCCESSFULLY_INSERTED);
 			resetForm();
 		} catch (NumberFormatException ex) {

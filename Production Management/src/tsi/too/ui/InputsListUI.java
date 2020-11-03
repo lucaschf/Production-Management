@@ -28,7 +28,7 @@ import tsi.too.controller.InputController;
 import tsi.too.io.MessageDialog;
 import tsi.too.model.Input;
 import tsi.too.ui.helper.TableMouseSelectionListener;
-import tsi.too.ui.table_model.ProductionInputTableModel;
+import tsi.too.ui.table_model.InputTableModel;
 import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
@@ -37,7 +37,7 @@ public class InputsListUI extends JFrame {
 	private JTextField tfName;
 
 	private final TableRowSorter<AbstractTableModel> sorter = new TableRowSorter<>();
-	private final ProductionInputTableModel tableModel = new ProductionInputTableModel();
+	private final InputTableModel tableModel = new InputTableModel();
 
 	private final Component parentComponent;
 	private InputController controller;

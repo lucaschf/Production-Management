@@ -9,10 +9,10 @@ import tsi.too.ext.StringExt;
 import tsi.too.model.Input;
 
 @SuppressWarnings("serial")
-public class ProductionInputTableModel extends CustomTableModel<Input> {
+public class InputTableModel extends CustomTableModel<Input> {
 	public static final String[] COLUMN_NAMES = {Constants.ID, Constants.NAME, Constants.QUANTITY, Constants.UNITARY_PRICE };
 
-	public ProductionInputTableModel() {
+	public InputTableModel() {
 		super(COLUMN_NAMES, 0);
 	}
 

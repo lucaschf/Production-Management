@@ -11,15 +11,13 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.JTable;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
@@ -27,22 +25,20 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.TableCellEditor;
 
 import tsi.too.Constants;
-import tsi.too.controller.InputsByProductController;
 import tsi.too.controller.ProductController;
+import tsi.too.controller.ProductInputsController;
 import tsi.too.io.InputDialog;
 import tsi.too.io.MessageDialog;
 import tsi.too.model.Input;
 import tsi.too.model.Product;
-import tsi.too.model.ProductInputRelation;
+import tsi.too.model.ProductInput;
+import tsi.too.ui.helper.ProductComboboxRenderer;
 import tsi.too.ui.helper.TableMouseSelectionListener;
-import tsi.too.ui.table_model.ProductionInputTableModel;
+import tsi.too.ui.table_model.InputTableModel;
 import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
-public class AssociateInputToProductUI extends JFrame {
-	private static final String LINKING_INFO_MESSAGE = "<html>Ao vincular um insumo, insira a quantidade desejada atraves da coluna quantidade "
-			+ "na tabela de insumos desvinculados. Insumos cuja quantidade esteja com 0, ser�o adicionados com a quantide 1.<br/> \u00C9 possivel "
-			+ "realizar a altera\u00E7\u00E3o da quantidade, atrav\u00E9s do menu de contexto da tabela de insumos vinculados.</html>";
+public class AssociateInputToProductUI extends JDialog {
 	private JTable tbUnlinked;
 	private JTable tbLinked;
 
@@ -52,13 +48,11 @@ public class AssociateInputToProductUI extends JFrame {
 	private final Component parentComponent;
 
 	private final LinkingInputTableModel unlinkedTableModel = new LinkingInputTableModel();
-	private final ProductionInputTableModel linkedTableModel = new ProductionInputTableModel();
+	private final InputTableModel linkedTableModel = new InputTableModel();
 
 	private ProductController productController;
-	private InputsByProductController inputsByProductController;
+	private ProductInputsController inputsByProductController;
 	private JComboBox<Product> cbProduct;
-	private JLabel lblQuantity;
-	private JSpinner spQuantity;
 
 	/**
 	 * @param parentComponent
@@ -122,7 +116,7 @@ public class AssociateInputToProductUI extends JFrame {
 		JButton btnUnlink = new JButton(Constants.UNLINK);
 		btnUnlink.addActionListener(e -> unlink());
 
-		JLabel lblNewLabel = new JLabel(LINKING_INFO_MESSAGE);
+		JLabel lblNewLabel = new JLabel(Constants.LINKING_INFO_MESSAGE);
 		lblNewLabel.setAutoscrolls(true);
 		lblNewLabel.setIcon(new ImageIcon(AssociateInputToProductUI.class.getResource("/resources/ic_info.png")));
 		lblNewLabel.setIconTextGap(10);
@@ -186,33 +180,19 @@ public class AssociateInputToProductUI extends JFrame {
 
 		JLabel lblProduct = new JLabel(String.format("%s:", Constants.PRODUCT));
 		lblProduct.setHorizontalAlignment(SwingConstants.TRAILING);
-
 		initProductsCombobox();
-
-		lblQuantity = new JLabel(String.format("%s:", Constants.QUANTITY));
-
-		spQuantity = new JSpinner(new SpinnerNumberModel(0.0, 0.0, null, 0.5));
-		spQuantity.addChangeListener(e -> loadInputs(getProductSelected().getId(), getQuantity()));
-		lblQuantity.setLabelFor(spQuantity);
 
 		GroupLayout gl_productPanel = new GroupLayout(productPanel);
 		gl_productPanel.setHorizontalGroup(gl_productPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_productPanel.createSequentialGroup().addContainerGap().addComponent(lblProduct)
 						.addPreferredGap(ComponentPlacement.UNRELATED)
 						.addComponent(cbProduct, GroupLayout.PREFERRED_SIZE, 386, GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(ComponentPlacement.UNRELATED)
-						.addComponent(lblQuantity, GroupLayout.DEFAULT_SIZE, 76, Short.MAX_VALUE)
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addComponent(spQuantity, GroupLayout.PREFERRED_SIZE, 133, GroupLayout.PREFERRED_SIZE)
-						.addGap(166)));
-		gl_productPanel.setVerticalGroup(gl_productPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_productPanel.createSequentialGroup().addContainerGap()
-						.addGroup(gl_productPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblProduct)
-								.addComponent(cbProduct, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblQuantity).addComponent(spQuantity, GroupLayout.PREFERRED_SIZE,
-										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addContainerGap(24, Short.MAX_VALUE)));
+						.addContainerGap(377, Short.MAX_VALUE)));
+		gl_productPanel.setVerticalGroup(gl_productPanel.createParallelGroup(Alignment.LEADING).addGroup(gl_productPanel
+				.createSequentialGroup().addContainerGap()
+				.addGroup(gl_productPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblProduct).addComponent(
+						cbProduct, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+				.addContainerGap(15, Short.MAX_VALUE)));
 		productPanel.setLayout(gl_productPanel);
 		getContentPane().setLayout(groupLayout);
 	}
@@ -220,20 +200,15 @@ public class AssociateInputToProductUI extends JFrame {
 	private void initProductsCombobox() {
 		try {
 			cbProduct = new JComboBox<>(productController.fetchProductsAsVector());
+			cbProduct.setRenderer(new ProductComboboxRenderer());
 			cbProduct.addItemListener(e -> {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					var p = ((Product) e.getItem());
-					loadInputs(p.getId(), getQuantity());
-					try {
-						lblQuantity.setText(
-								String.format("%s(%s):", Constants.QUANTITY, p.getMeasureUnity().getInitials()));
-					} catch (Exception ez) {
-						lblQuantity.setText(String.format("%s:", Constants.QUANTITY));
-					}
+					loadInputs(p.getId());
 				}
 			});
 
-			loadInputs(getProductSelected().getId(), getQuantity());
+			loadInputs(getProductSelected().getId());
 		} catch (NullPointerException | IOException e) {
 			MessageDialog.showErrorDialog(this, getTitle(), Constants.FAILED_TO_FETCH_DATA);
 			// TODO lock form
@@ -259,28 +234,20 @@ public class AssociateInputToProductUI extends JFrame {
 
 		try {
 			for (int i : selected) {
-				inputsByProductController.unLink(product.getId(), linkedTableModel.getValueAt(i).getId(), getQuantity());
+				inputsByProductController.unLink(product.getId(), linkedTableModel.getValueAt(i).getId());
 			}
 
 			MessageDialog.showInformationDialog(this, getTitle(), Constants.UNLINKING_SUCCESS);
 		} catch (IOException e) {
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.UNLINKING_FAILURE);
 		} finally {
-			loadInputs(product.getId(), getQuantity());
+			loadInputs(product.getId());
 		}
 	}
 
 	private void newInput() {
 		new InputsRegistrationUi(this).setVisible(true);
-		loadInputs(getProductSelected().getId(), getQuantity());
-	}
-
-	private double getQuantity() {
-		try {
-			return (Double) spQuantity.getValue();
-		} catch (Exception e) {
-			return 0;
-		}
+		loadInputs(getProductSelected().getId());
 	}
 
 	/**
@@ -300,23 +267,11 @@ public class AssociateInputToProductUI extends JFrame {
 		if (selected.length == 0)
 			return;
 
-		var q = getQuantity();
-		if (q == 0) {
-			MessageDialog.showAlertDialog(getTitle(), Constants.INVALID_QUANTITY);
-			return;
-		}
-
 		try {
 			for (int i : selected) {
 				var target = unlinkedTableModel.getValueAt(i);
-				
-				System.out.println(target);
 
-				var quantity =  target.getQuantity();
-				
-				System.out.println(quantity);
-				
-				var relation = new ProductInputRelation(product.getId(), q, target.getId(),
+				var relation = new ProductInput(product.getId(), target.getId(),
 						target.getQuantity() > 0 ? target.getQuantity() : 1.0);
 
 				inputsByProductController.link(relation);
@@ -326,7 +281,7 @@ public class AssociateInputToProductUI extends JFrame {
 		} catch (NullPointerException | IOException e) {
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.LINKING_FAILURE);
 		} finally {
-			loadInputs(product.getId(), getQuantity());
+			loadInputs(product.getId());
 		}
 	}
 
@@ -375,32 +330,24 @@ public class AssociateInputToProductUI extends JFrame {
 	}
 
 	private void editItemQuantity(Input target) {
-		var quantity = InputDialog.showIntegerInputDialog(target.getName(), Constants.QUANTITY,
+		var quantity = InputDialog.showDoubleInputDialog(target.getName(), Constants.QUANTITY,
 				input -> input <= 0 ? Constants.QUANTITY_MUST_BE_GREATER_THAN_ZERO : null);
 		var product = getProductSelected();
 
 		if (quantity != null && quantity != target.getQuantity()) {
 			target.setQuantity(quantity);
 
-			double amountProduced;
-			try {
-				amountProduced = (Double) spQuantity.getValue();
-			} catch (Exception e) {
-				MessageDialog.showAlertDialog(getTitle(), Constants.INVALID_PRODUCT_QUANTITY);
-				return;
-			}
-
 			try {
 				var pos = inputsByProductController.fetchByProductAndInput(product.getId(), target.getId());
 
-				inputsByProductController.update(pos.getSecond(), new ProductInputRelation(product.getId(),
-						amountProduced, target.getId(), target.getQuantity()));
+				inputsByProductController.update(pos.getSecond(),
+						new ProductInput(product.getId(), target.getId(), target.getQuantity()));
 
 				MessageDialog.showInformationDialog(this, getTitle(), Constants.QUANTITY_SUCCESSFUL_CHANGED);
 			} catch (IOException e) {
 				MessageDialog.showInformationDialog(this, getTitle(), Constants.QUANTITY_CHANGE_FAILURE);
 			} finally {
-				loadInputs(product.getId(), getQuantity());
+				loadInputs(product.getId());
 			}
 		}
 	}
@@ -420,6 +367,7 @@ public class AssociateInputToProductUI extends JFrame {
 
 	private void setupWindow() {
 		setTitle(Constants.PRODUCTION_INPUTS);
+		setModal(true);
 		pack();
 		setLocationRelativeTo(parentComponent);
 	}
@@ -427,7 +375,7 @@ public class AssociateInputToProductUI extends JFrame {
 	private void initControllers() {
 		try {
 			productController = ProductController.getInstance();
-			inputsByProductController = InputsByProductController.getInstance();
+			inputsByProductController = ProductInputsController.getInstance();
 		} catch (FileNotFoundException e) {
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.UNABLE_TO_OPEN_FILE);
 		}
@@ -439,9 +387,9 @@ public class AssociateInputToProductUI extends JFrame {
 	 * 
 	 * @param productId the target product id.
 	 */
-	private void loadInputs(long productId, double quantity) {
-		loadLinkedInputs(productId, quantity);
-		loadUnlinkedInputs(productId, quantity);
+	private void loadInputs(long productId) {
+		loadLinkedInputs(productId);
+		loadUnlinkedInputs(productId);
 	}
 
 	/**
@@ -450,10 +398,10 @@ public class AssociateInputToProductUI extends JFrame {
 	 * 
 	 * @param productId the target product id.
 	 */
-	private void loadLinkedInputs(long productId, double quantity) {
+	private void loadLinkedInputs(long productId) {
 		try {
 			linkedTableModel.clear();
-			var s = inputsByProductController.fetchLinkedInputs(productId, quantity);
+			var s = inputsByProductController.fetchLinkedInputs(productId);
 			linkedTableModel.addRows(s);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -466,17 +414,17 @@ public class AssociateInputToProductUI extends JFrame {
 	 * 
 	 * @param productId the target product id.
 	 */
-	private void loadUnlinkedInputs(long productId, double quantity) {
+	private void loadUnlinkedInputs(long productId) {
 		try {
 			unlinkedTableModel.clear();
-			var s = inputsByProductController.fetchUnlinkedInputs(productId, quantity);
+			var s = inputsByProductController.fetchUnlinkedInputs(productId);
 			unlinkedTableModel.addRows(s);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private static class LinkingInputTableModel extends ProductionInputTableModel {
+	private static class LinkingInputTableModel extends InputTableModel {
 		@Override
 		public boolean isCellEditable(int row, int column) {
 			return getRowCount() > 0 && getColumnName(column).equals(Constants.QUANTITY);

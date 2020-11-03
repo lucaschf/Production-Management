@@ -8,20 +8,20 @@ import java.io.IOException;
 import tsi.too.model.Input;
 import tsi.too.util.Pair;
 
-public class ProductionInputsFile extends BinaryFile<Input> {
+public class InputsFile extends BinaryFile<Input> {
 
 	private final static String NAME = "ProdctionInputs.dat";
 
-	private static ProductionInputsFile instance;
+	private static InputsFile instance;
 
-	private ProductionInputsFile() throws FileNotFoundException {
+	private InputsFile() throws FileNotFoundException {
 		openFile(NAME, OpenMode.READ_WRITE);
 	}
 
-	public static ProductionInputsFile getInstance() throws FileNotFoundException {
-		synchronized (ProductionInputsFile.class) {
+	public static InputsFile getInstance() throws FileNotFoundException {
+		synchronized (InputsFile.class) {
 			if (instance == null)
-				instance = new ProductionInputsFile();
+				instance = new InputsFile();
 
 			return instance;
 		}

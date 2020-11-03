@@ -27,18 +27,19 @@ import javax.swing.border.TitledBorder;
 
 import tsi.too.Constants;
 import tsi.too.Patterns;
-import tsi.too.controller.InputsByProductController;
+import tsi.too.controller.InputEntryController;
 import tsi.too.controller.ProductController;
+import tsi.too.controller.ProductInputsController;
 import tsi.too.controller.ProductionController;
-import tsi.too.ext.NumberExt;
 import tsi.too.io.InputDialog.InputValidator;
 import tsi.too.io.MessageDialog;
 import tsi.too.model.Product;
 import tsi.too.model.Production;
+import tsi.too.ui.helper.ProductComboboxRenderer;
 import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
-public class ProductionRegistrationUi extends JDialog {
+public class ProductionEntryUi extends JDialog {
 	private JFormattedTextField ftfTotalSaleValue;
 	private JFormattedTextField ftfProductionDate;
 	private JPanel formPanel;
@@ -48,8 +49,9 @@ public class ProductionRegistrationUi extends JDialog {
 	private BottomActionPanel bottomActionPanel;
 
 	private ProductController productController;
-	private InputsByProductController inputsByProductController;
+	private ProductInputsController inputsByProductController;
 	private ProductionController productionController;
+	private InputEntryController inputEntryController;
 
 	private JComboBox<Product> cbProduct;
 	private Production target;
@@ -59,7 +61,7 @@ public class ProductionRegistrationUi extends JDialog {
 	private JLabel lblError;
 	private JLabel lblProductionDate;
 
-	public ProductionRegistrationUi(Component parentComponent) {
+	public ProductionEntryUi(Component parentComponent) {
 		this.parentComponent = parentComponent;
 
 		initControllers();
@@ -71,8 +73,9 @@ public class ProductionRegistrationUi extends JDialog {
 	private void initControllers() {
 		try {
 			productController = ProductController.getInstance();
-			inputsByProductController = InputsByProductController.getInstance();
+			inputsByProductController = ProductInputsController.getInstance();
 			productionController = ProductionController.getInstance();
+			inputEntryController = InputEntryController.getInstance();
 		} catch (FileNotFoundException e) {
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.UNABLE_TO_OPEN_FILE);
 		}
@@ -86,9 +89,8 @@ public class ProductionRegistrationUi extends JDialog {
 	}
 
 	private void initComponents() {
-		initFieldsPanel();
-
 		bottomActionPanel = new BottomActionPanel(Constants.CANCEL, e -> onCancel(), Constants.TO_RECORD, e -> onOk());
+		initFieldsPanel();
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout
 				.createSequentialGroup().addContainerGap()
@@ -259,6 +261,9 @@ public class ProductionRegistrationUi extends JDialog {
 			var products = productController.fetchProductsAsVector();
 
 			cbProduct = new JComboBox<>(products);
+			cbProduct.setRenderer(new ProductComboboxRenderer());
+
+			bottomActionPanel.setPositiveButtonEnabled(!products.isEmpty());
 
 			cbProduct.addItemListener(e -> {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -268,6 +273,7 @@ public class ProductionRegistrationUi extends JDialog {
 				}
 			});
 		} catch (IOException e) {
+			bottomActionPanel.setPositiveButtonEnabled(false);
 			MessageDialog.showErrorDialog(this, getTitle(), Constants.FAILED_TO_FETCH_DATA);
 		}
 	}
@@ -291,24 +297,25 @@ public class ProductionRegistrationUi extends JDialog {
 		}
 
 		setInProgress(true);
+
 		try {
 			var quantity = (Double) spQuantity.getValue();
-			product = product
-					.with(inputsByProductController.fetchLinkedInputsWithPrice(product.getId(),  date, quantity));
+			var inputs = inputsByProductController.fetchAll(product.getId());
 
-			var manufacturingCost = product.getManufacturingCost() * quantity;
-			var totalSaleValue = product.getSaleValue() * quantity;
-
-			ftfProductionCost.setText(NumberExt.toBrazilianCurrency(manufacturingCost));
-			ftfTotalSaleValue.setText(NumberExt.toBrazilianCurrency(totalSaleValue));
-
-			target = new Production(product.getId(), (double) spQuantity.getValue(), date, manufacturingCost,
-					totalSaleValue);
-		} catch (Exception ex) {
+			var s = inputEntryController.reserveForCheckOut(inputs, quantity, date);
+			System.out.println(s);
+		} catch (IOException ex) {
+			ex.printStackTrace();
 			target = null;
 			lblError.setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			target = null;
+			lblError.setVisible(true);
+			MessageDialog.showAlertDialog(this, getTitle(), Constants.THERE_IS_NO_ENOUGH_INPUTS_FOR_THIS_PRODUCTION);
 		} finally {
 			setInProgress(false);
+			bottomActionPanel.setPositiveButtonEnabled(!lblError.isVisible());
 		}
 	}
 
@@ -353,7 +360,7 @@ public class ProductionRegistrationUi extends JDialog {
 			return;
 		}
 
-		if (target.getManufacturingCost() == 0
+		if (target.getUnitaryManufacturingCost() == 0
 				&& !MessageDialog.showConfirmationDialog(this, getTitle(), Constants.PRODUCTION_WITHOUT_INPUTS_MESSAGE))
 			return;
 

@@ -14,20 +14,20 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.TableColumnModel;
 
 import tsi.too.Constants;
-import tsi.too.controller.InputPriceEntryController;
+import tsi.too.controller.InputEntryController;
 import tsi.too.io.MessageDialog;
 import tsi.too.ui.helper.TableMouseSelectionListener;
-import tsi.too.ui.table_model.PriceEntryModel;
+import tsi.too.ui.table_model.InputStockTableModel;
 import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
 public class InputsPriceChangesListUi extends JFrame {
 	private JTable tbEntries;
 
-	private final PriceEntryModel tableModel = new PriceEntryModel();
+	private final InputStockTableModel tableModel = new InputStockTableModel();
 
 	private final Component parentComponent;
-	private InputPriceEntryController controller;
+	private InputEntryController controller;
 
 	public InputsPriceChangesListUi(Component parentComponent) {
 		this.parentComponent = parentComponent;
@@ -43,7 +43,7 @@ public class InputsPriceChangesListUi extends JFrame {
 	private void initComponent() {
 		JPanel dataPanel = new JPanel();
 		dataPanel.setBorder(
-				new TitledBorder(null, Constants.PRODUCT, TitledBorder.LEADING, TitledBorder.TOP, null, null));
+				new TitledBorder(null, Constants.ENTRY, TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(Alignment.LEADING,
 				groupLayout.createSequentialGroup().addContainerGap()
@@ -87,7 +87,7 @@ public class InputsPriceChangesListUi extends JFrame {
 
 	private void initController() {
 		try {
-			controller = InputPriceEntryController.getInstance();
+			controller = InputEntryController.getInstance();
 		} catch (Exception e) {
 			MessageDialog.showAlertDialog(parentComponent, Constants.PRODUCT_LISTING, Constants.FAILED_TO_FETCH_DATA);
 			dispose();

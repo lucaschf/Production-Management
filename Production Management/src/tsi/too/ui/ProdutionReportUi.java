@@ -3,6 +3,7 @@ package tsi.too.ui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -12,6 +13,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
@@ -19,20 +21,26 @@ import javax.swing.border.TitledBorder;
 import tsi.too.Constants;
 import tsi.too.controller.ProductionController;
 import tsi.too.io.MessageDialog;
+import tsi.too.ui.table_model.ProductionTableModel;
 
 @SuppressWarnings("serial")
 public class ProdutionReportUi extends JDialog {
 	private ProductionController controller;
-	
+
+	private JTable tbProduction;
+
 	private final Component parentComponent;
-	
+	private final ProductionTableModel tableModel = new ProductionTableModel();
+
 	public ProdutionReportUi(Component parentComponent) {
 		this.parentComponent = parentComponent;
-		
+
 		initController();
-		
+
 		initComponent();
 		setupWindow();
+		
+		fetchData();
 	}
 
 	private void initComponent() {
@@ -79,20 +87,15 @@ public class ProdutionReportUi extends JDialog {
 
 		JScrollPane scrollPane = new JScrollPane();
 		GroupLayout gl_tablePanel = new GroupLayout(tablePanel);
-		gl_tablePanel.setHorizontalGroup(
-			gl_tablePanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_tablePanel.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 832, Short.MAX_VALUE)
-					.addContainerGap())
-		);
-		gl_tablePanel.setVerticalGroup(
-			gl_tablePanel.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_tablePanel.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
-					.addContainerGap())
-		);
+		gl_tablePanel.setHorizontalGroup(gl_tablePanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_tablePanel.createSequentialGroup().addContainerGap()
+						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 832, Short.MAX_VALUE).addContainerGap()));
+		gl_tablePanel.setVerticalGroup(gl_tablePanel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_tablePanel.createSequentialGroup().addContainerGap()
+						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE).addContainerGap()));
+
+		tbProduction = new JTable(tableModel);
+		scrollPane.setViewportView(tbProduction);
 		tablePanel.setLayout(gl_tablePanel);
 
 		BottomActionPanel bottomPanel = new BottomActionPanel(Constants.CANCEL, e -> onCancel(), Constants.OK,
@@ -122,12 +125,21 @@ public class ProdutionReportUi extends JDialog {
 			MessageDialog.showErrorDialog(this, getTitle(), Constants.UNABLE_TO_OPEN_FILE);
 		}
 	}
-	
+
 	private void setupWindow() {
 		setTitle(Constants.PRODUCTION_REPORT);
 		setMinimumSize(new Dimension(900, 600));
 		pack();
 		setLocationRelativeTo(parentComponent);
+	}
+
+	private void fetchData() {
+		try {
+			tableModel.clear();
+			tableModel.addRows(controller.fetchAll());
+		} catch (IOException e) {
+			MessageDialog.showAlertDialog(Constants.PRODUCT, Constants.FAILED_TO_FETCH_DATA);
+		}
 	}
 	
 	private void onCancel() {
@@ -135,6 +147,6 @@ public class ProdutionReportUi extends JDialog {
 	}
 
 	private void onOk() {
-		
+		dispose();
 	}
 }

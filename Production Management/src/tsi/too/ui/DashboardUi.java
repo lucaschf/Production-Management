@@ -50,7 +50,7 @@ public class DashboardUi extends JFrame {
 		JMenu mnEntry = new JMenu(Constants.ENTRY);
 
 		JMenuItem mntmInputEntry = new JMenuItem(Constants.PRODUCTION_INPUTS);
-		mntmInputEntry.addActionListener(e -> new AddInputToStockUi(this).setVisible(true));
+		mntmInputEntry.addActionListener(e -> new InputEntryUi(this).setVisible(true));
 		mnEntry.add(mntmInputEntry);
 		
 		return mnEntry;
@@ -88,7 +88,7 @@ public class DashboardUi extends JFrame {
 		mnRegister.add(mntmRegisterProduct);
 
 		JMenuItem mntmRegisterProduction = new JMenuItem(Constants.PRODUCTION);
-		mntmRegisterProduction.addActionListener(e -> new ProductionRegistrationUi(this).setVisible(true));
+		mntmRegisterProduction.addActionListener(e -> new ProductionEntryUi(this).setVisible(true));
 		mnRegister.add(mntmRegisterProduction);
 
 		JMenuItem mntmRegisterProductionInputs = new JMenuItem(Constants.PRODUCTION_INPUTS);
@@ -151,6 +151,7 @@ public class DashboardUi extends JFrame {
 				if (changeLook.equals(lookAndFeelsDisplay.get(i))) {
 					try {
 						UIManager.setLookAndFeel(lookAndFeelsRealNames.get(i));
+						repaint();
 						break;
 					} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
 							| UnsupportedLookAndFeelException ex) {

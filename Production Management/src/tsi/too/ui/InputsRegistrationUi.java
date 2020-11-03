@@ -24,7 +24,6 @@ import javax.swing.border.TitledBorder;
 
 import tsi.too.Constants;
 import tsi.too.controller.InputController;
-import tsi.too.controller.InputPriceEntryController;
 import tsi.too.ext.StringExt;
 import tsi.too.io.MessageDialog;
 import tsi.too.model.Input;
@@ -230,6 +229,7 @@ public class InputsRegistrationUi extends JDialog {
     private void fillFields() {
         if (input == null)
             return;
+        
         tfName.setText(input.getName());
     }
 }

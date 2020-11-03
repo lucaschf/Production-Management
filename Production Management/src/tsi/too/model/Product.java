@@ -12,33 +12,43 @@ public class Product implements Cloneable {
 	private long id;
 	private String name;
 	private MeasureUnity measureUnity;
+	private double size;
 	private double percentageProfitMargin;
 
-	private final ArrayList<Input> productionInputs = new ArrayList<>();
+	private final ArrayList<Input> inputs = new ArrayList<>();
 
-	public Product(long id, String name, MeasureUnity measureUnity, double percentageProfitMargin) {
+	public Product(long id, String name, MeasureUnity measureUnity, double percentageProfitMargin, double size) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.measureUnity = measureUnity;
 		this.percentageProfitMargin = percentageProfitMargin;
+		this.size = size;
+	}
+	
+	public Product(String name, MeasureUnity measureUnity, double percentageProfitMargin, double size) {
+		super();
+		this.name = name;
+		this.measureUnity = measureUnity;
+		this.percentageProfitMargin = percentageProfitMargin;
+		this.size = size;
 	}
 
 	public boolean addProductionInput(Input input) {
 		Objects.requireNonNull(input);
 
-		return productionInputs.add(input.clone());
+		return inputs.add(input.clone());
 	}
 
 	public boolean addProductionInput(Collection<Input> inputs) throws IllegalArgumentException {
 		if (inputs == null)
 			throw new IllegalArgumentException();
 
-		return productionInputs.addAll(inputs.stream().map(input -> input.clone()).collect(Collectors.toList()));
+		return this.inputs.addAll(inputs.stream().map(input -> input.clone()).collect(Collectors.toList()));
 	}
 
 	public List<Input> getProductionInputs() {
-		return productionInputs.stream().map(pi -> pi.clone()).collect(Collectors.toList());
+		return inputs.stream().map(pi -> pi.clone()).collect(Collectors.toList());
 	}
 
 	public long getId() {
@@ -79,7 +89,7 @@ public class Product implements Cloneable {
 	}
 
 	public double getManufacturingCost() {
-		return productionInputs.stream().mapToDouble(pi -> pi.getPriceForQuantity()).sum();
+		return inputs.stream().mapToDouble(pi -> pi.getPriceForQuantity()).sum();
 	}
 
 	public double getSaleValue() {
@@ -87,6 +97,10 @@ public class Product implements Cloneable {
 		var profit = (percentageProfitMargin * manufacturingCost) / 100;
 	
 		return manufacturingCost + profit;
+	}
+	
+	public double getSize() {
+		return size;
 	}
 
 	/**
@@ -110,7 +124,7 @@ public class Product implements Cloneable {
 	 */
 	public Product with(Collection<Input> inputs) {
 		var p = clone();
-		p.productionInputs.clear();
+		p.inputs.clear();
 		p.addProductionInput(inputs);
 		
 		return p;
@@ -127,6 +141,7 @@ public class Product implements Cloneable {
 
 	@Override
 	public String toString() {
-		return name; // used for combobox
+		return String.format("Product {id= %d, name= %s, measureUnity= %s, size= %f, percentageProfitMargin= %f, inputs= %s}",
+				id, name, measureUnity, size, percentageProfitMargin, inputs);
 	}
 }
