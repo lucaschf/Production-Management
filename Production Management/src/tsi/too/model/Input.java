@@ -29,6 +29,14 @@ public class Input implements Cloneable {
 		this.price = price;
 	}
 
+	public Input(long id, double quantity, double price) {
+		super();
+		this.name = "";
+		this.id = id;
+		this.quantity = quantity;
+		this.price = price;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -62,12 +70,13 @@ public class Input implements Cloneable {
 	}
 
 	/**
-	 * Creates a copy with the given id
+	 * Creates a copy of this {@link Input} with the new {@code id}.
 	 *
 	 * @param id the target id
-	 * @return a copy with a new id.
+	 * @return a copy with the new id
+	 * @throws CloneNotSupportedException if cloning is not supported.
 	 */
-	public Input withId(long id) {
+	public Input withId(long id) throws CloneNotSupportedException {
 		var p = clone();
 		p.id = id;
 
@@ -75,12 +84,8 @@ public class Input implements Cloneable {
 	}
 
 	@Override
-	public Input clone() {
-		try {
-			return (Input) super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException("Something goes wrong");
-		}
+	public Input clone() throws CloneNotSupportedException {
+		return (Input) super.clone();
 	}
 
 	@Override

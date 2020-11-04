@@ -38,6 +38,7 @@ import tsi.too.io.MessageDialog;
 import tsi.too.model.MeasureUnity;
 import tsi.too.model.Product;
 import tsi.too.util.Pair;
+import tsi.too.utils.Validators;
 
 @SuppressWarnings("serial")
 public class ProductRegistrationUi extends JDialog {
@@ -64,7 +65,10 @@ public class ProductRegistrationUi extends JDialog {
 	}
 
 	public ProductRegistrationUi(Component parentComponent, Product product) {
-		this.product = product == null ? null : product.clone();
+		try {
+			this.product = product == null ? null : product.clone();
+		} catch (CloneNotSupportedException ignored) {}
+
 		this.parentComponent = parentComponent;
 
 		setupWindow();
@@ -252,9 +256,9 @@ public class ProductRegistrationUi extends JDialog {
 		var name = tfName.getText();
 		var profitMargin = (double) spProfit.getValue();
 		var size = (double) spSize.getValue();
-		if (!productController.productNameValidator.isValid(name)) {
+		if (!Validators.nameValidator.isValid(name)) {
 			MessageDialog.showAlertDialog(this, getTitle(),
-					productController.productNameValidator.getErrorMessage(name));
+					Validators.nameValidator.getErrorMessage(name));
 			return;
 		}
 
@@ -285,7 +289,7 @@ public class ProductRegistrationUi extends JDialog {
 				default:
 					break;
 			}
-		} catch (IOException e) {
+		} catch (IOException | CloneNotSupportedException e) {
 			var message = actionEvent.getActionCommand().equals(UPDATE) ? FAILED_TO_UPDATE_RECORD
 					: FAILED_TO_INSERT_RECORD;
 			MessageDialog.showAlertDialog(this, getTitle(), message);
@@ -304,13 +308,13 @@ public class ProductRegistrationUi extends JDialog {
 			} else if (MessageDialog.showConfirmationDialog(this, PRODUCT_REGISTRATION, String.format("%s\n%s",
 					AN_ITEM_WITH_THIS_NAME_ALREADY_REGISTERED, DO_YOU_WANT_TO_UPDATE_WITH_INFORMED_VALUES)))
 				update(p.withId(target.getFirst().getId()), target);
-		} catch (IOException e) {
+		} catch (IOException | CloneNotSupportedException e) {
 			MessageDialog.showAlertDialog(this, UPDATE, FAILED_TO_INSERT_RECORD);
 		}
 	}
 
 	private void registerInputs(Product p) {
-		new AssociateInputToProductUI(this, p).setVisible(true);
+		new ProductInputsUI(this, p).setVisible(true);
 	}
 
 	private void update(Product p, Pair<Product, Long> target) {
@@ -327,7 +331,7 @@ public class ProductRegistrationUi extends JDialog {
 			MessageDialog.showInformationDialog(this, PRODUCT_REGISTRATION, RECORD_SUCCESSFULLY_UPDATED);
 			resetForm();
 
-		} catch (IOException | NullPointerException e) {
+		} catch (IOException  | NullPointerException | CloneNotSupportedException e) {
 			MessageDialog.showAlertDialog(this, UPDATE, FAILED_TO_UPDATE_RECORD);
 		}
 	}

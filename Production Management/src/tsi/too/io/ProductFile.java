@@ -25,10 +25,6 @@ public class ProductFile extends BinaryFile<Product> {
 		}
 	}
 
-	private ProductFile(String name) throws FileNotFoundException {
-		openFile(name, OpenMode.READ_WRITE);
-	}
-
 	@Override
 	public int recordSize() {
 		return Long.BYTES + // code
@@ -54,6 +50,12 @@ public class ProductFile extends BinaryFile<Product> {
 				file.readDouble(), file.readDouble());
 	}
 
+	/**
+	 * Retrieves the last {@link Product} id registered in the file.
+	 * 
+	 * @return the last id or {@code 0} if the file has no records.
+	 * @throws IOException if an I / O error occurs.
+	 */
 	public long getLastId() throws IOException {
 		var numberOfRecords = countRecords();
 

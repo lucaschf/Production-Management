@@ -1,25 +1,5 @@
 package tsi.too.ui;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.SwingConstants;
-import javax.swing.border.TitledBorder;
-
 import tsi.too.Constants;
 import tsi.too.Patterns;
 import tsi.too.controller.ProductionController;
@@ -28,8 +8,19 @@ import tsi.too.ui.helper.TableMouseSelectionListener;
 import tsi.too.ui.table_model.ProductionTableModel;
 import tsi.too.util.UiUtils;
 
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 @SuppressWarnings("serial")
-public class ProdutionReportUi extends JDialog {
+public class ProductionReportUi extends JDialog {
 	private ProductionController controller;
 
 	private JTable tbProduction;
@@ -39,9 +30,9 @@ public class ProdutionReportUi extends JDialog {
 	private JFormattedTextField ftfStartDate;
 	private JFormattedTextField ftfEndDate;
 
-	private final DateTimeFormatter dateFormater = DateTimeFormatter.ofPattern(Patterns.BRAZILIAN_DATE_PATTERN);
+	private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(Patterns.BRAZILIAN_DATE_PATTERN);
 
-	public ProdutionReportUi(Component parentComponent) {
+	public ProductionReportUi(Component parentComponent) {
 		this.parentComponent = parentComponent;
 
 		initController();
@@ -60,14 +51,14 @@ public class ProdutionReportUi extends JDialog {
 		JLabel lblStartDate = new JLabel(String.format("%s:", Constants.START_DATE));
 
 		ftfStartDate = new JFormattedTextField(UiUtils.createBrazilianDateMaskFormatter());
-		ftfStartDate.setText(LocalDate.now().minusDays(7).format(dateFormater));
+		ftfStartDate.setText(LocalDate.now().minusDays(7).format(dateFormatter));
 		lblStartDate.setLabelFor(ftfStartDate);
 
 		JLabel lblEndDate = new JLabel(String.format("%s:", Constants.END_DATE));
 		lblEndDate.setHorizontalAlignment(SwingConstants.TRAILING);
 
 		ftfEndDate = new JFormattedTextField(UiUtils.createBrazilianDateMaskFormatter());
-		ftfEndDate.setText(LocalDate.now().format(dateFormater));
+		ftfEndDate.setText(LocalDate.now().format(dateFormatter));
 		lblEndDate.setLabelFor(ftfEndDate);
 
 		JButton btnCreateReport = new JButton(Constants.GET_PRODUCTION_DATA);
@@ -137,7 +128,6 @@ public class ProdutionReportUi extends JDialog {
 		tbProduction.removeColumn(tbProduction.getColumnModel().getColumn(0));
 
 		UiUtils.setHorizontalAlignment(tbProduction, SwingConstants.LEFT);
-
 	}
 
 	private void initController() {
@@ -157,16 +147,8 @@ public class ProdutionReportUi extends JDialog {
 
 	private void fetchData() {
 		try {
-			LocalDate startDate;
-			LocalDate endDate;
-
-			try {
-				startDate = LocalDate.parse(ftfStartDate.getText(), dateFormater);
-				endDate = LocalDate.parse(ftfEndDate.getText(), dateFormater);
-			} catch (Exception e) {
-				MessageDialog.showAlertDialog(this, getTitle(), Constants.INVALID_PERIOD);
-				return;
-			}
+			LocalDate startDate = LocalDate.parse(ftfStartDate.getText(), dateFormatter);
+			LocalDate endDate = LocalDate.parse(ftfEndDate.getText(), dateFormatter);
 
 			if (startDate.isAfter(endDate)) {
 				MessageDialog.showAlertDialog(this, getTitle(), Constants.INVALID_PERIOD);
@@ -174,8 +156,11 @@ public class ProdutionReportUi extends JDialog {
 
 			tableModel.clear();
 			tableModel.addRows(controller.fetchPairedByPeriod(startDate, endDate));
+			System.out.println(controller.fetchPairedByPeriod(startDate, endDate));
 		} catch (IOException e) {
-			MessageDialog.showAlertDialog(Constants.PRODUCT, Constants.FAILED_TO_FETCH_DATA);
+			MessageDialog.showAlertDialog(this, Constants.PRODUCT, Constants.FAILED_TO_FETCH_DATA);
+		} catch (DateTimeParseException e) {
+			MessageDialog.showAlertDialog(this, getTitle(), Constants.INVALID_PERIOD);
 		}
 	}
 

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -35,7 +36,7 @@ import tsi.too.exception.InsufficientStockException;
 import tsi.too.ext.NumberExt;
 import tsi.too.io.InputDialog.InputValidator;
 import tsi.too.io.MessageDialog;
-import tsi.too.model.InputEntry;
+import tsi.too.model.Input;
 import tsi.too.model.Product;
 import tsi.too.model.Production;
 import tsi.too.ui.helper.ProductComboboxRenderer;
@@ -49,7 +50,7 @@ public class ProductionEntryUi extends JDialog {
 	private JPanel formPanel;
 
 	private Product product;
-	private Component parentComponent;
+	private final Component parentComponent;
 	private BottomActionPanel bottomActionPanel;
 
 	private ProductController productController;
@@ -62,7 +63,7 @@ public class ProductionEntryUi extends JDialog {
 	private JSpinner spQuantity;
 	private JTextField ftfProductionCost;
 	private JLabel lblProductionDate;
-	private Pair<Double, List<InputEntry>> neededInputs;
+	private List<Pair<Long, Input>> inputsReserved;
 
 	public ProductionEntryUi(Component parentComponent) {
 		this.parentComponent = parentComponent;
@@ -238,8 +239,6 @@ public class ProductionEntryUi extends JDialog {
 		ftfProductionCost.setText("");
 		ftfTotalSaleValue.setText("");
 
-		neededInputs = null;
-
 		if (date == null || product == null) {
 			target = null;
 			return;
@@ -248,16 +247,23 @@ public class ProductionEntryUi extends JDialog {
 		setInProgress(true);
 
 		try {
-			var quantity = (Double) spQuantity.getValue();
-			var inputs = inputsByProductController.fetchAll(product.getId());
+			var amountBeingproduced = (Double) spQuantity.getValue();
+			var inputsForUnitaryProduction = inputsByProductController.fetchAll(product.getId());
 
-			neededInputs = inputEntryController.reserveForCheckOut(inputs, quantity, date);
+			inputsReserved = inputEntryController.getInputsNeeded(inputsForUnitaryProduction, amountBeingproduced,
+					date);
 
-			target = new Production(product.getId(), quantity, date, neededInputs.getFirst() / quantity,
-					neededInputs.getFirst() / quantity); // TODO CALCULATE
+			List<Input> needed = inputsReserved.stream().map(m -> m.getSecond()).collect(Collectors.toList());
+
+			product.setManufacturingCost(needed.stream().mapToDouble(Input::getPriceForQuantity).sum() / amountBeingproduced);
+			
+			target = new Production(product.getId(), amountBeingproduced, date, product.getManufacturingCost(),
+					product.getSaleValue());
 
 			ftfProductionCost.setText(NumberExt.toBrazilianCurrency(target.getTotalManufacturingCost()));
 			ftfTotalSaleValue.setText(NumberExt.toBrazilianCurrency(target.getTotalSaleValue()));
+			
+			bottomActionPanel.setPositiveButtonEnabled(true);
 		} catch (IOException ex) {
 			target = null;
 			bottomActionPanel.setPositiveButtonEnabled(false);
@@ -267,6 +273,42 @@ public class ProductionEntryUi extends JDialog {
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.THERE_IS_NO_ENOUGH_INPUTS_FOR_THIS_PRODUCTION);
 		} finally {
 			setInProgress(false);
+		}
+	}
+
+	private void onOk() {
+		var date = getDate();
+
+		var dateValidator = (InputValidator<LocalDate>) input -> {
+			if (input == null)
+				return Constants.INVALID_PRODUCTION_DATE;
+			if (input.isAfter(LocalDate.now())) {
+				return Constants.DATE_CANNOT_BE_A_FUTURE_DATE;
+			}
+			return null;
+		};
+
+		if (!dateValidator.isValid(date)) {
+			MessageDialog.showAlertDialog(this, getTitle(), dateValidator.getErrorMessage(date));
+			return;
+		}
+
+		if (target == null) { // there is no product selected
+			MessageDialog.showAlertDialog(getTitle(), Constants.INVALID_PRODUCTION_DATA);
+			return;
+		}
+
+		if (target.getUnitaryManufacturingCost() == 0
+				&& !MessageDialog.showConfirmationDialog(this, getTitle(), Constants.PRODUCTION_WITHOUT_INPUTS_MESSAGE))
+			return;
+
+		try {
+			productionController.withdraw(inputsReserved);
+			productionController.insert(target);
+			resetForm();
+			MessageDialog.showInformationDialog(this, getTitle(), Constants.RECORD_SUCCESSFULLY_INSERTED);
+		} catch (IllegalArgumentException | InsufficientStockException | IOException | CloneNotSupportedException e) {
+			MessageDialog.showAlertDialog(this, getTitle(), Constants.FAILED_TO_INSERT_RECORD);
 		}
 	}
 
@@ -285,42 +327,6 @@ public class ProductionEntryUi extends JDialog {
 					DateTimeFormatter.ofPattern(Patterns.BRAZILIAN_DATE_PATTERN));
 		} catch (Exception e) {
 			return null;
-		}
-	}
-
-	private void onOk() {
-		var date = getDate();
-
-		var dateValidator = (InputValidator<LocalDate>) input -> {
-			if (input == null)
-				return Constants.INVALID_PRODUCTION_DATE;
-			if (input.isAfter(LocalDate.now())) {
-				return Constants.DATE_CANNOT_BE_A_FUCTURE_DATE;
-			}
-			return null;
-		};
-
-		if (!dateValidator.isValid(date)) { // date is not informed or not valid
-			MessageDialog.showAlertDialog(this, getTitle(), dateValidator.getErrorMessage(date));
-			return;
-		}
-
-		if (target == null) { // there is no product selected
-			MessageDialog.showAlertDialog(getTitle(), Constants.INVALID_PRODUCTION_DATA);
-			return;
-		}
-
-		if (target.getUnitaryManufacturingCost() == 0
-				&& !MessageDialog.showConfirmationDialog(this, getTitle(), Constants.PRODUCTION_WITHOUT_INPUTS_MESSAGE))
-			return;
-
-		try {
-			productionController.insert(target);
-			productionController.checkout(neededInputs.getSecond());
-			MessageDialog.showInformationDialog(this, getTitle(), Constants.RECORD_SUCCESSFULLY_INSERTED);
-			resetForm();
-		} catch (IOException e) {
-			MessageDialog.showAlertDialog(this, getTitle(), Constants.FAILED_TO_INSERT_RECORD);
 		}
 	}
 

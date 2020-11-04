@@ -2,15 +2,16 @@ package tsi.too.model;
 
 import java.time.LocalDate;
 
-public class Production {
+public class Production implements Cloneable {
 	private long productId;
-	private double amountProduced;
+	private long id;
+	private final double amountProduced;
 	private LocalDate date;
-	private double unitaryManufacturingCost;
-	private double unitarySaleValue;
-	private double available;
+	private final double unitaryManufacturingCost;
+	private final double unitarySaleValue;
+	private final double available;
 
-	public Production(long productId, double amountProduced, LocalDate date, double unitaryManufacturingCost,
+	public Production(long id, long productId, double amountProduced, LocalDate date, double unitaryManufacturingCost,
 			double unitarySaleValue, double available) {
 		super();
 		this.productId = productId;
@@ -19,6 +20,7 @@ public class Production {
 		this.unitaryManufacturingCost = unitaryManufacturingCost;
 		this.unitarySaleValue = unitarySaleValue;
 		this.available = available;
+		this.id = id;
 	}
 
 	public Production(long productId, double amountProduced, LocalDate date, double unitaryManufacturingCost,
@@ -44,10 +46,6 @@ public class Production {
 		return amountProduced;
 	}
 
-	public void setAmountProduced(double amountProduced) {
-		this.amountProduced = amountProduced;
-	}
-
 	public LocalDate getDate() {
 		return date;
 	}
@@ -58,10 +56,6 @@ public class Production {
 
 	public double getUnitaryManufacturingCost() {
 		return unitaryManufacturingCost;
-	}
-
-	public void setUnitaryManufacturingCost(double unitaryManufacturingCost) {
-		this.unitaryManufacturingCost = unitaryManufacturingCost;
 	}
 
 	public double getTotalManufacturingCost() {
@@ -76,22 +70,38 @@ public class Production {
 		return unitarySaleValue;
 	}
 
-	public void setUnitarySaleValue(double unitarySaleValue) {
-		this.unitarySaleValue = unitarySaleValue;
-	}
-
 	public double getAvailable() {
 		return available;
 	}
 
-	public void setAvailable(double available) {
-		this.available = available;
+	public long getId() {
+		return id;
+	}
+	
+	/**
+	 * Creates a copy of this {@link Production} with the new {@code inputs}.
+	 *
+	 * @param inputs the target id,
+	 * @return a copy with the new inputs.
+	 * @throws CloneNotSupportedException if cloning is not supported.
+	 */
+	public Production withId(long id) throws CloneNotSupportedException {
+		var p = clone();
+		p.id = id;
+		return p;
+	}
+
+	@Override
+	protected Production clone() throws CloneNotSupportedException {
+		return (Production) super.clone();
 	}
 
 	@Override
 	public String toString() {
 		return String.format(
-				"Production {productId= %d, amountProduced= %f, date= %s, unitaryManufacturingCost= %f, unitarySaleValue= %f, available= %f}",
-				productId, amountProduced, date, unitaryManufacturingCost, unitarySaleValue, available);
+				"Production [productId=%d, id=%d, amountProduced=%f, date=%s, unitaryManufacturingCost=%f, unitarySaleValue=%f, available=%f]",
+				productId, id, amountProduced, date, unitaryManufacturingCost, unitarySaleValue, available);
 	}
+
+	
 }

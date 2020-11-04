@@ -7,15 +7,31 @@ import tsi.too.Patterns;
 import tsi.too.model.InputEntry;
 
 public class InputStockFile extends BinaryFile<InputEntry> {
-
-	public InputStockFile(String fileName) throws FileNotFoundException {
-		openFile(fileName, OpenMode.READ_WRITE);
+	private static final String FILE_NAME = "inputStock.dat";
+	private static InputStockFile instance;
+	
+	private InputStockFile() throws FileNotFoundException {
+		openFile(FILE_NAME, OpenMode.READ_WRITE);
+	}
+	
+	/**
+	 * Ensures that only one instance is created
+	 * 
+	 * @return the created instance.
+	 * @throws FileNotFoundException if persistence file opening fails.
+	 */
+	public static InputStockFile getInstance() throws FileNotFoundException {
+		synchronized (InputStockFile.class) {
+			if(instance == null)
+				instance = new InputStockFile();
+			
+			return instance;			
+		}
 	}
 
 	@Override
 	public int recordSize() {
-		return
-				Long.BYTES + // entryid
+		return Long.BYTES + // entryId
 				Long.BYTES + // inputId
 				Double.BYTES + // incoming
 				Double.BYTES + // price
@@ -45,7 +61,13 @@ public class InputStockFile extends BinaryFile<InputEntry> {
 
 		return new InputEntry(id, inputId, incoming, price, available, date);
 	}
-	
+
+	/**
+	 * Retrieves the last {@link InputEntry} id registered in the file.
+	 * 
+	 * @return the last id or {@code 0} if the file has no records.
+	 * @throws IOException if an I / O error occurs.
+	 */
 	public long getLastId() throws IOException {
 		var numberOfRecords = countRecords();
 

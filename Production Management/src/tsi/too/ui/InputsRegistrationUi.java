@@ -28,6 +28,7 @@ import tsi.too.ext.StringExt;
 import tsi.too.io.MessageDialog;
 import tsi.too.model.Input;
 import tsi.too.util.Pair;
+import tsi.too.utils.Validators;
 
 @SuppressWarnings("serial")
 public class InputsRegistrationUi extends JDialog {
@@ -49,7 +50,10 @@ public class InputsRegistrationUi extends JDialog {
     }
 
     public InputsRegistrationUi(Component parentComponent, Input input) {
-        this.input = input == null ? null : input.clone();
+        try {
+            this.input = input == null ? null : input.clone();
+        } catch (CloneNotSupportedException ignored) { }
+
         this.parentComponent = parentComponent;
 
         initComponent();
@@ -148,41 +152,39 @@ public class InputsRegistrationUi extends JDialog {
 
             resetForm();
 
-        } catch (IOException e) {
+        } catch (IOException | CloneNotSupportedException e) {
             var message = actionEvent.getActionCommand().equals(UPDATE) ? FAILED_TO_UPDATE_RECORD : FAILED_TO_INSERT_RECORD;
             MessageDialog.showAlertDialog(this, getTitle(), message);
         }
     }
 
     private String getValidationMessage(Input item) {
-        if (!inputController.nameValidator.isValid(item.getName())) {
-            return inputController.nameValidator.getErrorMessage(item.getName());
+        if (!Validators.nameValidator.isValid(item.getName())) {
+            return Validators.nameValidator.getErrorMessage(item.getName());
         }
 
         return null;
     }
 
-    private Input addProduct(Input p, Pair<Input, Long> target) {
+    private void addProduct(Input p, Pair<Input, Long> target) {
         try {
             if (target != null) {
                 MessageDialog.showAlertDialog(this, getTitle(), AN_ITEM_WITH_THIS_NAME_ALREADY_REGISTERED);
-                return null;
+                return;
             }
 
-            var out = inputController.insert(p);
+            inputController.insert(p);
             MessageDialog.showInformationDialog(this, getTitle(), Constants.RECORD_SUCCESSFULLY_INSERTED);
-            return out;
-        } catch (IOException e) {
+        } catch (IOException | CloneNotSupportedException e) {
             MessageDialog.showAlertDialog(this, getTitle(), FAILED_TO_INSERT_RECORD);
-            return null;
         }
     }
 
-    private Input update(Input newData, Pair<Input, Long> target) {
+    private void update(Input newData, Pair<Input, Long> target) {
         try {
             if (target != null && target.getFirst().getId() != newData.getId()) {
                 MessageDialog.showAlertDialog(this, getTitle(), AN_ITEM_WITH_THIS_NAME_ALREADY_REGISTERED);
-                return null;
+                return;
             }
 
             if (target == null)
@@ -190,11 +192,9 @@ public class InputsRegistrationUi extends JDialog {
 
             inputController.update(target.getSecond(), newData);
             MessageDialog.showInformationDialog(this, getTitle(), RECORD_SUCCESSFULLY_UPDATED);
-            return newData;
         } catch (IOException | NullPointerException e) {
             e.printStackTrace();
             MessageDialog.showAlertDialog(this, getTitle(), FAILED_TO_UPDATE_RECORD);
-            return null;
         }
     }
 

@@ -2,9 +2,7 @@ package tsi.too.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class Product implements Cloneable {
 	public static final int MAX_NAME_LENGTH = 50;
@@ -12,14 +10,34 @@ public class Product implements Cloneable {
 	private long id;
 	private String name;
 	private MeasureUnity measureUnity;
-	private double size;
+	private final double size;
 	private double percentageProfitMargin;
+	private double manufacturingCost;
 
 	private final ArrayList<Input> inputs = new ArrayList<>();
 
+	public Product(long id, String name, MeasureUnity measureUnity, double percentageProfitMargin, double size, double manufacturingCost) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.measureUnity = measureUnity;
+		this.percentageProfitMargin = percentageProfitMargin;
+		this.size = size;
+		this.manufacturingCost = manufacturingCost;
+	}
+	
 	public Product(long id, String name, MeasureUnity measureUnity, double percentageProfitMargin, double size) {
 		super();
 		this.id = id;
+		this.name = name;
+		this.measureUnity = measureUnity;
+		this.percentageProfitMargin = percentageProfitMargin;
+		this.size = size;
+		this.manufacturingCost = 0;
+	}
+	
+	public Product(String name, MeasureUnity measureUnity, double percentageProfitMargin, double size, double manufacturingCost) {
+		super();
 		this.name = name;
 		this.measureUnity = measureUnity;
 		this.percentageProfitMargin = percentageProfitMargin;
@@ -32,23 +50,17 @@ public class Product implements Cloneable {
 		this.measureUnity = measureUnity;
 		this.percentageProfitMargin = percentageProfitMargin;
 		this.size = size;
+		this.manufacturingCost = 0;
 	}
 
-	public boolean addProductionInput(Input input) {
-		Objects.requireNonNull(input);
-
-		return inputs.add(input.clone());
-	}
-
-	public boolean addProductionInput(Collection<Input> inputs) throws IllegalArgumentException {
+	public void addProductionInput(Collection<Input> inputs) throws IllegalArgumentException, CloneNotSupportedException {
 		if (inputs == null)
 			throw new IllegalArgumentException();
 
-		return this.inputs.addAll(inputs.stream().map(input -> input.clone()).collect(Collectors.toList()));
-	}
-
-	public List<Input> getProductionInputs() {
-		return inputs.stream().map(pi -> pi.clone()).collect(Collectors.toList());
+		for (Input input : inputs){
+			this.inputs.add(input.clone());
+			manufacturingCost += input.getPriceForQuantity(); 
+		}
 	}
 
 	public long getId() {
@@ -89,7 +101,10 @@ public class Product implements Cloneable {
 	}
 
 	public double getManufacturingCost() {
-		return inputs.stream().mapToDouble(pi -> pi.getPriceForQuantity()).sum();
+		if(manufacturingCost == 0)
+			manufacturingCost = inputs.stream().mapToDouble(Input::getPriceForQuantity).sum();
+		
+		return manufacturingCost;
 	}
 
 	public double getSaleValue() {
@@ -103,40 +118,43 @@ public class Product implements Cloneable {
 		return size;
 	}
 
+	public void setManufacturingCost(double manufacturingCost) {
+		this.manufacturingCost = manufacturingCost;
+	}
+	
 	/**
-	 * Creates a copy with the given id
-	 * 
-	 * @param id
-	 * @return a copy with a new id.
+	 * Creates a copy of this {@link Product} with the new {@code id}.
+	 *
+	 * @param id the target id
+	 * @return a copy with the new id
+	 * @throws CloneNotSupportedException  if cloning is not supported.
 	 */
-	public Product withId(long id) {
+	public Product withId(long id) throws CloneNotSupportedException {
 		var p = clone();
 		p.id = id;
 
 		return p;
 	}
-	
+
 	/**
-	 * Creates a copy with the given inputs
-	 * 
-	 * @param inputs
-	 * @return a copy with new inputs.
+	 * Creates a copy of this {@link Product} with the new {@code inputs}.
+	 *
+	 * @param inputs the target id,
+	 * @return a copy with the new inputs.
+	 * @throws CloneNotSupportedException  if cloning is not supported.
 	 */
-	public Product with(Collection<Input> inputs) {
+	public Product with(Collection<Input> inputs) throws CloneNotSupportedException {
 		var p = clone();
 		p.inputs.clear();
+		p.setManufacturingCost(0);
 		p.addProductionInput(inputs);
 		
 		return p;
 	}
 
 	@Override
-	public Product clone() {
-		try {
-			return (Product) super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException("Something goes wrong");
-		}
+	public Product clone() throws CloneNotSupportedException {
+		return (Product) super.clone();
 	}
 
 	@Override

@@ -191,7 +191,7 @@ public class ProductListUI extends JFrame {
 	}
 
 	private void registerInputs() {
-		new AssociateInputToProductUI(this, getSelected()).setVisible(true);
+		new ProductInputsUI(this, getSelected()).setVisible(true);
 	}
 
 	private void edit() {
