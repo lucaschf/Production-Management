@@ -251,7 +251,7 @@ public class AssociateInputToProductUI extends JDialog {
 	}
 
 	/**
-	 * Performs a loop in the selected inputs unlinking from the current selected
+	 * Performs a loop in the selected inputs linking to the current selected
 	 * product.
 	 */
 	private void link() {
