@@ -1,5 +1,6 @@
 package tsi.too.exception;
 
+@SuppressWarnings("serial")
 public class InsufficientStockException extends Exception {
 
 	public InsufficientStockException() {

@@ -33,10 +33,15 @@ import tsi.too.util.Pair;
  *
  * @author Lucas Cristovam
  * @author Prof. Márlon Oliveira da Silva
- * @version 0.40
+ * @version 0.41
  */
 public abstract class BinaryFile<E> {
 	private String fileName;
+
+	/**
+	 * Stores all opened {@link BinaryFile} for closing all with a single call. 
+	 */
+	private static final ArrayList<BinaryFile<?>> openedFiles = new ArrayList<>();
 
 	protected RandomAccessFile file;
 
@@ -45,7 +50,7 @@ public abstract class BinaryFile<E> {
 
 	protected BinaryFile(String fileName, OpenMode mode) throws FileNotFoundException {
 		openFile(fileName, mode);
-	}	
+	}
 
 	/**
 	 * Gets the file name from disk.
@@ -94,6 +99,7 @@ public abstract class BinaryFile<E> {
 	protected void openFile(String fileName, OpenMode mode) throws FileNotFoundException {
 		this.fileName = fileName;
 		file = new RandomAccessFile(fileName, mode.getMode());
+		openedFiles.add(this);
 	}
 
 	/**
@@ -288,7 +294,7 @@ public abstract class BinaryFile<E> {
 	 * @since 0.37
 	 */
 	public List<E> readAllFile() throws IOException {
-		var list = new ArrayList<E>();
+		var<E> list = new ArrayList<E>();
 
 		seekRecord(0);
 
@@ -409,6 +415,17 @@ public abstract class BinaryFile<E> {
 	public void closeFile() throws IOException {
 		if (file != null)
 			file.close();
+	}
+
+	/**
+	 * Closes all opened files by subclasses of {@link BinaryFile}
+	 * 
+	 * @throws IOException if an I / O error occurs
+	 * @since 0.41
+	 */
+	public static void closeAllOpenedBinaryFiles() throws IOException {
+		for (BinaryFile<?> b : openedFiles)
+			b.closeFile();
 	}
 
 	/**

@@ -14,10 +14,28 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import tsi.too.Constants;
+import tsi.too.io.BinaryFile;
+import tsi.too.io.MessageDialog;
+
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 @SuppressWarnings("serial")
 public class DashboardUi extends JFrame {
+	
+	private final class WindowAdapterExtension extends WindowAdapter {
+		@Override
+		public void windowClosing(WindowEvent e) {
+			try {
+				BinaryFile.closeAllOpenedBinaryFiles();
+			}catch (Exception ex) {
+				MessageDialog.showErrorDialog(DashboardUi.this, getTitle(), Constants.UNABLE_TO_CLOSE_OPENED_FILES);
+			}
+		}
+	}
+
 	public DashboardUi() {
+		addWindowListener(new WindowAdapterExtension());
 		setTitle(Constants.APP_NAME);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -152,5 +170,5 @@ public class DashboardUi extends JFrame {
 				}
 			}
 		}
-	}
+	}	
 }

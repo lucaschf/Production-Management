@@ -144,4 +144,5 @@ public interface Constants {
     String INFORM_THE_QUANTITY = "Informe a quantidade";
 	String INFORM_THE_UNITARY_PRICE = "Informe o valor unitário";
 	String ENTRY_DATA = "Dados da entrada";
+	String UNABLE_TO_CLOSE_OPENED_FILES = "Incapaz de fechar os arquivos abertos";
 }
