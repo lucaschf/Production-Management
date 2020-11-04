@@ -29,6 +29,14 @@ public class Input implements Cloneable {
 		this.price = price;
 	}
 
+	public Input(long id, double quantity, double price) {
+		super();
+		this.name = "";
+		this.id = id;
+		this.quantity = quantity;
+		this.price = price;
+	}
+
 	public String getName() {
 		return name;
 	}

@@ -1,17 +1,18 @@
 package tsi.too.controller;
 
-import tsi.too.ext.LocalDateExt;
-import tsi.too.io.ProductionFile;
-import tsi.too.model.InputEntry;
-import tsi.too.model.Product;
-import tsi.too.model.Production;
-import tsi.too.util.Pair;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import tsi.too.exception.InsufficientStockException;
+import tsi.too.ext.LocalDateExt;
+import tsi.too.io.ProductionFile;
+import tsi.too.model.Input;
+import tsi.too.model.Product;
+import tsi.too.model.Production;
+import tsi.too.util.Pair;
 
 public class ProductionController {
 	private final ProductionFile productionFile;
@@ -69,7 +70,10 @@ public class ProductionController {
 		return paired;
 	}
 
-	public void checkout(List<InputEntry> entries) throws IOException {
-		inputEntryController.update(entries);
+	public void withdraw(List<Pair<Long, Input>> inputsReserved)
+			throws IOException, IllegalArgumentException, InsufficientStockException {
+		for (Pair<Long, Input> p : inputsReserved) {
+			inputEntryController.withdraw(p.getFirst(), p.getSecond().getQuantity());
+		}
 	}
 }
