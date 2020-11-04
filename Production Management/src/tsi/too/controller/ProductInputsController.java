@@ -2,14 +2,12 @@ package tsi.too.controller;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import tsi.too.io.ProductInputFile;
 import tsi.too.model.Input;
-import tsi.too.model.InputEntry;
 import tsi.too.model.ProductInput;
 import tsi.too.util.Pair;
 
@@ -18,12 +16,9 @@ public class ProductInputsController {
 	private final InputController inputController;
 	private static ProductInputsController instance;
 
-	private InputEntryController inputStockController;
-
 	private ProductInputsController() throws FileNotFoundException {
 		prodcutInputsFile = ProductInputFile.getInstance();
 		inputController = InputController.getInstance();
-		inputStockController = InputEntryController.getInstance();
 	}
 
 	public static ProductInputsController getInstance() throws FileNotFoundException {
@@ -105,8 +100,8 @@ public class ProductInputsController {
 		return result;
 	}
 
-	public List<ProductInput> fetchAll(long productId) throws IOException{
-		return prodcutInputsFile.readAllFile(p-> p.getProductId() == productId);
+	public List<ProductInput> fetchAll(long productId) throws IOException {
+		return prodcutInputsFile.readAllFile(p -> p.getProductId() == productId);
 	}
 
 	public Pair<ProductInput, Long> fetchByProductAndInput(long productId, long inputId) throws IOException {

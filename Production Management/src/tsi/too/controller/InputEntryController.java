@@ -21,9 +21,11 @@ public class InputEntryController {
 	private static final String fileName = "inputStock.dat";
 
 	private static InputEntryController instance;
+	private InputController inputController;
 
 	private InputEntryController() throws FileNotFoundException {
 		inputStockFile = new InputStockFile(fileName);
+		inputController = InputController.getInstance();
 	}
 
 	public static InputEntryController getInstance() throws FileNotFoundException {
@@ -41,6 +43,24 @@ public class InputEntryController {
 
 	public List<InputEntry> fetchAll() throws IOException {
 		return inputStockFile.readAllFile();
+	}
+
+	public List<Pair<String, InputEntry>> fetchPaired() throws IOException {
+		var entries = inputStockFile.readAllFile();
+		var result = new ArrayList<Pair<String, InputEntry>>();
+		
+		String name;
+		
+		for(InputEntry entry : entries) {
+			try {
+				name = inputController.findById(entry.getInputId()).getFirst().getName();
+			}catch (Exception e) {
+				name = "";
+			}
+			result.add(new Pair<String, InputEntry>(name, entry));
+		}
+
+		return result;
 	}
 
 	public List<InputEntry> fetchByInput(long inputId) throws IOException {
@@ -127,7 +147,7 @@ public class InputEntryController {
 		var totalInStock = stock.stream().mapToDouble(InputEntry::getAvailable).sum();
 
 		if (totalInStock < totalNeeded)
-			throw new InsufficientStockException("There is no enough input stock");
+			throw new InsufficientStockException();
 
 		stock.sort(Comparator.comparing(InputEntry::getDate));
 
@@ -165,5 +185,13 @@ public class InputEntryController {
 		} catch (Exception e) {
 			return 0;
 		}
+	}
+
+	public Pair<InputEntry, Long> fetchById(long id) throws IOException {
+		return inputStockFile.fetch(p -> p.getId() == id);
+	}
+
+	public void update(Long position, InputEntry newData) throws IOException {
+		inputStockFile.update(position, newData);
 	}
 }

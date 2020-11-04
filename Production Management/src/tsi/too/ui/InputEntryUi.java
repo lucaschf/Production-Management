@@ -46,13 +46,17 @@ public class InputEntryUi extends JDialog {
 	private JFormattedTextField ftfDate;
 
 	public InputEntryUi(Component parentComponent) {
+		this(parentComponent, null);
+	}
+
+	public InputEntryUi(Component parentComponent, Input input) {
 		this.parentComponent = parentComponent;
 
 		initController();
 
 		initComponent();
 		setupWindow();
-
+		
 		resetForm();
 	}
 
@@ -67,7 +71,7 @@ public class InputEntryUi extends JDialog {
 	}
 
 	private void setupWindow() {
-		setTitle(Constants.INPUT_ENTRY);
+		setTitle(Constants.INPUT_ENTRIES);
 		pack();
 		setLocationRelativeTo(parentComponent);
 	}
@@ -100,7 +104,7 @@ public class InputEntryUi extends JDialog {
 		JLabel lblQuantity = new JLabel(String.format("%s:", Constants.QUANTITY));
 		lblQuantity.setHorizontalAlignment(SwingConstants.TRAILING);
 
-		JLabel lblInput = new JLabel(String.format("%s:", Constants.PRODUCTION_INPUT));
+		JLabel lblInput = new JLabel(String.format("%s:", Constants.INPUT));
 		lblInput.setHorizontalAlignment(SwingConstants.TRAILING);
 
 		JLabel lblPrice = new JLabel("pre\u00E7o unit\u00E1rio:");
@@ -192,12 +196,12 @@ public class InputEntryUi extends JDialog {
 
 		try {
 			price = StringExt.toDouble(ftfprice.getText());
-			
-			if (price  == 0.0) {
+
+			if (price == 0.0) {
 				MessageDialog.showAlertDialog(getTitle(), "Informe o valor de entrada");
 				return;
 			}
-			
+
 			InputEntry iStock = new InputEntry(input.getId(), quantity, price, date);
 
 			inputEntryController.insert(iStock);

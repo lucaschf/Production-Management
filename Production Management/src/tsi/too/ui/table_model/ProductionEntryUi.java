@@ -1,5 +1,6 @@
-package tsi.too.ui;
+package tsi.too.ui.table_model;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
@@ -9,7 +10,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -18,6 +18,7 @@ import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -31,15 +32,12 @@ import tsi.too.controller.InputEntryController;
 import tsi.too.controller.ProductController;
 import tsi.too.controller.ProductInputsController;
 import tsi.too.controller.ProductionController;
-import tsi.too.exception.InsufficientStockException;
-import tsi.too.ext.NumberExt;
 import tsi.too.io.InputDialog.InputValidator;
 import tsi.too.io.MessageDialog;
-import tsi.too.model.InputEntry;
 import tsi.too.model.Product;
 import tsi.too.model.Production;
+import tsi.too.ui.BottomActionPanel;
 import tsi.too.ui.helper.ProductComboboxRenderer;
-import tsi.too.util.Pair;
 import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
@@ -61,8 +59,9 @@ public class ProductionEntryUi extends JDialog {
 	private Production target;
 	private JSpinner spQuantity;
 	private JTextField ftfProductionCost;
+	private JPanel priceCalculationPanel;
+	private JLabel lblError;
 	private JLabel lblProductionDate;
-	private Pair<Double, List<InputEntry>> neededInputs;
 
 	public ProductionEntryUi(Component parentComponent) {
 		this.parentComponent = parentComponent;
@@ -129,6 +128,10 @@ public class ProductionEntryUi extends JDialog {
 		JLabel lblTotalSaleValue = new JLabel(String.format("%s:", Constants.TOTAL_SALE_AMOUNT));
 		lblTotalSaleValue.setHorizontalAlignment(SwingConstants.TRAILING);
 
+		lblError = new JLabel(Constants.FAILED_TO_CALCULATE_VALUES);
+		lblError.setVisible(false);
+		lblError.setForeground(Color.RED);
+
 		ftfTotalSaleValue = new JFormattedTextField();
 		ftfTotalSaleValue.setEditable(false);
 		lblTotalSaleValue.setLabelFor(ftfTotalSaleValue);
@@ -137,56 +140,106 @@ public class ProductionEntryUi extends JDialog {
 		ftfProductionCost.setEditable(false);
 		ftfProductionCost.setColumns(10);
 
+		priceCalculationPanel = new JPanel();
+		priceCalculationPanel.setVisible(false);
+
 		initQuantitySpinner();
 		initProductsCombobox();
 		initDateTextField();
 
-		cbProduct.setSelectedIndex(-1);
+		try {
+			cbProduct.setSelectedIndex(-1); // forces deselect
+			cbProduct.setSelectedIndex(0); // reselect the first element to fire data retrieving
+		} catch (Exception ignored) {
+		}
 
 		GroupLayout gl_formPanel = new GroupLayout(formPanel);
-		gl_formPanel
-				.setHorizontalGroup(gl_formPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_formPanel.createSequentialGroup().addContainerGap()
-								.addGroup(gl_formPanel.createParallelGroup(Alignment.TRAILING, false)
-										.addComponent(lblTotalSaleValue, Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
-												GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.addComponent(lblProductionCost, Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
-												GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.addComponent(lblQuantityProduced, GroupLayout.DEFAULT_SIZE,
-												GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.addComponent(lblProductionDate, Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
-												GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.addComponent(lblProductName, Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
-												GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addGroup(gl_formPanel.createParallelGroup(Alignment.LEADING).addGroup(gl_formPanel
-										.createParallelGroup(Alignment.LEADING, false).addComponent(ftfTotalSaleValue)
+		gl_formPanel.setHorizontalGroup(gl_formPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_formPanel.createSequentialGroup().addContainerGap()
+						.addGroup(gl_formPanel.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(lblTotalSaleValue, Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(lblProductionCost, Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(lblQuantityProduced, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
+										Short.MAX_VALUE)
+								.addComponent(lblProductionDate, Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(
+										lblProductName, Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addGroup(gl_formPanel.createParallelGroup(Alignment.LEADING).addGroup(gl_formPanel
+								.createSequentialGroup()
+								.addGroup(gl_formPanel.createParallelGroup(Alignment.LEADING, false)
+										.addComponent(ftfTotalSaleValue)
 										.addComponent(ftfProductionCost, GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
-										.addComponent(ftfProductionDate, GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
-										.addComponent(spQuantity)).addComponent(cbProduct, 0, 498, Short.MAX_VALUE))
-								.addContainerGap()));
+										.addGroup(gl_formPanel.createParallelGroup(Alignment.TRAILING, false)
+												.addComponent(spQuantity, Alignment.LEADING)
+												.addComponent(ftfProductionDate, Alignment.LEADING,
+														GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(gl_formPanel.createParallelGroup(Alignment.LEADING)
+										.addGroup(gl_formPanel.createSequentialGroup()
+												.addComponent(lblError, GroupLayout.DEFAULT_SIZE,
+														GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+												.addGap(231))
+										.addComponent(priceCalculationPanel, GroupLayout.PREFERRED_SIZE, 213,
+												GroupLayout.PREFERRED_SIZE)))
+								.addComponent(cbProduct, 0, 492, Short.MAX_VALUE))
+						.addContainerGap()));
 		gl_formPanel.setVerticalGroup(gl_formPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_formPanel.createSequentialGroup().addContainerGap()
-						.addGroup(gl_formPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblProductName)
-								.addComponent(cbProduct, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+						.addGroup(gl_formPanel
+								.createParallelGroup(Alignment.BASELINE).addComponent(lblProductName)
+								.addComponent(
+										cbProduct, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
 										GroupLayout.PREFERRED_SIZE))
 						.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addGroup(gl_formPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblProductionDate)
-								.addComponent(ftfProductionDate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_formPanel.createParallelGroup(Alignment.TRAILING).addGroup(gl_formPanel
+								.createSequentialGroup()
+								.addGroup(gl_formPanel.createParallelGroup(Alignment.BASELINE)
+										.addComponent(lblProductionDate)
+										.addComponent(ftfProductionDate, GroupLayout.PREFERRED_SIZE,
+												GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(gl_formPanel.createParallelGroup(Alignment.BASELINE)
+										.addComponent(lblQuantityProduced).addComponent(spQuantity,
+												GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(gl_formPanel.createParallelGroup(Alignment.BASELINE)
+										.addComponent(lblProductionCost).addComponent(ftfProductionCost,
+												GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE)))
+								.addComponent(priceCalculationPanel, GroupLayout.PREFERRED_SIZE,
+										GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_formPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblQuantityProduced)
-								.addComponent(spQuantity, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_formPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblProductionCost)
-								.addComponent(ftfProductionCost, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_formPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblTotalSaleValue)
-								.addComponent(ftfTotalSaleValue, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE))
+						.addGroup(
+								gl_formPanel.createParallelGroup(Alignment.BASELINE).addComponent(lblTotalSaleValue)
+										.addComponent(ftfTotalSaleValue, GroupLayout.PREFERRED_SIZE,
+												GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+										.addComponent(lblError))
 						.addContainerGap()));
+
+		JLabel lblCalculating = new JLabel(String.format("%s...", Constants.CALCUTATING));
+
+		JProgressBar progressBar = new JProgressBar();
+		progressBar.setIndeterminate(true);
+		GroupLayout gl_priceCalculationPanel = new GroupLayout(priceCalculationPanel);
+		gl_priceCalculationPanel.setHorizontalGroup(gl_priceCalculationPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_priceCalculationPanel.createSequentialGroup().addGap(1)
+						.addGroup(gl_priceCalculationPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblCalculating, GroupLayout.PREFERRED_SIZE, 148,
+										GroupLayout.PREFERRED_SIZE))
+						.addContainerGap(53, Short.MAX_VALUE)));
+		gl_priceCalculationPanel.setVerticalGroup(gl_priceCalculationPanel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_priceCalculationPanel.createSequentialGroup().addContainerGap(22, Short.MAX_VALUE)
+						.addComponent(lblCalculating).addPreferredGap(ComponentPlacement.UNRELATED)
+						.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)));
+		priceCalculationPanel.setLayout(gl_priceCalculationPanel);
 		formPanel.setLayout(gl_formPanel);
 	}
 
@@ -235,10 +288,10 @@ public class ProductionEntryUi extends JDialog {
 	}
 
 	private void retrieveInputsAndCalculateValues(LocalDate date) {
+		lblError.setVisible(false);
+
 		ftfProductionCost.setText("");
 		ftfTotalSaleValue.setText("");
-
-		neededInputs = null;
 
 		if (date == null || product == null) {
 			target = null;
@@ -251,28 +304,27 @@ public class ProductionEntryUi extends JDialog {
 			var quantity = (Double) spQuantity.getValue();
 			var inputs = inputsByProductController.fetchAll(product.getId());
 
-			neededInputs = inputEntryController.reserveForCheckOut(inputs, quantity, date);
-
-			target = new Production(product.getId(), quantity, date, neededInputs.getFirst() / quantity,
-					neededInputs.getFirst() / quantity); // TODO CALCULATE
-
-			ftfProductionCost.setText(NumberExt.toBrazilianCurrency(target.getTotalManufacturingCost()));
-			ftfTotalSaleValue.setText(NumberExt.toBrazilianCurrency(target.getTotalSaleValue()));
+			var s = inputEntryController.reserveForCheckOut(inputs, quantity, date);
+			System.out.println(s);
 		} catch (IOException ex) {
+			ex.printStackTrace();
 			target = null;
-			bottomActionPanel.setPositiveButtonEnabled(false);
-		} catch (InsufficientStockException e) {
+			lblError.setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
 			target = null;
-			bottomActionPanel.setPositiveButtonEnabled(false);
+			lblError.setVisible(true);
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.THERE_IS_NO_ENOUGH_INPUTS_FOR_THIS_PRODUCTION);
 		} finally {
 			setInProgress(false);
+			bottomActionPanel.setPositiveButtonEnabled(!lblError.isVisible());
 		}
 	}
 
 	private void setInProgress(boolean inProgress) {
 		ftfProductionDate.setEnabled(!inProgress);
 		spQuantity.setEnabled(!inProgress);
+		priceCalculationPanel.setVisible(inProgress);
 	}
 
 	private void onCancel() {
@@ -316,7 +368,6 @@ public class ProductionEntryUi extends JDialog {
 
 		try {
 			productionController.insert(target);
-			productionController.checkout(neededInputs.getSecond());
 			MessageDialog.showInformationDialog(this, getTitle(), Constants.RECORD_SUCCESSFULLY_INSERTED);
 			resetForm();
 		} catch (IOException e) {
@@ -326,8 +377,6 @@ public class ProductionEntryUi extends JDialog {
 
 	private void resetForm() {
 		cbProduct.setSelectedIndex(-1);
-		ftfProductionCost.setText("");
-		ftfTotalSaleValue.setText("");
 		target = null;
 	}
 }

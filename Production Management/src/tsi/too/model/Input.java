@@ -1,5 +1,7 @@
 package tsi.too.model;
 
+import java.util.Objects;
+
 public class Input implements Cloneable {
 	public static final int MAX_NAME_LENGTH = 50;
 
@@ -26,7 +28,7 @@ public class Input implements Cloneable {
 		this.quantity = quantity;
 		this.price = price;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -61,7 +63,7 @@ public class Input implements Cloneable {
 
 	/**
 	 * Creates a copy with the given id
-	 * 
+	 *
 	 * @param id the target id
 	 * @return a copy with a new id.
 	 */
@@ -71,7 +73,7 @@ public class Input implements Cloneable {
 
 		return p;
 	}
-	
+
 	@Override
 	public Input clone() {
 		try {
@@ -79,6 +81,23 @@ public class Input implements Cloneable {
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException("Something goes wrong");
 		}
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+
+		Input input = (Input) o;
+		return Double.compare(input.quantity, quantity) == 0 && id == input.id
+				&& Double.compare(input.price, price) == 0 && name.equals(input.name);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, quantity, id, price);
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package tsi.too;
 
+import javax.swing.Icon;
+
 public interface Constants {
 	String APP_NAME = "Gestão de produção";
 	String CANCEL = "Cancelar";
@@ -105,7 +107,7 @@ public interface Constants {
 	String QUANTITY_MUST_BE_GREATER_THAN_ZERO = "Quantidade deve ser maior que zero";
 	String QUANTITY_SUCCESSFUL_CHANGED = "Quantidade atualizada com sucesso";
 	String QUANTITY_CHANGE_FAILURE = "Falha ao atualizar quantidade";
-	String PRICE = "preço";
+	String PRICE = "Preço";
 	String PRICE_MUST_BE_GREATER_THAN_ZERO = "Preço deve ser maior que zero";
 	String FAILED_TO_LOG_PRICE_ENTRY = "Falha ao salvar log de preço";
 	String PRODUCTION_INPUTS_PRICES_CHANGES = "Alteração de preços de insumos";
@@ -116,9 +118,8 @@ public interface Constants {
 	String INVALID_PRODUCTION_DATE = "Data de produção inválida";
 	String INVALID_PRODUCTION_DATA = "Dados de produção inválidos";
 	String PRODUCTION_REPORT = "Relatório de produção";
-	String PRODUCTION_INPUT = "Insumo";
+	String INPUT = "Insumo";
 	String ENTRY = "Lançamento";
-	String INPUT_ENTRY = "Lançamento de insumos";
 	String INVALID_DATE = "Data inválida";
 	String INVALID_QUANTITY = "Quantidade invalida";
 	String INVALID_PRODUCT_QUANTITY = "Informe uma quantidade do produto válida";
@@ -137,4 +138,8 @@ public interface Constants {
 	String TOTAL_SALE_VALUE = "Custo total de venda";
 	String INPUT_ID = "Id do insumo";
 	String THERE_IS_NO_ENOUGH_INPUTS_FOR_THIS_PRODUCTION = "Não há insumos suficientes para essa produção";
+	String INVALID_PERIOD = "Verifique o periodo informado";
+	String INPUT_ENTRIES = "Entrada de insumos";
+	String ORDER = "Venda";
+	String PRODUCT_INPUT_LINK = "Insumos por produto";
 }

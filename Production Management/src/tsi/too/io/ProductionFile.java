@@ -38,7 +38,7 @@ public class ProductionFile extends BinaryFile<Production> {
 	public Production read() throws IOException {
 		var productId = file.readLong();
 		var amountProduced = file.readDouble();
-		var date = readDateTime(BRAZILIAN_DATE_PATTERN).toLocalDate();
+		var date = readDate(BRAZILIAN_DATE_PATTERN);
 		var unitaryManufacturingCost = file.readDouble();
 		var unitarySaleValue = file.readDouble();
 		var available = file.readDouble();

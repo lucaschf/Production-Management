@@ -366,7 +366,7 @@ public class AssociateInputToProductUI extends JDialog {
 	}
 
 	private void setupWindow() {
-		setTitle(Constants.PRODUCTION_INPUTS);
+		setTitle(Constants.PRODUCT_INPUT_LINK);
 		setModal(true);
 		pack();
 		setLocationRelativeTo(parentComponent);

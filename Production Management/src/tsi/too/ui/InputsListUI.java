@@ -20,7 +20,6 @@ import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import tsi.too.Constants;
@@ -125,14 +124,9 @@ public class InputsListUI extends JFrame {
 		tbInputs.setModel(tableModel);
 		tbInputs.addMouseListener(new TableMouseSelectionListener(tbInputs));
 		tbInputs.removeColumn(tbInputs.getColumnModel().getColumn(2));
+		tbInputs.removeColumn(tbInputs.getColumnModel().getColumn(2));
 
 		UiUtils.setHorizontalAlignment(tbInputs, SwingConstants.LEFT);
-
-		TableColumnModel columnModel = tbInputs.getColumnModel();
-
-		columnModel.getColumn(0).setPreferredWidth(5);
-		columnModel.getColumn(1).setPreferredWidth(400);
-		columnModel.getColumn(2).setPreferredWidth(5);
 
 		setupPopupMenu();
 	}
@@ -198,6 +192,6 @@ public class InputsListUI extends JFrame {
 	}
 
 	private void checkIn() {
-		// TODO
+		new InputEntryUi(this, getSelectedItem()).setVisible(true);
 	}
 }
