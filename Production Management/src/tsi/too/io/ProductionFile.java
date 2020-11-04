@@ -23,8 +23,8 @@ public class ProductionFile extends BinaryFile<Production> {
 	 * @throws FileNotFoundException if persistence file opening fails.
 	 */
 	public static ProductionFile getInstance() throws FileNotFoundException {
-		synchronized (ProductionFile.class){
-			if(instance == null)
+		synchronized (ProductionFile.class) {
+			if (instance == null)
 				instance = new ProductionFile();
 
 			return instance;
@@ -33,7 +33,8 @@ public class ProductionFile extends BinaryFile<Production> {
 
 	@Override
 	public int recordSize() {
-		return Long.BYTES + // product id
+		return Long.BYTES + // id
+				Long.BYTES + // product id
 				Double.BYTES + // amountProduced
 				BRAZILIAN_DATE_PATTERN.length() * Character.BYTES + // date
 				Double.BYTES + // unitaryManufacturingCost
@@ -44,6 +45,7 @@ public class ProductionFile extends BinaryFile<Production> {
 
 	@Override
 	public void write(Production e) throws IOException {
+		file.writeLong(e.getId());
 		file.writeLong(e.getProductId());
 		file.writeDouble(e.getAmountProduced());
 		writeLocalDate(e.getDate(), BRAZILIAN_DATE_PATTERN);
@@ -54,6 +56,7 @@ public class ProductionFile extends BinaryFile<Production> {
 
 	@Override
 	public Production read() throws IOException {
+		var id = file.readLong();
 		var productId = file.readLong();
 		var amountProduced = file.readDouble();
 		var date = readDate(BRAZILIAN_DATE_PATTERN);
@@ -61,7 +64,22 @@ public class ProductionFile extends BinaryFile<Production> {
 		var unitarySaleValue = file.readDouble();
 		var available = file.readDouble();
 
-		return new Production(productId, amountProduced, date, unitaryManufacturingCost,
-				unitarySaleValue, available);
+		return new Production(id, productId, amountProduced, date, unitaryManufacturingCost, unitarySaleValue,
+				available);
+	}
+
+	/**
+	 * Retrieves the last {@link Production} id registered in the file.
+	 * 
+	 * @return the last id or {@code 0} if the file has no records.
+	 * @throws IOException if an I / O error occurs.
+	 */
+	public long getLastId() throws IOException {
+		var numberOfRecords = countRecords();
+
+		if (numberOfRecords == 0)
+			return 0;
+
+		return read(numberOfRecords - 1).getId();
 	}
 }

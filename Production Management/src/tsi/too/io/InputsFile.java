@@ -9,7 +9,7 @@ import tsi.too.model.Input;
 
 public class InputsFile extends BinaryFile<Input> {
 
-	private final static String NAME = "ProductionInputs.dat";
+	private final static String NAME = "Inputs.dat";
 
 	private static InputsFile instance;
 

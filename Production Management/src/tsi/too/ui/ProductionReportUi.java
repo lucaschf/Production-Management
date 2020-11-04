@@ -156,6 +156,7 @@ public class ProductionReportUi extends JDialog {
 
 			tableModel.clear();
 			tableModel.addRows(controller.fetchPairedByPeriod(startDate, endDate));
+			System.out.println(controller.fetchPairedByPeriod(startDate, endDate));
 		} catch (IOException e) {
 			MessageDialog.showAlertDialog(this, Constants.PRODUCT, Constants.FAILED_TO_FETCH_DATA);
 		} catch (DateTimeParseException e) {

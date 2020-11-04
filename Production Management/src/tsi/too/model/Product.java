@@ -12,12 +12,32 @@ public class Product implements Cloneable {
 	private MeasureUnity measureUnity;
 	private final double size;
 	private double percentageProfitMargin;
+	private double manufacturingCost;
 
 	private final ArrayList<Input> inputs = new ArrayList<>();
 
+	public Product(long id, String name, MeasureUnity measureUnity, double percentageProfitMargin, double size, double manufacturingCost) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.measureUnity = measureUnity;
+		this.percentageProfitMargin = percentageProfitMargin;
+		this.size = size;
+		this.manufacturingCost = manufacturingCost;
+	}
+	
 	public Product(long id, String name, MeasureUnity measureUnity, double percentageProfitMargin, double size) {
 		super();
 		this.id = id;
+		this.name = name;
+		this.measureUnity = measureUnity;
+		this.percentageProfitMargin = percentageProfitMargin;
+		this.size = size;
+		this.manufacturingCost = 0;
+	}
+	
+	public Product(String name, MeasureUnity measureUnity, double percentageProfitMargin, double size, double manufacturingCost) {
+		super();
 		this.name = name;
 		this.measureUnity = measureUnity;
 		this.percentageProfitMargin = percentageProfitMargin;
@@ -30,6 +50,7 @@ public class Product implements Cloneable {
 		this.measureUnity = measureUnity;
 		this.percentageProfitMargin = percentageProfitMargin;
 		this.size = size;
+		this.manufacturingCost = 0;
 	}
 
 	public void addProductionInput(Collection<Input> inputs) throws IllegalArgumentException, CloneNotSupportedException {
@@ -38,6 +59,7 @@ public class Product implements Cloneable {
 
 		for (Input input : inputs){
 			this.inputs.add(input.clone());
+			manufacturingCost += input.getPriceForQuantity(); 
 		}
 	}
 
@@ -79,7 +101,10 @@ public class Product implements Cloneable {
 	}
 
 	public double getManufacturingCost() {
-		return inputs.stream().mapToDouble(Input::getPriceForQuantity).sum();
+		if(manufacturingCost == 0)
+			manufacturingCost = inputs.stream().mapToDouble(Input::getPriceForQuantity).sum();
+		
+		return manufacturingCost;
 	}
 
 	public double getSaleValue() {
@@ -93,6 +118,10 @@ public class Product implements Cloneable {
 		return size;
 	}
 
+	public void setManufacturingCost(double manufacturingCost) {
+		this.manufacturingCost = manufacturingCost;
+	}
+	
 	/**
 	 * Creates a copy of this {@link Product} with the new {@code id}.
 	 *
@@ -117,6 +146,7 @@ public class Product implements Cloneable {
 	public Product with(Collection<Input> inputs) throws CloneNotSupportedException {
 		var p = clone();
 		p.inputs.clear();
+		p.setManufacturingCost(0);
 		p.addProductionInput(inputs);
 		
 		return p;

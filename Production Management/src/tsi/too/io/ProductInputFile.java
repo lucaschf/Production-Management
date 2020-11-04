@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class ProductInputFile extends BinaryFile<ProductInput> {
 
-    private static final String NAME = "ProductInputsRelation.dat";
+    private static final String NAME = "ProductInputs.dat";
 
     private static ProductInputFile instance;
 

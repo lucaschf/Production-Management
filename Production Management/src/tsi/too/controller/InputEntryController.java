@@ -227,10 +227,14 @@ public class InputEntryController {
 
 			double quantity;
 
-			quantity = needed > entry.getAvailable() ? entry.getAvailable() : needed;
+			if (entry.getAvailable() > 0) {
 
-			totalChecked += quantity;
-			inputs.add(new Pair<Long, Input>(entry.getId(), new Input(entry.getInputId(), quantity, entry.getPrice())));
+				quantity = needed > entry.getAvailable() ? entry.getAvailable() : needed;
+
+				totalChecked += quantity;
+				inputs.add(new Pair<Long, Input>(entry.getId(),
+						new Input(entry.getInputId(), quantity, entry.getPrice())));
+			}
 		}
 
 		Double priceMean = inputs.stream().map(m -> m.getSecond().getPrice())

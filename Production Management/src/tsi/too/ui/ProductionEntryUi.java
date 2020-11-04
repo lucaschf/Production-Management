@@ -255,14 +255,16 @@ public class ProductionEntryUi extends JDialog {
 
 			List<Input> needed = inputsReserved.stream().map(m -> m.getSecond()).collect(Collectors.toList());
 
-			product = product.with(needed);
-
+			product.setManufacturingCost(needed.stream().mapToDouble(Input::getPriceForQuantity).sum() / amountBeingproduced);
+			
 			target = new Production(product.getId(), amountBeingproduced, date, product.getManufacturingCost(),
 					product.getSaleValue());
 
 			ftfProductionCost.setText(NumberExt.toBrazilianCurrency(target.getTotalManufacturingCost()));
 			ftfTotalSaleValue.setText(NumberExt.toBrazilianCurrency(target.getTotalSaleValue()));
-		} catch (CloneNotSupportedException | IOException ex) {
+			
+			bottomActionPanel.setPositiveButtonEnabled(true);
+		} catch (IOException ex) {
 			target = null;
 			bottomActionPanel.setPositiveButtonEnabled(false);
 		} catch (InsufficientStockException e) {
@@ -305,7 +307,7 @@ public class ProductionEntryUi extends JDialog {
 			productionController.insert(target);
 			resetForm();
 			MessageDialog.showInformationDialog(this, getTitle(), Constants.RECORD_SUCCESSFULLY_INSERTED);
-		} catch (IllegalArgumentException | InsufficientStockException | IOException e) {
+		} catch (IllegalArgumentException | InsufficientStockException | IOException | CloneNotSupportedException e) {
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.FAILED_TO_INSERT_RECORD);
 		}
 	}

@@ -37,8 +37,8 @@ public class ProductionController {
 		}
 	}
 
-	public void insert(Production p) throws IOException {
-		productionFile.writeAtEnd(p);
+	public void insert(Production p) throws IOException, CloneNotSupportedException {
+		productionFile.writeAtEnd(p.withId(productionFile.getLastId() + 1));
 	}
 
 	public List<Production> fetchAll() throws IOException {
