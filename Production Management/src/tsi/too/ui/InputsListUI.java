@@ -20,7 +20,6 @@ import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import tsi.too.Constants;
@@ -28,7 +27,7 @@ import tsi.too.controller.InputController;
 import tsi.too.io.MessageDialog;
 import tsi.too.model.Input;
 import tsi.too.ui.helper.TableMouseSelectionListener;
-import tsi.too.ui.table_model.ProductionInputTableModel;
+import tsi.too.ui.table_model.InputTableModel;
 import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
@@ -37,7 +36,7 @@ public class InputsListUI extends JFrame {
 	private JTextField tfName;
 
 	private final TableRowSorter<AbstractTableModel> sorter = new TableRowSorter<>();
-	private final ProductionInputTableModel tableModel = new ProductionInputTableModel();
+	private final InputTableModel tableModel = new InputTableModel();
 
 	private final Component parentComponent;
 	private InputController controller;
@@ -125,14 +124,9 @@ public class InputsListUI extends JFrame {
 		tbInputs.setModel(tableModel);
 		tbInputs.addMouseListener(new TableMouseSelectionListener(tbInputs));
 		tbInputs.removeColumn(tbInputs.getColumnModel().getColumn(2));
+		tbInputs.removeColumn(tbInputs.getColumnModel().getColumn(2));
 
 		UiUtils.setHorizontalAlignment(tbInputs, SwingConstants.LEFT);
-
-		TableColumnModel columnModel = tbInputs.getColumnModel();
-
-		columnModel.getColumn(0).setPreferredWidth(5);
-		columnModel.getColumn(1).setPreferredWidth(400);
-		columnModel.getColumn(2).setPreferredWidth(5);
 
 		setupPopupMenu();
 	}
@@ -198,6 +192,6 @@ public class InputsListUI extends JFrame {
 	}
 
 	private void checkIn() {
-		// TODO
+		new InputEntryUi(this, getSelectedItem()).setVisible(true);
 	}
 }

@@ -10,10 +10,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
+import java.util.function.Predicate;
 
 public class ProductController {
 	ProductFile productFile;
 	private static ProductController instance;
+
+	private ProductInputsController productInputsController;
 
 	public final InputValidator<String> productNameValidator = input -> {
 		if (input == null || input.isBlank())
@@ -26,6 +29,7 @@ public class ProductController {
 
 	private ProductController() throws FileNotFoundException {
 		this.productFile = ProductFile.getInstance();
+		productInputsController = ProductInputsController.getInstance();
 	}
 
 	public static ProductController getInstance() throws FileNotFoundException {
@@ -40,13 +44,28 @@ public class ProductController {
 	public List<Product> fetchProducts() throws IOException {
 		return productFile.readAllFile();
 	}
-	
+
 	public Vector<Product> fetchProductsAsVector() throws IOException {
 		return productFile.readAllFileAsVector();
 	}
 
 	public Pair<Product, Long> findByName(final String name) throws IOException {
-		return productFile.findByName(name);
+		return fetch(p -> p.getName().equalsIgnoreCase(name));
+	}
+
+	public Pair<Product, Long> fetch(Predicate<Product> p) throws IOException {
+		var product = productFile.fetch(p);
+
+		if(product != null)
+			retrieveInputs(product.getFirst());
+
+		return product;
+	}
+
+	private void retrieveInputs(Product p) throws IOException {
+		var inputs = productInputsController.fetchLinkedInputs(p.getId());
+
+		p.addProductionInput(inputs);
 	}
 
 	public void insert(Product p) throws IOException {

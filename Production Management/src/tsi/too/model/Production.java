@@ -4,19 +4,32 @@ import java.time.LocalDate;
 
 public class Production {
 	private long productId;
-	private double quantity;
+	private double amountProduced;
 	private LocalDate date;
-	private double totalManufacturingCost;
-	private double totalSaleValue;
-	
-	public Production(long productId, double quantity, LocalDate date, double manufacturingCost,
-			double totalSaleValue) {
+	private double unitaryManufacturingCost;
+	private double unitarySaleValue;
+	private double available;
+
+	public Production(long productId, double amountProduced, LocalDate date, double unitaryManufacturingCost,
+			double unitarySaleValue, double available) {
 		super();
 		this.productId = productId;
-		this.quantity = quantity;
+		this.amountProduced = amountProduced;
 		this.date = date;
-		this.totalManufacturingCost = manufacturingCost;
-		this.totalSaleValue = totalSaleValue;
+		this.unitaryManufacturingCost = unitaryManufacturingCost;
+		this.unitarySaleValue = unitarySaleValue;
+		this.available = available;
+	}
+
+	public Production(long productId, double amountProduced, LocalDate date, double unitaryManufacturingCost,
+			double unitarySaleValue) {
+		super();
+		this.productId = productId;
+		this.amountProduced = amountProduced;
+		this.date = date;
+		this.unitaryManufacturingCost = unitaryManufacturingCost;
+		this.unitarySaleValue = unitarySaleValue;
+		this.available = amountProduced;
 	}
 
 	public long getProductId() {
@@ -27,12 +40,12 @@ public class Production {
 		this.productId = productId;
 	}
 
-	public double getQuantity() {
-		return quantity;
+	public double getAmountProduced() {
+		return amountProduced;
 	}
 
-	public void setQuantity(double quantity) {
-		this.quantity = quantity;
+	public void setAmountProduced(double amountProduced) {
+		this.amountProduced = amountProduced;
 	}
 
 	public LocalDate getDate() {
@@ -43,26 +56,42 @@ public class Production {
 		this.date = date;
 	}
 
-	public double getManufacturingCost() {
-		return totalManufacturingCost;
+	public double getUnitaryManufacturingCost() {
+		return unitaryManufacturingCost;
 	}
 
-	public void setManufacturingCost(double manufacturingCost) {
-		this.totalManufacturingCost = manufacturingCost;
+	public void setUnitaryManufacturingCost(double unitaryManufacturingCost) {
+		this.unitaryManufacturingCost = unitaryManufacturingCost;
+	}
+
+	public double getTotalManufacturingCost() {
+		return unitaryManufacturingCost * amountProduced;
 	}
 
 	public double getTotalSaleValue() {
-		return totalSaleValue;
+		return unitarySaleValue * amountProduced;
 	}
 
-	public void setTotalSaleValue(double totalSaleValue) {
-		this.totalSaleValue = totalSaleValue;
+	public double getUnitarySaleValue() {
+		return unitarySaleValue;
+	}
+
+	public void setUnitarySaleValue(double unitarySaleValue) {
+		this.unitarySaleValue = unitarySaleValue;
+	}
+
+	public double getAvailable() {
+		return available;
+	}
+
+	public void setAvailable(double available) {
+		this.available = available;
 	}
 
 	@Override
 	public String toString() {
 		return String.format(
-				"Production {productId= %d, quantity= %1.2f, date= %s, manufacturingCost= %f, totalSaleValue= %f}",
-				productId, quantity, date, totalManufacturingCost, totalSaleValue);
+				"Production {productId= %d, amountProduced= %f, date= %s, unitaryManufacturingCost= %f, unitarySaleValue= %f, available= %f}",
+				productId, amountProduced, date, unitaryManufacturingCost, unitarySaleValue, available);
 	}
 }

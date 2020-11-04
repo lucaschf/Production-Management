@@ -2,16 +2,17 @@ package tsi.too.controller;
 
 import tsi.too.Constants;
 import tsi.too.io.InputDialog.InputValidator;
-import tsi.too.io.ProductionInputsFile;
+import tsi.too.io.InputsFile;
 import tsi.too.model.Input;
 import tsi.too.util.Pair;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Vector;
 
 public class InputController {
-	private final ProductionInputsFile inputsFile;
+	private final InputsFile inputsFile;
 
 	private static InputController instance;
 
@@ -31,7 +32,7 @@ public class InputController {
 	};
 
 	private InputController() throws FileNotFoundException {
-		inputsFile = ProductionInputsFile.getInstance();
+		inputsFile = InputsFile.getInstance();
 	}
 
 	public static InputController getInstance() throws FileNotFoundException {
@@ -45,6 +46,10 @@ public class InputController {
 
 	public List<Input> fetchInputs() throws IOException {
 		return inputsFile.readAllFile();
+	}
+
+	public Vector<Input> fetchInputsAsVector() throws IOException {
+		return inputsFile.readAllFileAsVector();
 	}
 
 	public Pair<Input, Long> findByName(final String name) throws IOException {

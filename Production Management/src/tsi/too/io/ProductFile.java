@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import tsi.too.model.MeasureUnity;
 import tsi.too.model.Product;
-import tsi.too.util.Pair;
 
 public class ProductFile extends BinaryFile<Product> {
 
@@ -35,7 +34,8 @@ public class ProductFile extends BinaryFile<Product> {
 		return Long.BYTES + // code
 				Product.MAX_NAME_LENGTH * Character.BYTES + // name
 				Integer.BYTES + // measureUnity
-				Double.BYTES // profitMargin
+				Double.BYTES + // profitMargin
+				Double.BYTES // size
 		;
 	}
 
@@ -45,12 +45,13 @@ public class ProductFile extends BinaryFile<Product> {
 		writeString(e.getName(), Product.MAX_NAME_LENGTH);
 		file.writeInt(e.getMeasureUnity().getCode());
 		file.writeDouble(e.getPercentageProfitMargin());
+		file.writeDouble(e.getSize());
 	}
 
 	@Override
 	public Product read() throws IOException {
 		return new Product(file.readLong(), readString(Product.MAX_NAME_LENGTH), MeasureUnity.from(file.readInt()),
-				file.readDouble());
+				file.readDouble(), file.readDouble());
 	}
 
 	public long getLastId() throws IOException {
@@ -60,20 +61,5 @@ public class ProductFile extends BinaryFile<Product> {
 			return 0;
 
 		return read(numberOfRecords - 1).getId();
-	}
-	
-	public Pair<Product, Long> findByName(final String name) throws IOException {
-		seekRecord(0);
-		
-		Product product;
-		
-		for(long i = 0; i < countRecords(); i++) {
-			product = read();
-			
-			if(product.getName().equalsIgnoreCase(name))
-				return new Pair<>(product, i);
-		}
-		
-		return null;
 	}
 }

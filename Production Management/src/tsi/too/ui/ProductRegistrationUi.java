@@ -1,5 +1,37 @@
 package tsi.too.ui;
 
+import static tsi.too.Constants.AN_ITEM_WITH_THIS_NAME_ALREADY_REGISTERED;
+import static tsi.too.Constants.DO_YOU_WANT_TO_UPDATE_WITH_INFORMED_VALUES;
+import static tsi.too.Constants.FAILED_TO_INSERT_RECORD;
+import static tsi.too.Constants.FAILED_TO_UPDATE_RECORD;
+import static tsi.too.Constants.PRODUCT_REGISTRATION;
+import static tsi.too.Constants.RECORD_SUCCESSFULLY_INSERTED;
+import static tsi.too.Constants.RECORD_SUCCESSFULLY_UPDATED;
+import static tsi.too.Constants.REGISTER_PRODUCTION_INPUTS;
+import static tsi.too.Constants.TO_RECORD;
+import static tsi.too.Constants.UPDATE;
+
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import tsi.too.Constants;
 import tsi.too.controller.ProductController;
 import tsi.too.io.MessageDialog;
@@ -7,36 +39,24 @@ import tsi.too.model.MeasureUnity;
 import tsi.too.model.Product;
 import tsi.too.util.Pair;
 
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import static tsi.too.Constants.*;
-
 @SuppressWarnings("serial")
 public class ProductRegistrationUi extends JDialog {
-	private JTextField tfName;
-	private JComboBox<MeasureUnity> cbUnity;
 	private JPanel fieldsPanel;
 	private JLabel lblName;
 	private JButton btnRegisterInputs;
-	private JSpinner spProfitmargin;
 	private BottomActionPanel bottomActionPanel;
 
 	private ProductController productController;
 
 	Component parentComponent;
 	Product product;
+	private JTextField tfName;
+	private JSpinner spProfit;
+	private JComboBox<MeasureUnity> cbUnit;
+	private JSpinner spSize;
 
 	/**
-	 * @param parentComponent 
+	 * @param parentComponent
 	 * @wbp.parser.constructor
 	 */
 	public ProductRegistrationUi(Component parentComponent) {
@@ -81,19 +101,21 @@ public class ProductRegistrationUi extends JDialog {
 	private void initContentGroupLayout() {
 		setupBottomPanel();
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
-		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(groupLayout
-				.createSequentialGroup()
-				.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addGroup(groupLayout.createSequentialGroup().addContainerGap().addComponent(fieldsPanel,
-								GroupLayout.DEFAULT_SIZE, 568, Short.MAX_VALUE))
-						.addGroup(groupLayout.createSequentialGroup().addContainerGap().addComponent(bottomActionPanel,
-								GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-				.addContainerGap()));
-		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup().addContainerGap()
-						.addComponent(fieldsPanel, GroupLayout.PREFERRED_SIZE, 154, Short.MAX_VALUE)
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addComponent(bottomActionPanel, GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addComponent(fieldsPanel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 575,
+										Short.MAX_VALUE)
+								.addComponent(bottomActionPanel, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 575,
+										Short.MAX_VALUE))
+						.addContainerGap()));
+		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(groupLayout.createSequentialGroup().addContainerGap()
+						.addComponent(fieldsPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+								GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(bottomActionPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+								GroupLayout.PREFERRED_SIZE)
 						.addContainerGap()));
 
 		getContentPane().setLayout(groupLayout);
@@ -113,7 +135,7 @@ public class ProductRegistrationUi extends JDialog {
 		lblName = new JLabel(String.format("%s:", Constants.NAME));
 		lblName.setHorizontalAlignment(SwingConstants.TRAILING);
 
-		JLabel lblUnity = new JLabel(String.format("%s:", Constants.UNITY));
+		JLabel lblUnity = new JLabel("Unidade de medida:");
 		lblUnity.setHorizontalAlignment(SwingConstants.TRAILING);
 
 		JLabel lblProfitMargin = new JLabel(String.format("%s:", Constants.PROFIT_MARGIN));
@@ -121,51 +143,67 @@ public class ProductRegistrationUi extends JDialog {
 
 		setupNameTextField();
 
-		cbUnity = new JComboBox<>(MeasureUnity.values());
-		lblUnity.setLabelFor(cbUnity);
-
-		spProfitmargin = new JSpinner();
-		lblProfitMargin.setLabelFor(spProfitmargin);
-		spProfitmargin.setModel(new SpinnerNumberModel(0.0, 0.0, 100.0, 1.0));
-
 		initBtnInputRegistration();
 
+		JLabel lblNewLabel = new JLabel("Tamanho:");
+
+		lblName.setLabelFor(tfName);
+		tfName.setColumns(10);
+
+		cbUnit = new JComboBox<>(MeasureUnity.values());
+		lblUnity.setLabelFor(cbUnit);
+
+		spSize = new JSpinner(new SpinnerNumberModel(0.0, 0.0, null, 0.5));
+		lblNewLabel.setLabelFor(spSize);
+
+		spProfit = new JSpinner(new SpinnerNumberModel(0.0, 0.0, null, 0.5));
+		lblProfitMargin.setLabelFor(spProfit);
+
 		GroupLayout gl_panel = new GroupLayout(fieldsPanel);
-		gl_panel.setHorizontalGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel.createSequentialGroup().addContainerGap()
-						.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-								.addComponent(lblUnity, GroupLayout.PREFERRED_SIZE, 74, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblProfitMargin, GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
-								.addComponent(lblName))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addComponent(cbUnity, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
-								.addGroup(Alignment.TRAILING,
-										gl_panel.createSequentialGroup()
-												.addComponent(spProfitmargin, GroupLayout.PREFERRED_SIZE, 66,
-														GroupLayout.PREFERRED_SIZE)
-												.addPreferredGap(ComponentPlacement.RELATED, 228, Short.MAX_VALUE)
-												.addComponent(btnRegisterInputs, GroupLayout.PREFERRED_SIZE, 143,
-														GroupLayout.PREFERRED_SIZE))
-								.addComponent(tfName, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 435,
-										Short.MAX_VALUE))
-						.addContainerGap()));
+		gl_panel.setHorizontalGroup(gl_panel.createParallelGroup(Alignment.LEADING).addGroup(gl_panel
+				.createSequentialGroup().addContainerGap()
+				.addGroup(gl_panel.createParallelGroup(Alignment.LEADING).addGroup(gl_panel
+						.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel.createSequentialGroup()
+								.addPreferredGap(ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
+								.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING).addComponent(lblName)
+										.addComponent(lblUnity, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 125,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(lblNewLabel))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+										.addComponent(tfName, GroupLayout.PREFERRED_SIZE, 404,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(cbUnit, GroupLayout.PREFERRED_SIZE, 199,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(spSize, GroupLayout.PREFERRED_SIZE, 117,
+												GroupLayout.PREFERRED_SIZE))
+								.addContainerGap())
+						.addGroup(gl_panel.createSequentialGroup()
+								.addComponent(lblProfitMargin, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
+										Short.MAX_VALUE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(spProfit, GroupLayout.PREFERRED_SIZE, 117, GroupLayout.PREFERRED_SIZE)
+								.addGap(299)))
+						.addGroup(Alignment.TRAILING,
+								gl_panel.createSequentialGroup().addComponent(btnRegisterInputs,
+										GroupLayout.PREFERRED_SIZE, 143, GroupLayout.PREFERRED_SIZE)
+										.addContainerGap()))));
 		gl_panel.setVerticalGroup(gl_panel.createParallelGroup(Alignment.LEADING).addGroup(gl_panel
 				.createSequentialGroup().addContainerGap()
 				.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblName).addComponent(tfName,
 						GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-				.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING).addGroup(gl_panel.createSequentialGroup()
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblUnity).addComponent(
-								cbUnity, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-								GroupLayout.PREFERRED_SIZE))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblProfitMargin)
-								.addComponent(spProfitmargin, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-										GroupLayout.PREFERRED_SIZE))
-						.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-						.addGroup(gl_panel.createSequentialGroup().addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(btnRegisterInputs).addContainerGap()))));
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblUnity).addComponent(cbUnit,
+						GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblNewLabel).addComponent(
+						spSize, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblProfitMargin).addComponent(
+						spProfit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+				.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.addComponent(btnRegisterInputs).addContainerGap()));
 
 		fieldsPanel.setLayout(gl_panel);
 	}
@@ -212,25 +250,29 @@ public class ProductRegistrationUi extends JDialog {
 
 	private void onOk(ActionEvent actionEvent) {
 		var name = tfName.getText();
-		var profitMargin = (double) spProfitmargin.getValue();
+		var profitMargin = (double) spProfit.getValue();
+		var size = (double) spSize.getValue();
 		if (!productController.productNameValidator.isValid(name)) {
 			MessageDialog.showAlertDialog(this, getTitle(),
 					productController.productNameValidator.getErrorMessage(name));
 			return;
 		}
-		
-		if(profitMargin == 0) {
-			if(!MessageDialog.showConfirmationDialog(this, getTitle(), "Deseja registrar o produto sem margem de lucro?"))
-			{
-				spProfitmargin.requestFocus();
+
+		if (size == 0) {
+			MessageDialog.showAlertDialog(this, getTitle(), Constants.INVALID_SIZE);
+			return;
+		}
+
+		if (profitMargin == 0) {
+			if (!MessageDialog.showConfirmationDialog(this, getTitle(),
+					"Deseja registrar o produto sem margem de lucro?")) {
+				spProfit.requestFocus();
 				return;
 			}
 		}
-		
-		try {
-			var p = new Product(0, tfName.getText(), (MeasureUnity) cbUnity.getSelectedItem(),
-					(Double) spProfitmargin.getValue());
 
+		try {
+			var p = new Product(name, (MeasureUnity) cbUnit.getSelectedItem(), profitMargin, size);
 			var target = productController.findByName(p.getName());
 
 			switch (actionEvent.getActionCommand()) {
@@ -244,7 +286,8 @@ public class ProductRegistrationUi extends JDialog {
 					break;
 			}
 		} catch (IOException e) {
-			var message = actionEvent.getActionCommand().equals(UPDATE) ? FAILED_TO_UPDATE_RECORD : FAILED_TO_INSERT_RECORD;
+			var message = actionEvent.getActionCommand().equals(UPDATE) ? FAILED_TO_UPDATE_RECORD
+					: FAILED_TO_INSERT_RECORD;
 			MessageDialog.showAlertDialog(this, getTitle(), message);
 		}
 	}
@@ -258,8 +301,8 @@ public class ProductRegistrationUi extends JDialog {
 						String.format("%s\n%s?", RECORD_SUCCESSFULLY_INSERTED, REGISTER_PRODUCTION_INPUTS)))
 					registerInputs(p);
 				resetForm();
-			} else if (MessageDialog.showConfirmationDialog(this, PRODUCT_REGISTRATION,
-					String.format("%s\n%s", AN_ITEM_WITH_THIS_NAME_ALREADY_REGISTERED, DO_YOU_WANT_TO_UPDATE_WITH_INFORMED_VALUES)))
+			} else if (MessageDialog.showConfirmationDialog(this, PRODUCT_REGISTRATION, String.format("%s\n%s",
+					AN_ITEM_WITH_THIS_NAME_ALREADY_REGISTERED, DO_YOU_WANT_TO_UPDATE_WITH_INFORMED_VALUES)))
 				update(p.withId(target.getFirst().getId()), target);
 		} catch (IOException e) {
 			MessageDialog.showAlertDialog(this, UPDATE, FAILED_TO_INSERT_RECORD);
@@ -267,7 +310,7 @@ public class ProductRegistrationUi extends JDialog {
 	}
 
 	private void registerInputs(Product p) {
-		new ProductionInputsAssociationUi(this, p).setVisible(true);
+		new AssociateInputToProductUI(this, p).setVisible(true);
 	}
 
 	private void update(Product p, Pair<Product, Long> target) {
@@ -283,7 +326,7 @@ public class ProductRegistrationUi extends JDialog {
 			productController.update(target.getSecond(), p);
 			MessageDialog.showInformationDialog(this, PRODUCT_REGISTRATION, RECORD_SUCCESSFULLY_UPDATED);
 			resetForm();
-			
+
 		} catch (IOException | NullPointerException e) {
 			MessageDialog.showAlertDialog(this, UPDATE, FAILED_TO_UPDATE_RECORD);
 		}
@@ -291,8 +334,9 @@ public class ProductRegistrationUi extends JDialog {
 
 	private void resetForm() {
 		tfName.setText("");
-		cbUnity.setSelectedIndex(0);
-		spProfitmargin.setValue(0.0);
+		cbUnit.setSelectedIndex(0);
+		spProfit.setValue(0.0);
+		spSize.setValue(0.0);
 		bottomActionPanel.setPositiveText(TO_RECORD);
 		product = null;
 	}
@@ -300,9 +344,10 @@ public class ProductRegistrationUi extends JDialog {
 	private void fillFields() {
 		if (product == null)
 			return;
-
+		
 		tfName.setText(product.getName());
-		cbUnity.setSelectedItem(product.getMeasureUnity());
-		spProfitmargin.setValue(product.getPercentageProfitMargin());
+		cbUnit.setSelectedItem(product.getMeasureUnity());
+		spProfit.setValue(product.getPercentageProfitMargin());
+		spSize.setValue(product.getSize());
 	}
 }

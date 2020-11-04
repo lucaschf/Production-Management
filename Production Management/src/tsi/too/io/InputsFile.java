@@ -8,20 +8,20 @@ import java.io.IOException;
 import tsi.too.model.Input;
 import tsi.too.util.Pair;
 
-public class ProductionInputsFile extends BinaryFile<Input> {
+public class InputsFile extends BinaryFile<Input> {
 
 	private final static String NAME = "ProdctionInputs.dat";
 
-	private static ProductionInputsFile instance;
+	private static InputsFile instance;
 
-	private ProductionInputsFile() throws FileNotFoundException {
+	private InputsFile() throws FileNotFoundException {
 		openFile(NAME, OpenMode.READ_WRITE);
 	}
 
-	public static ProductionInputsFile getInstance() throws FileNotFoundException {
-		synchronized (ProductionInputsFile.class) {
+	public static InputsFile getInstance() throws FileNotFoundException {
+		synchronized (InputsFile.class) {
 			if (instance == null)
-				instance = new ProductionInputsFile();
+				instance = new InputsFile();
 
 			return instance;
 		}
@@ -30,7 +30,7 @@ public class ProductionInputsFile extends BinaryFile<Input> {
 	@Override
 	public int recordSize() {
 		return MAX_NAME_LENGTH * Character.BYTES // name
-				+ Integer.BYTES // quantity
+				+ Double.BYTES // quantity
 				+ Long.BYTES // code
 				+ Double.BYTES // price
 		;
@@ -39,7 +39,7 @@ public class ProductionInputsFile extends BinaryFile<Input> {
 	@Override
 	public void write(Input e) throws IOException {
 		writeString(e.getName(), MAX_NAME_LENGTH);
-		file.writeInt(e.getQuantity());
+		file.writeDouble(e.getQuantity());
 		file.writeLong(e.getId());
 		file.writeDouble(e.getPrice());
 	}
@@ -78,7 +78,7 @@ public class ProductionInputsFile extends BinaryFile<Input> {
 
 	@Override
 	public Input read() throws IOException {
-		return new Input(readString(MAX_NAME_LENGTH), file.readInt(), file.readLong(), file.readDouble());
+		return new Input(readString(MAX_NAME_LENGTH), file.readDouble(), file.readLong(), file.readDouble());
 	}
 
 	public Pair<Input, Long> findByName(final String name) throws IOException {

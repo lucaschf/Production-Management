@@ -38,21 +38,24 @@ public class DashboardUi extends JFrame {
 		setJMenuBar(menuBar);
 
 		menuBar.add(createRegistrationMenu());
-
-		menuBar.add(createOrdersMenu());
-		menuBar.add(createReportMenu());
 		menuBar.add(createConsultationMenu());
+		menuBar.add(createEntryMeny());
+		menuBar.add(createReportMenu());
 		menuBar.add(createSettingsMenu());
 	}
 
-	private JMenu createOrdersMenu() {
-		JMenu mnOrder = new JMenu(Constants.ORDERS);
+	private JMenu createEntryMeny() {
+		JMenu mnEntry = new JMenu(Constants.ENTRY);
 
-		JMenuItem mntmPlaceOrder = new JMenuItem(Constants.NEW_ORDER);
+		JMenuItem mntmInputEntry = new JMenuItem(Constants.INPUT_ENTRIES);
+		mntmInputEntry.addActionListener(e -> new InputEntryUi(this).setVisible(true));
+		mnEntry.add(mntmInputEntry);
+
+		JMenuItem mntmPlaceOrder = new JMenuItem(Constants.ORDER);
 		mntmPlaceOrder.addActionListener(e -> new PlaceOrderUi(this).setVisible(true));
-		mnOrder.add(mntmPlaceOrder);
-		
-		return mnOrder;
+		mnEntry.add(mntmPlaceOrder);
+
+		return mnEntry;
 	}
 
 	private JMenu createReportMenu() {
@@ -66,25 +69,29 @@ public class DashboardUi extends JFrame {
 		mntmSalesReport.addActionListener(e -> new SalesReportUi(this).setVisible(true));
 		mnReport.add(mntmSalesReport);
 
+		JMenuItem mntmConsultationInputsPrices = new JMenuItem(Constants.INPUT_ENTRIES);
+		mntmConsultationInputsPrices.addActionListener(e -> new InputsEntryListUi(this).setVisible(true));
+		mnReport.add(mntmConsultationInputsPrices);
+
 		return mnReport;
 	}
 
 	private JMenu createRegistrationMenu() {
 		JMenu mnRegister = new JMenu(Constants.REGISTRATION);
 
+		JMenuItem mntmRegisterProductionInputs = new JMenuItem(Constants.INPUT);
+		mntmRegisterProductionInputs.addActionListener(e -> new InputsRegistrationUi(this).setVisible(true));
+		mnRegister.add(mntmRegisterProductionInputs);
+		
 		JMenuItem mntmRegisterProduct = new JMenuItem(Constants.PRODUCT);
 		mntmRegisterProduct.addActionListener(e -> new ProductRegistrationUi(this).setVisible(true));
 		mnRegister.add(mntmRegisterProduct);
 
 		JMenuItem mntmRegisterProduction = new JMenuItem(Constants.PRODUCTION);
-		mntmRegisterProduction.addActionListener(e -> new ProductionRegistrationUi(this).setVisible(true));
+		mntmRegisterProduction.addActionListener(e -> new ProductionEntryUi(this).setVisible(true));
 		mnRegister.add(mntmRegisterProduction);
 
-		JMenuItem mntmRegisterProductionInputs = new JMenuItem(Constants.PRODUCTION_INPUTS);
-		mntmRegisterProductionInputs.addActionListener(e -> new InputsRegistrationUi(this).setVisible(true));
-		mnRegister.add(mntmRegisterProductionInputs);
-
-		JMenuItem mntmAssociateProductInputs = new JMenuItem(Constants.PRODUCTION_INPUTS);
+		JMenuItem mntmAssociateProductInputs = new JMenuItem(Constants.PRODUCT_INPUT_LINK);
 		mntmAssociateProductInputs.addActionListener(e -> new AssociateInputToProductUI(this).setVisible(true));
 		mnRegister.add(mntmAssociateProductInputs);
 
@@ -116,10 +123,6 @@ public class DashboardUi extends JFrame {
 		mntmConsultationInputs.addActionListener(e -> new InputsListUI(this).setVisible(true));
 		mnConsultations.add(mntmConsultationInputs);
 
-		JMenuItem mntmConsultationInputsPrices = new JMenuItem(Constants.PRODUCTION_INPUTS_PRICES_CHANGES);
-		mntmConsultationInputsPrices.addActionListener(e -> new InputsPriceChangesListUi(this).setVisible(true));
-		mnConsultations.add(mntmConsultationInputsPrices);
-
 		return mnConsultations;
 	}
 
@@ -140,6 +143,7 @@ public class DashboardUi extends JFrame {
 				if (changeLook.equals(lookAndFeelsDisplay.get(i))) {
 					try {
 						UIManager.setLookAndFeel(lookAndFeelsRealNames.get(i));
+						repaint();
 						break;
 					} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
 							| UnsupportedLookAndFeelException ex) {

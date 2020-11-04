@@ -9,10 +9,10 @@ import tsi.too.ext.StringExt;
 import tsi.too.model.Input;
 
 @SuppressWarnings("serial")
-public class ProductionInputTableModel extends CustomTableModel<Input> {
+public class InputTableModel extends CustomTableModel<Input> {
 	public static final String[] COLUMN_NAMES = {Constants.ID, Constants.NAME, Constants.QUANTITY, Constants.UNITARY_PRICE };
 
-	public ProductionInputTableModel() {
+	public InputTableModel() {
 		super(COLUMN_NAMES, 0);
 	}
 
@@ -46,11 +46,12 @@ public class ProductionInputTableModel extends CustomTableModel<Input> {
 
 			var productId = (long) rowData.get(0);
 			var name = (String) rowData.get(1);
-			var quantity = (int) rowData.get(2);
+			var quantity = (double) rowData.get(2);
 			var inputsId = StringExt.fromBraziliaCurrencyString(rowData.get(3).toString()).doubleValue();
 
 			return new Input(name, quantity, productId, inputsId);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}	

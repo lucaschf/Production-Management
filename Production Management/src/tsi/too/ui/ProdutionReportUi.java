@@ -3,6 +3,9 @@ package tsi.too.ui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -12,27 +15,41 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import tsi.too.Constants;
+import tsi.too.Patterns;
 import tsi.too.controller.ProductionController;
 import tsi.too.io.MessageDialog;
+import tsi.too.ui.helper.TableMouseSelectionListener;
+import tsi.too.ui.table_model.ProductionTableModel;
+import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
 public class ProdutionReportUi extends JDialog {
 	private ProductionController controller;
-	
+
+	private JTable tbProduction;
+
 	private final Component parentComponent;
-	
+	private final ProductionTableModel tableModel = new ProductionTableModel();
+	private JFormattedTextField ftfStartDate;
+	private JFormattedTextField ftfEndDate;
+
+	private final DateTimeFormatter dateFormater = DateTimeFormatter.ofPattern(Patterns.BRAZILIAN_DATE_PATTERN);
+
 	public ProdutionReportUi(Component parentComponent) {
 		this.parentComponent = parentComponent;
-		
+
 		initController();
-		
+
 		initComponent();
 		setupWindow();
+
+		fetchData();
 	}
 
 	private void initComponent() {
@@ -42,16 +59,19 @@ public class ProdutionReportUi extends JDialog {
 
 		JLabel lblStartDate = new JLabel(String.format("%s:", Constants.START_DATE));
 
-		JFormattedTextField ftfStartDate = new JFormattedTextField();
+		ftfStartDate = new JFormattedTextField(UiUtils.createBrazilianDateMaskFormatter());
+		ftfStartDate.setText(LocalDate.now().minusDays(7).format(dateFormater));
 		lblStartDate.setLabelFor(ftfStartDate);
 
 		JLabel lblEndDate = new JLabel(String.format("%s:", Constants.END_DATE));
 		lblEndDate.setHorizontalAlignment(SwingConstants.TRAILING);
 
-		JFormattedTextField ftfEndDate = new JFormattedTextField();
+		ftfEndDate = new JFormattedTextField(UiUtils.createBrazilianDateMaskFormatter());
+		ftfEndDate.setText(LocalDate.now().format(dateFormater));
 		lblEndDate.setLabelFor(ftfEndDate);
 
 		JButton btnCreateReport = new JButton(Constants.GET_PRODUCTION_DATA);
+		btnCreateReport.addActionListener(e -> fetchData());
 		GroupLayout gl_filterPanel = new GroupLayout(filterPanel);
 		gl_filterPanel.setHorizontalGroup(gl_filterPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_filterPanel.createSequentialGroup().addContainerGap().addComponent(lblStartDate)
@@ -77,14 +97,18 @@ public class ProdutionReportUi extends JDialog {
 		tablePanel.setBorder(
 				new TitledBorder(null, Constants.PRODUCTION_DATA, TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
-		JScrollPane scrollPane = new JScrollPane();
+		JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		GroupLayout gl_tablePanel = new GroupLayout(tablePanel);
 		gl_tablePanel.setHorizontalGroup(gl_tablePanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_tablePanel.createSequentialGroup().addContainerGap()
-						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 1079, Short.MAX_VALUE).addContainerGap()));
-		gl_tablePanel.setVerticalGroup(gl_tablePanel.createParallelGroup(Alignment.LEADING).addGroup(Alignment.TRAILING,
-				gl_tablePanel.createSequentialGroup()
-						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 521, Short.MAX_VALUE).addContainerGap()));
+						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 832, Short.MAX_VALUE).addContainerGap()));
+		gl_tablePanel.setVerticalGroup(gl_tablePanel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_tablePanel.createSequentialGroup().addContainerGap()
+						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE).addContainerGap()));
+
+		setupTable();
+		scrollPane.setViewportView(tbProduction);
 		tablePanel.setLayout(gl_tablePanel);
 
 		BottomActionPanel bottomPanel = new BottomActionPanel(Constants.CANCEL, e -> onCancel(), Constants.OK,
@@ -107,6 +131,15 @@ public class ProdutionReportUi extends JDialog {
 		getContentPane().setLayout(groupLayout);
 	}
 
+	private void setupTable() {
+		tbProduction = new JTable(tableModel);
+		tbProduction.addMouseListener(new TableMouseSelectionListener(tbProduction));
+		tbProduction.removeColumn(tbProduction.getColumnModel().getColumn(0));
+
+		UiUtils.setHorizontalAlignment(tbProduction, SwingConstants.LEFT);
+
+	}
+
 	private void initController() {
 		try {
 			controller = ProductionController.getInstance();
@@ -114,19 +147,43 @@ public class ProdutionReportUi extends JDialog {
 			MessageDialog.showErrorDialog(this, getTitle(), Constants.UNABLE_TO_OPEN_FILE);
 		}
 	}
-	
+
 	private void setupWindow() {
 		setTitle(Constants.PRODUCTION_REPORT);
 		setMinimumSize(new Dimension(900, 600));
 		pack();
 		setLocationRelativeTo(parentComponent);
 	}
-	
+
+	private void fetchData() {
+		try {
+			LocalDate startDate;
+			LocalDate endDate;
+
+			try {
+				startDate = LocalDate.parse(ftfStartDate.getText(), dateFormater);
+				endDate = LocalDate.parse(ftfEndDate.getText(), dateFormater);
+			} catch (Exception e) {
+				MessageDialog.showAlertDialog(this, getTitle(), Constants.INVALID_PERIOD);
+				return;
+			}
+
+			if (startDate.isAfter(endDate)) {
+				MessageDialog.showAlertDialog(this, getTitle(), Constants.INVALID_PERIOD);
+			}
+
+			tableModel.clear();
+			tableModel.addRows(controller.fetchPairedByPeriod(startDate, endDate));
+		} catch (IOException e) {
+			MessageDialog.showAlertDialog(Constants.PRODUCT, Constants.FAILED_TO_FETCH_DATA);
+		}
+	}
+
 	private void onCancel() {
 		dispose();
 	}
 
 	private void onOk() {
-		
+		dispose();
 	}
 }

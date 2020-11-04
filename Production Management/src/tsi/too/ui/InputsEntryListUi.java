@@ -2,6 +2,10 @@ package tsi.too.ui;
 
 import java.awt.Component;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
+import java.util.Vector;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -10,28 +14,32 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.TableColumnModel;
 
 import tsi.too.Constants;
-import tsi.too.controller.InputPriceEntryController;
+import tsi.too.Patterns;
+import tsi.too.controller.InputEntryController;
+import tsi.too.ext.NumberExt;
+import tsi.too.ext.StringExt;
 import tsi.too.io.MessageDialog;
+import tsi.too.model.InputEntry;
 import tsi.too.ui.helper.TableMouseSelectionListener;
-import tsi.too.ui.table_model.PriceEntryModel;
+import tsi.too.ui.table_model.CustomTableModel;
+import tsi.too.util.Pair;
 import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
-public class InputsPriceChangesListUi extends JFrame {
+public class InputsEntryListUi extends JFrame {
 	private JTable tbEntries;
 
-	private final PriceEntryModel tableModel = new PriceEntryModel();
+	private final InputStockTableModel tableModel = new InputStockTableModel();
 
 	private final Component parentComponent;
-	private InputPriceEntryController controller;
+	private InputEntryController controller;
 
-	public InputsPriceChangesListUi(Component parentComponent) {
+	public InputsEntryListUi(Component parentComponent) {
 		this.parentComponent = parentComponent;
-		setTitle(Constants.PRODUCT_LISTING);
+		setTitle(Constants.INPUT_ENTRIES);
 
 		initComponent();
 		setupWindow();
@@ -42,8 +50,7 @@ public class InputsPriceChangesListUi extends JFrame {
 
 	private void initComponent() {
 		JPanel dataPanel = new JPanel();
-		dataPanel.setBorder(
-				new TitledBorder(null, Constants.PRODUCT, TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING).addGroup(Alignment.LEADING,
 				groupLayout.createSequentialGroup().addContainerGap()
@@ -76,8 +83,11 @@ public class InputsPriceChangesListUi extends JFrame {
 		TableColumnModel columnModel = tbEntries.getColumnModel();
 
 		columnModel.getColumn(0).setPreferredWidth(5);
-		columnModel.getColumn(1).setPreferredWidth(400);
-		columnModel.getColumn(2).setPreferredWidth(5);
+		columnModel.getColumn(1).setPreferredWidth(5);
+		columnModel.getColumn(2).setPreferredWidth(400);
+
+		tbEntries.removeColumn(columnModel.getColumn(1));
+		tbEntries.removeColumn(columnModel.getColumn(0));
 	}
 
 	private void setupWindow() {
@@ -87,7 +97,7 @@ public class InputsPriceChangesListUi extends JFrame {
 
 	private void initController() {
 		try {
-			controller = InputPriceEntryController.getInstance();
+			controller = InputEntryController.getInstance();
 		} catch (Exception e) {
 			MessageDialog.showAlertDialog(parentComponent, Constants.PRODUCT_LISTING, Constants.FAILED_TO_FETCH_DATA);
 			dispose();
@@ -97,9 +107,61 @@ public class InputsPriceChangesListUi extends JFrame {
 	private void fetchData() {
 		try {
 			tableModel.clear();
-			tableModel.addRows(controller.fetchAll());
+			tableModel.addRows(controller.fetchPaired());
 		} catch (IOException e) {
 			MessageDialog.showAlertDialog(Constants.PRODUCT, Constants.FAILED_TO_FETCH_DATA);
+		}
+	}
+
+	private static class InputStockTableModel extends CustomTableModel<Pair<String, InputEntry>> {
+
+		public static final String[] COLUMN_NAMES = { Constants.ID, Constants.INPUT_ID, Constants.NAME, Constants.PRICE,
+				Constants.INCOME, Constants.IN_STOCK, Constants.DATE };
+
+		public InputStockTableModel() {
+			super(COLUMN_NAMES, 0);
+		}
+
+		@Override
+		public void addRow(Pair<String, InputEntry> item) {
+			Objects.requireNonNull(item);
+
+			Vector<Object> rowVector = new Vector<>();
+
+			var entry = item.getSecond();
+
+			rowVector.add(entry.getId());
+			rowVector.add(entry.getInputId());
+			rowVector.add(item.getFirst());// name
+
+			rowVector.add(NumberExt.toBrazilianCurrency(entry.getPrice()));
+			rowVector.add(entry.getIncoming());
+			rowVector.add(entry.getAvailable());
+			rowVector.add(entry.getDate().format(DateTimeFormatter.ofPattern(Patterns.BRAZILIAN_DATE_PATTERN)));
+
+			super.addRow(rowVector);
+		}
+
+		@Override
+		public Pair<String, InputEntry> getValueAt(int row) {
+			try {
+				var rowData = getDataVector().elementAt(row);
+
+				var id = (Long) rowData.get(0);
+				var inputId = (Long) rowData.get(1);
+				var name = (String) rowData.get(2);
+				var price = StringExt.fromBraziliaCurrencyString(rowData.get(3).toString()).doubleValue();
+				var incoming = (double) rowData.get(4);
+				var available = (double) rowData.get(5);
+
+				var date = (LocalDate.parse(rowData.get(6).toString(),
+						DateTimeFormatter.ofPattern(Patterns.BRAZILIAN_DATE_PATTERN)));
+
+				return new Pair<String, InputEntry>(name,
+						new InputEntry(id, inputId, incoming, price, available, date));
+			} catch (Exception e) {
+				return null;
+			}
 		}
 	}
 }
