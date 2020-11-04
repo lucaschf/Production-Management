@@ -8,9 +8,27 @@ import java.io.IOException;
 import tsi.too.model.Production;
 
 public class ProductionFile extends BinaryFile<Production> {
+	private static final String FILE_NAME = "Production.dat";
 
-	public ProductionFile(String fileName) throws FileNotFoundException {
-		openFile(fileName, OpenMode.READ_WRITE);
+	private static ProductionFile instance;
+
+	private ProductionFile() throws FileNotFoundException {
+		openFile(FILE_NAME, OpenMode.READ_WRITE);
+	}
+
+	/**
+	 * Ensures that only one instance is created
+	 * 
+	 * @return the created instance.
+	 * @throws FileNotFoundException if persistence file opening fails.
+	 */
+	public static ProductionFile getInstance() throws FileNotFoundException {
+		synchronized (ProductionFile.class){
+			if(instance == null)
+				instance = new ProductionFile();
+
+			return instance;
+		}
 	}
 
 	@Override

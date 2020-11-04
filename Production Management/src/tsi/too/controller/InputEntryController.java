@@ -1,5 +1,12 @@
 package tsi.too.controller;
 
+import tsi.too.exception.InsufficientStockException;
+import tsi.too.io.InputStockFile;
+import tsi.too.model.Input;
+import tsi.too.model.InputEntry;
+import tsi.too.model.ProductInput;
+import tsi.too.util.Pair;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -7,27 +14,26 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
-
-import tsi.too.exception.InsufficientStockException;
-import tsi.too.io.InputStockFile;
-import tsi.too.model.InputEntry;
-import tsi.too.model.ProductInput;
-import tsi.too.util.Pair;
 
 public class InputEntryController {
 	private final InputStockFile inputStockFile;
 
-	private static final String fileName = "inputStock.dat";
-
 	private static InputEntryController instance;
-	private InputController inputController;
+	private final InputController inputController;
 
 	private InputEntryController() throws FileNotFoundException {
-		inputStockFile = new InputStockFile(fileName);
+		inputStockFile = InputStockFile.getInstance();
 		inputController = InputController.getInstance();
 	}
 
+	/**
+	 * Ensures that only one instance is created
+	 * 
+	 * @return the created instance.
+	 * @throws FileNotFoundException if persistence file opening fails.
+	 */
 	public static InputEntryController getInstance() throws FileNotFoundException {
 		synchronized (InputEntryController.class) {
 			if (instance == null)
@@ -37,32 +43,49 @@ public class InputEntryController {
 		}
 	}
 
-	public void insert(InputEntry iStock) throws IOException {
-		inputStockFile.writeAtEnd(iStock.withId(inputStockFile.getLastId() + 1));
+	/**
+	 * Generates an id for the {@link InputEntry} and inserts it to the file.
+	 * 
+	 * @param entry the {@link InputEntry} to be inserted.
+	 * @throws IOException                if an I / O error occurs.
+	 * @throws CloneNotSupportedException If cloning the {@code entry} with the new
+	 *                                    id fails.
+	 */
+	public void insert(InputEntry entry) throws IOException, CloneNotSupportedException {
+		inputStockFile.writeAtEnd(entry.withId(inputStockFile.getLastId() + 1));
 	}
 
-	public List<InputEntry> fetchAll() throws IOException {
-		return inputStockFile.readAllFile();
-	}
-
+	/**
+	 * Fetch all recorded {@link InputEntry} paired with the {@link Input} name.
+	 * 
+	 * @return a list with all paired {@link InputEntry}.
+	 * @throws IOException if an I / O error occurs.
+	 */
 	public List<Pair<String, InputEntry>> fetchPaired() throws IOException {
 		var entries = inputStockFile.readAllFile();
 		var result = new ArrayList<Pair<String, InputEntry>>();
-		
+
 		String name;
-		
-		for(InputEntry entry : entries) {
+
+		for (InputEntry entry : entries) {
 			try {
 				name = inputController.findById(entry.getInputId()).getFirst().getName();
-			}catch (Exception e) {
+			} catch (Exception e) {
 				name = "";
 			}
-			result.add(new Pair<String, InputEntry>(name, entry));
+			result.add(new Pair<>(name, entry));
 		}
 
 		return result;
 	}
 
+	/**
+	 * Fetch all recorded {@link InputEntry} for a {@link Input} based on its id.
+	 * 
+	 * @param inputId the target input id.
+	 * @return a list with all {@link InputEntry}.
+	 * @throws IOException if an I / O error occurs.
+	 */
 	public List<InputEntry> fetchByInput(long inputId) throws IOException {
 		return new ArrayList<>(inputStockFile.readAllFile(p -> p.getInputId() == inputId));
 	}
@@ -83,67 +106,59 @@ public class InputEntryController {
 	}
 
 	/**
-	 * Retrieves all prices entries for a given input in a given period.
-	 *
-	 * @param inputId            the target input id;
-	 * @param startDateInclusive the start date.
-	 * @param endDateInclusive   the end date.
-	 * @return a list with the entries.
-	 * @throws IOException if an I / O error occurs.
+	 * Reserves production inputs for stock withdraw.
+	 * 
+	 * @param items      the requested {@link ProductInput} list.
+	 * @param multiplier the amount of each {@link ProductInput} that should be
+	 *                   withdrawn.
+	 * @param date       the withdrawn date
+	 * @return A {@link Pair} containing the total value of the withdrawn and a list
+	 *         of the {@link InputEntry} with the new available values after the
+	 *         withdrawn.
+	 *         <p>
+	 *         <b>WARNING:</b>This method does not performs the withdrawn, if a
+	 *         withdrawn is required, use {@link #update(List) for the list of the
+	 * returned Pair.</p>
+	 * @throws IOException                if an I / O error occurs.
+	 * @throws InsufficientStockException if any of the request {@link ProductInput}
+	 *                                    has no sufficient stock.
 	 */
-	public List<InputEntry> fetchByPeriod(long inputId, LocalDate startDateInclusive, LocalDate endDateInclusive)
-			throws IOException {
-		if (startDateInclusive.isAfter(endDateInclusive))
-			return new ArrayList<>();
-
-		return fetchByInput(inputId).stream().filter(t -> {
-			LocalDate d = LocalDate.from(t.getDate());
-
-			return (d.equals(startDateInclusive) || d.equals(endDateInclusive))
-					|| (d.isBefore(endDateInclusive) && d.isAfter(startDateInclusive));
-		}).collect(Collectors.toList());
-	}
-
-	/**
-	 * Retrieves the last entry for the input for a given date. If there is no
-	 * entry, an empty entry will be returned.
-	 *
-	 * @param inputId       the target input id
-	 * @param dateInclusive the target date inclusive.
-	 * @return the last input entry if found, an empty entry if not found.
-	 * @throws IOException if an I / O error occurs.
-	 */
-	public InputEntry fetchWithLastPrice(long inputId, LocalDate dateInclusive) throws IOException {
-		var all = fetchByProductBeforeDate(inputId, dateInclusive);
-
-		all.sort(Comparator.comparing(InputEntry::getDate).reversed());
-
-		try {
-			return all.get(0);
-		} catch (IndexOutOfBoundsException e) {
-			return new InputEntry(inputId, 0, 0, dateInclusive);
-		}
-	}
-
-	public Pair<Double, List<InputEntry>> reserveForCheckOut(List<ProductInput> items, double forQuantity,
+	public Pair<Double, List<InputEntry>> reserveForWithdraw(List<ProductInput> items, double multiplier,
 			LocalDate date) throws IOException, InsufficientStockException {
 		var totalCost = 0.0;
 		var checkingOut = new ArrayList<InputEntry>();
 
 		for (ProductInput i : items) {
-			var checking = reserveForCheckOut(i, forQuantity, date);
+			var checking = reserveForWithdraw(i, multiplier, date);
 			checkingOut.addAll(checking.getSecond());
 			totalCost += checking.getFirst() / checking.getSecond().size();
 		}
 
-		return new Pair<Double, List<InputEntry>>(totalCost, checkingOut);
+		return new Pair<>(totalCost, checkingOut);
 	}
 
-	private Pair<Double, List<InputEntry>> reserveForCheckOut(ProductInput item, double forQuantity, LocalDate date)
+	/**
+	 * Reserve a {@link ProductInput} for stock withdraw.
+	 * 
+	 * @param item       the requested {@link ProductInput}
+	 * @param multiplier the amount of each {@link ProductInput} that should be
+	 *                   withdrawn.
+	 * @param date       the withdrawn date
+	 * @return A {@link Pair} containing the total value of the withdrawn and a list
+	 *         of the {@link InputEntry} with the new available values after the
+	 *         withdrawn.
+	 *         <p>
+	 *         <b>WARNING:</b>This method does not performs the withdrawn, if a
+	 *         withdrawn is required, use {@link #update(List) for the list of the
+	 * @throws IOException                if an I / O error occurs.
+	 * @throws InsufficientStockException if the request {@link ProductInput} has no
+	 *                                    sufficient stock.
+	 */
+	private Pair<Double, List<InputEntry>> reserveForWithdraw(ProductInput item, double multiplier, LocalDate date)
 			throws IOException, InsufficientStockException {
 		var stock = fetchByProductBeforeDate(item.getInputId(), date);
 
-		double totalNeeded = item.getInputQuantity() * forQuantity;
+		double totalNeeded = item.getInputQuantity() * multiplier;
 		var totalInStock = stock.stream().mapToDouble(InputEntry::getAvailable).sum();
 
 		if (totalInStock < totalNeeded)
@@ -173,25 +188,32 @@ public class InputEntryController {
 				break;
 		}
 
-		return new Pair<Double, List<InputEntry>>(totalValue, checkingOut);
+		return new Pair<>(totalValue, checkingOut);
 	}
 
-	public double fetchLastPriceEntry(long inputId) throws IOException {
-		var all = inputStockFile.readAllFile(p -> p.getInputId() == inputId);
-		all.sort(Comparator.comparing(InputEntry::getDate).reversed());
-
-		try {
-			return all.get(0).getPrice();
-		} catch (Exception e) {
-			return 0;
-		}
-	}
-
+	/**
+	 * Fetch an {@link InputEntry} and its position in file.
+	 * 
+	 * @param id the target id.
+	 * @return A {@link Pair} with the found {@link InputEntry} and its position in file, null if not found.
+	 * @throws IOException if an I / O error occurs.
+	 */
 	public Pair<InputEntry, Long> fetchById(long id) throws IOException {
 		return inputStockFile.fetch(p -> p.getId() == id);
 	}
 
-	public void update(Long position, InputEntry newData) throws IOException {
-		inputStockFile.update(position, newData);
+	/**
+	 * Performs a loop updating all the entries in file.
+	 * 
+	 * @param entries the target entries.
+	 * @throws IOException if an I / O error occurs.
+	 */
+	public void update(List<InputEntry> entries) throws IOException {
+		Objects.requireNonNull(entries);
+
+		for (InputEntry entry : entries) {
+			var p = fetchById(entry.getId());
+			inputStockFile.update(p.getSecond(), entry);
+		}
 	}
 }

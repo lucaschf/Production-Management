@@ -1,40 +1,29 @@
 package tsi.too.controller;
 
-import tsi.too.Constants;
-import tsi.too.io.InputDialog.InputValidator;
-import tsi.too.io.InputsFile;
-import tsi.too.model.Input;
-import tsi.too.util.Pair;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
+
+import tsi.too.io.InputsFile;
+import tsi.too.model.Input;
+import tsi.too.util.Pair;
 
 public class InputController {
 	private final InputsFile inputsFile;
 
 	private static InputController instance;
 
-	public final InputValidator<String> nameValidator = input -> {
-		if (input.isBlank())
-			return Constants.NAME_CANNOT_BE_BLANK;
-		if (input.length() < 4)
-			return Constants.NAME_IS_TO_SHORT;
-		return null;
-	};
-
-	public final InputValidator<Double> priceValidator = input -> {
-		if (input <= 0)
-			return Constants.PRICE_MUST_BE_GREATER_THAN_ZERO;
-
-		return null;
-	};
-
 	private InputController() throws FileNotFoundException {
 		inputsFile = InputsFile.getInstance();
 	}
 
+	/**
+	 * Ensures that only one instance is created
+	 * 
+	 * @return the created instance.
+	 * @throws FileNotFoundException if persistence file opening fails.
+	 */
 	public static InputController getInstance() throws FileNotFoundException {
 		synchronized (InputController.class) {
 			if (instance == null)
@@ -44,29 +33,72 @@ public class InputController {
 		}
 	}
 
+	/**
+	 * Fetch all {@link Input} in file.
+	 * 
+	 * @return a list with all {@link Input}
+	 * @throws IOException if an I / o error occurs.
+	 */
 	public List<Input> fetchInputs() throws IOException {
 		return inputsFile.readAllFile();
 	}
 
+	/**
+	 * Fetch all {@link Input} in file as a {@link Vector}.
+	 * 
+	 * @return a {@link Vector} with all {@link Input}
+	 * @throws IOException if an I / o error occurs.
+	 */
 	public Vector<Input> fetchInputsAsVector() throws IOException {
 		return inputsFile.readAllFileAsVector();
 	}
 
+	/**
+	 * Fetch a {@link Input} by its name (case insensitive).
+	 * 
+	 * @param name the target name.
+	 * @return A {@link Pair} with the {@link Input} and its position in file or
+	 *         null if not found.
+	 * @throws IOException if an I / O error occurs.
+	 */
 	public Pair<Input, Long> findByName(final String name) throws IOException {
-		return inputsFile.findByName(name);
+		return inputsFile.fetch(p -> p.getName().equalsIgnoreCase(name));
 	}
 
+	/**
+	 * Fetch a {@link Input} by its id.
+	 * 
+	 * @param id the target id.
+	 * @return A {@link Pair} with the {@link Input} and its position in file or
+	 *         null if not found.
+	 * @throws IOException if an I / O error occurs.
+	 */
 	public Pair<Input, Long> findById(final long id) throws IOException {
 		return inputsFile.fetch(p -> p.getId() == id);
 	}
 
-	public Input insert(Input p) throws IOException {
-		var target = p.withId(inputsFile.getLastId() + 1);
+	/**
+	 * Generates an id for the {@link Input} and inserts it to the file.
+	 * 
+	 * @param input the {@link Input} to be inserted.
+	 * @throws IOException                if an I / O error occurs.
+	 * @throws CloneNotSupportedException If cloning the {@code input} with the new
+	 *                                    id fails.
+	 */
+	public Input insert(Input input) throws IOException, CloneNotSupportedException {
+		var target = input.withId(inputsFile.getLastId() + 1);
 		inputsFile.writeAtEnd(target);
 		return target;
 	}
 
-	public void update(Long position, Input p) throws IOException {
-		inputsFile.update(position, p);
+	/**
+	 * Update the {@link Input} data.
+	 * 
+	 * @param position the target position.
+	 * @param newData  the new data.
+	 * @throws IOException if an I / O error occurs.
+	 */
+	public void update(Long position, Input newData) throws IOException {
+		inputsFile.update(position, newData);
 	}
 }

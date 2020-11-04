@@ -6,11 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import tsi.too.model.Input;
-import tsi.too.util.Pair;
 
 public class InputsFile extends BinaryFile<Input> {
 
-	private final static String NAME = "ProdctionInputs.dat";
+	private final static String NAME = "ProductionInputs.dat";
 
 	private static InputsFile instance;
 
@@ -18,6 +17,12 @@ public class InputsFile extends BinaryFile<Input> {
 		openFile(NAME, OpenMode.READ_WRITE);
 	}
 
+	/**
+	 * Ensures that only one instance is created
+	 * 
+	 * @return the created instance.
+	 * @throws FileNotFoundException if persistence file opening fails.
+	 */
 	public static InputsFile getInstance() throws FileNotFoundException {
 		synchronized (InputsFile.class) {
 			if (instance == null)
@@ -43,30 +48,13 @@ public class InputsFile extends BinaryFile<Input> {
 		file.writeLong(e.getId());
 		file.writeDouble(e.getPrice());
 	}
-	
-	public Input findById(long id) throws IOException {
-		long high = recordSize();
-		long low = 0;
-		Input current;
 
-		while (low <= high) {
-			long middle = (low + high) / 2;
-			seekRecord(middle);
-			current = read();
-
-			if (id == current.getId())
-				return current;
-
-			if (id < current.getId()) {
-				high = middle - 1;
-			} else {
-				low = middle + 1;
-			}
-		}
-		
-		return null;
-	}
-	
+	/**
+	 * Retrieves the last {@link Input} id registered in the file.
+	 * 
+	 * @return the last id or {@code 0} if the file has no records.
+	 * @throws IOException if an I / O error occurs.
+	 */
 	public long getLastId() throws IOException {
 		var numberOfRecords = countRecords();
 
@@ -79,9 +67,5 @@ public class InputsFile extends BinaryFile<Input> {
 	@Override
 	public Input read() throws IOException {
 		return new Input(readString(MAX_NAME_LENGTH), file.readDouble(), file.readLong(), file.readDouble());
-	}
-
-	public Pair<Input, Long> findByName(final String name) throws IOException {
-		return fetch( p -> p.getName().equalsIgnoreCase(name));
 	}
 }

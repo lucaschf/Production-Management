@@ -12,6 +12,7 @@ import javax.swing.JTable;
  * 
  * @author Lucas Cristovam
  *
+ * @version 0.1
  */
 public class TableMouseSelectionListener extends MouseAdapter {
 
@@ -27,7 +28,7 @@ public class TableMouseSelectionListener extends MouseAdapter {
 			Point point = event.getPoint();
 			int currentRow = table.rowAtPoint(point);
 			table.setRowSelectionInterval(currentRow, currentRow);
-		} catch (Exception e) {
+		} catch (Exception ignored) {
 		}
 	}
 }

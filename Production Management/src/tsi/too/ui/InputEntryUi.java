@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
@@ -35,11 +36,11 @@ import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
 public class InputEntryUi extends JDialog {
-	private JFormattedTextField ftfprice;
+	private JFormattedTextField ftfPrice;
 	private JComboBox<Input> cbInput;
 	private JSpinner spQuantity;
 
-	private Component parentComponent;
+	private final Component parentComponent;
 
 	private InputController inputController;
 	private InputEntryController inputEntryController;
@@ -56,8 +57,10 @@ public class InputEntryUi extends JDialog {
 
 		initComponent();
 		setupWindow();
-		
+
 		resetForm();
+
+		cbInput.setSelectedItem(input);
 	}
 
 	private void initController() {
@@ -78,7 +81,8 @@ public class InputEntryUi extends JDialog {
 
 	private void initComponent() {
 		JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(null, "Dados da entrada", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel.setBorder(
+				new TitledBorder(null, Constants.ENTRY_DATA, TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		BottomActionPanel bottomActionPanel = new BottomActionPanel(Constants.CANCEL, this::onCancel, Constants.ADD,
 				this::onOk);
@@ -107,11 +111,11 @@ public class InputEntryUi extends JDialog {
 		JLabel lblInput = new JLabel(String.format("%s:", Constants.INPUT));
 		lblInput.setHorizontalAlignment(SwingConstants.TRAILING);
 
-		JLabel lblPrice = new JLabel("pre\u00E7o unit\u00E1rio:");
+		JLabel lblPrice = new JLabel(String.format("%s:", Constants.UNITARY_PRICE));
 		lblPrice.setHorizontalAlignment(SwingConstants.TRAILING);
 
 		try {
-			cbInput = new JComboBox<Input>();
+			cbInput = new JComboBox<>();
 			cbInput.setModel(new DefaultComboBoxModel<>(inputController.fetchInputsAsVector()));
 			cbInput.setRenderer(new InputComboboxRenderer());
 		} catch (IOException e) {
@@ -119,13 +123,13 @@ public class InputEntryUi extends JDialog {
 		}
 		lblInput.setLabelFor(cbInput);
 
-		ftfprice = new JFormattedTextField(UiUtils.createCurrencyFormatterFactory(0.0, Double.MAX_VALUE));
-		lblPrice.setLabelFor(ftfprice);
+		ftfPrice = new JFormattedTextField(UiUtils.createCurrencyFormatterFactory(0.0, Double.MAX_VALUE));
+		lblPrice.setLabelFor(ftfPrice);
 
 		SpinnerNumberModel model = new SpinnerNumberModel(0.0, 0.0, null, 0.5);
 		spQuantity = new JSpinner(model);
 
-		JLabel lblDate = new JLabel("Data:");
+		JLabel lblDate = new JLabel(String.format("%s:", Constants.DATE));
 
 		ftfDate = new JFormattedTextField(UiUtils.createBrazilianDateMaskFormatter());
 		lblDate.setLabelFor(ftfDate);
@@ -140,7 +144,7 @@ public class InputEntryUi extends JDialog {
 								.addComponent(cbInput, Alignment.TRAILING, 0, 447, Short.MAX_VALUE)
 								.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
 										.addComponent(ftfDate, Alignment.LEADING)
-										.addComponent(ftfprice, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 120,
+										.addComponent(ftfPrice, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 120,
 												Short.MAX_VALUE)
 										.addComponent(spQuantity, Alignment.LEADING)))
 						.addContainerGap()));
@@ -154,7 +158,7 @@ public class InputEntryUi extends JDialog {
 				.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblQuantity).addComponent(
 						spQuantity, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 				.addGap(10)
-				.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblPrice).addComponent(ftfprice,
+				.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblPrice).addComponent(ftfPrice,
 						GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 				.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 				.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblDate).addComponent(ftfDate,
@@ -165,26 +169,23 @@ public class InputEntryUi extends JDialog {
 	}
 
 	private void onOk(ActionEvent e) {
-		Input input;
+
+		Input input = (Input) cbInput.getSelectedItem();
+		if (input == null) {
+			MessageDialog.showAlertDialog(this, getTitle(), Constants.SELECT_THE_INPUT);
+			return;
+		}
+
 		var quantity = (Double) spQuantity.getValue();
-		double price;
-		LocalDate date;
-
-		try {
-			input = (Input) cbInput.getSelectedItem();
-		} catch (NullPointerException npe) {
-			MessageDialog.showAlertDialog(getTitle(), "Selecione o insumo para entrada");
-			return;
-		}
-
 		if (quantity == 0.0) {
-			MessageDialog.showAlertDialog(getTitle(), "Informe a quantidade de entrada");
+			MessageDialog.showAlertDialog(this, getTitle(), Constants.INFORM_THE_QUANTITY);
 			return;
 		}
 
+		LocalDate date;
 		try {
 			date = LocalDate.parse(ftfDate.getText(), DateTimeFormatter.ofPattern(Patterns.BRAZILIAN_DATE_PATTERN));
-		} catch (Exception ex) {
+		} catch (DateTimeParseException ex) {
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.INVALID_DATE);
 			return;
 		}
@@ -194,29 +195,32 @@ public class InputEntryUi extends JDialog {
 			return;
 		}
 
+		double price;
 		try {
-			price = StringExt.toDouble(ftfprice.getText());
+			price = StringExt.toDouble(ftfPrice.getText());
+		} catch (NumberFormatException ex) {
+			MessageDialog.showAlertDialog(this, getTitle(), Constants.INFORM_THE_UNITARY_PRICE);
+			return;
+		}
 
-			if (price == 0.0) {
-				MessageDialog.showAlertDialog(getTitle(), "Informe o valor de entrada");
-				return;
-			}
-
+		try {
 			InputEntry iStock = new InputEntry(input.getId(), quantity, price, date);
 
 			inputEntryController.insert(iStock);
 			MessageDialog.showInformationDialog(this, getTitle(), Constants.RECORD_SUCCESSFULLY_INSERTED);
 			resetForm();
-		} catch (NumberFormatException ex) {
-			MessageDialog.showAlertDialog(this, getTitle(), "Informe um preço válido para o insumo");
-		} catch (IOException ex) {
+		} catch (IOException | CloneNotSupportedException ex) {
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.FAILED_TO_INSERT_RECORD);
 		}
 	}
 
 	private void resetForm() {
-		cbInput.setSelectedIndex(0);
-		ftfprice.setText("0.00");
+		try {
+			cbInput.setSelectedIndex(0);
+		} catch (Exception ignored) {
+		}
+		
+		ftfPrice.setText("0.00");
 		spQuantity.setValue(0.0);
 		ftfDate.setText(LocalDate.now().format(DateTimeFormatter.ofPattern(Patterns.BRAZILIAN_DATE_PATTERN)));
 	}
@@ -225,12 +229,15 @@ public class InputEntryUi extends JDialog {
 		dispose();
 	}
 
-	private class InputComboboxRenderer extends BasicComboBoxRenderer {
+	private static class InputComboboxRenderer extends BasicComboBoxRenderer {
 		@Override
-		public Component getListCellRendererComponent(JList<? extends Object> list, Object value, int index,
-				boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+				boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-			setText(((Input) value).getName());
+
+			if (value != null)
+				setText(((Input) value).getName());
+
 			return this;
 		}
 	}

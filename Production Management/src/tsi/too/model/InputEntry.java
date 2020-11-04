@@ -1,11 +1,13 @@
 package tsi.too.model;
 
+import tsi.too.exception.InsufficientStockException;
+
 import java.time.LocalDate;
 
 public class InputEntry implements Cloneable {
 	private long id;
 	private long inputId;
-	private double incoming;
+	private final double incoming;
 	private double price;
 	private double available;
 	private LocalDate date;
@@ -45,16 +47,6 @@ public class InputEntry implements Cloneable {
 		return incoming;
 	}
 
-	public void withdraw(double quantity) throws IllegalArgumentException {
-		if (available == 0)
-			throw new IllegalArgumentException("Nothing available");
-
-		if (quantity > available)
-			throw new IllegalArgumentException("Quantity must be lesser or equal than available quantity");
-
-		available -= quantity;
-	}
-
 	public double getPrice() {
 		return price;
 	}
@@ -75,24 +67,42 @@ public class InputEntry implements Cloneable {
 		return id;
 	}
 
-	public InputEntry withId(long id) {
+	/**
+	 * Creates a copy of this {@link InputEntry} with the new {@code id}.
+	 *
+	 * @param id the target id
+	 * @return a copy with the new id
+	 * @throws CloneNotSupportedException  if cloning is not supported.
+	 */
+	public InputEntry withId(long id) throws CloneNotSupportedException {
 		var i = clone();
 		i.id = id;
 		return i;
 	}
-	
-	public InputEntry minus(double quantity) {
+
+	/**
+	 * decreases the available quantity in {@code quantity}.
+	 *
+	 * @param quantity the quantity to be decreased.
+	 * @return this with the available quantity decreased.
+	 *
+	 * @throws InsufficientStockException if {@code available} is equal {@code 0} or is lesser than {@code quantity}.
+	 */
+	public InputEntry minus(double quantity) throws InsufficientStockException {
+		if (available == 0)
+			throw new InsufficientStockException("Nothing available");
+
+		if (quantity > available)
+			throw new InsufficientStockException("Quantity must be lesser or equal than available quantity");
+
 		available -= quantity;
+
 		return this;
 	}
 	
 	@Override
-	protected InputEntry clone() {
-		try {
-			return (InputEntry) super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException("Failed to clone");
-		}
+	protected InputEntry clone() throws CloneNotSupportedException {
+		return (InputEntry) super.clone();
 	}
 
 	@Override

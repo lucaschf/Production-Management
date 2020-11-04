@@ -3,11 +3,11 @@ package tsi.too.model;
 import tsi.too.Constants;
 
 /**
- * Represents all acceptable measure units
+ * Represents all acceptable units of measurement
  * 
  * 
  * @author Lucas Cristovam
- *
+ * @version 0.1
  */
 public enum MeasureUnity {
 	GRAM(0 ,Constants.GRAM, "g"),
@@ -15,11 +15,11 @@ public enum MeasureUnity {
 	LITER(2, Constants.LITER, "L"),
 	MILLILITER(3, Constants.MILLILITER, "Ml");
 	
-	private String description;
-	private String initials;
-	private int code;
+	private final String description;
+	private final String initials;
+	private final int code;
 	
-	private MeasureUnity(int code, String description, String initials) {
+	MeasureUnity(int code, String description, String initials) {
 		this.code = code;
 		this.description = description;
 		this.initials = initials;
@@ -28,11 +28,7 @@ public enum MeasureUnity {
 	public int getCode() {
 		return code;
 	}
-	
-	public String getDescription() {
-		return description;
-	}
-	
+
 	public String getInitials() {
 		return initials;
 	}
@@ -47,6 +43,6 @@ public enum MeasureUnity {
 			if(mu.getCode() == code)
 				return mu;
 		
-		throw new IllegalArgumentException("No such unity");
+		throw new IllegalArgumentException("No such unit of measurement");
 	}
 }

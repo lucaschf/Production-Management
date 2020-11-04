@@ -157,7 +157,7 @@ public class InputsEntryListUi extends JFrame {
 				var date = (LocalDate.parse(rowData.get(6).toString(),
 						DateTimeFormatter.ofPattern(Patterns.BRAZILIAN_DATE_PATTERN)));
 
-				return new Pair<String, InputEntry>(name,
+				return new Pair<>(name,
 						new InputEntry(id, inputId, incoming, price, available, date));
 			} catch (Exception e) {
 				return null;

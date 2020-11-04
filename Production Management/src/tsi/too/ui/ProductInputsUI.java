@@ -38,7 +38,7 @@ import tsi.too.ui.table_model.InputTableModel;
 import tsi.too.util.UiUtils;
 
 @SuppressWarnings("serial")
-public class AssociateInputToProductUI extends JDialog {
+public class ProductInputsUI extends JDialog {
 	private JTable tbUnlinked;
 	private JTable tbLinked;
 
@@ -58,11 +58,11 @@ public class AssociateInputToProductUI extends JDialog {
 	 * @param parentComponent
 	 * @wbp.parser.constructor
 	 */
-	public AssociateInputToProductUI(Component parentComponent) {
+	public ProductInputsUI(Component parentComponent) {
 		this(parentComponent, null);
 	}
 
-	public AssociateInputToProductUI(Component parentComponent, Product product) {
+	public ProductInputsUI(Component parentComponent, Product product) {
 		this.parentComponent = parentComponent;
 		initControllers();
 
@@ -118,7 +118,7 @@ public class AssociateInputToProductUI extends JDialog {
 
 		JLabel lblNewLabel = new JLabel(Constants.LINKING_INFO_MESSAGE);
 		lblNewLabel.setAutoscrolls(true);
-		lblNewLabel.setIcon(new ImageIcon(AssociateInputToProductUI.class.getResource("/resources/ic_info.png")));
+		lblNewLabel.setIcon(new ImageIcon(ProductInputsUI.class.getResource("/resources/ic_info.png")));
 		lblNewLabel.setIconTextGap(10);
 
 		GroupLayout gl_inputsPanel = new GroupLayout(inputsPanel);
@@ -203,15 +203,13 @@ public class AssociateInputToProductUI extends JDialog {
 			cbProduct.setRenderer(new ProductComboboxRenderer());
 			cbProduct.addItemListener(e -> {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					var p = ((Product) e.getItem());
-					loadInputs(p.getId());
+					loadInputs();
 				}
 			});
 
-			loadInputs(getProductSelected().getId());
-		} catch (NullPointerException | IOException e) {
+			loadInputs();
+		} catch (IOException e) {
 			MessageDialog.showErrorDialog(this, getTitle(), Constants.FAILED_TO_FETCH_DATA);
-			// TODO lock form
 		}
 	}
 
@@ -241,13 +239,13 @@ public class AssociateInputToProductUI extends JDialog {
 		} catch (IOException e) {
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.UNLINKING_FAILURE);
 		} finally {
-			loadInputs(product.getId());
+			loadInputs();
 		}
 	}
 
 	private void newInput() {
 		new InputsRegistrationUi(this).setVisible(true);
-		loadInputs(getProductSelected().getId());
+		loadInputs();
 	}
 
 	/**
@@ -281,7 +279,7 @@ public class AssociateInputToProductUI extends JDialog {
 		} catch (NullPointerException | IOException e) {
 			MessageDialog.showAlertDialog(this, getTitle(), Constants.LINKING_FAILURE);
 		} finally {
-			loadInputs(product.getId());
+			loadInputs();
 		}
 	}
 
@@ -347,7 +345,7 @@ public class AssociateInputToProductUI extends JDialog {
 			} catch (IOException e) {
 				MessageDialog.showInformationDialog(this, getTitle(), Constants.QUANTITY_CHANGE_FAILURE);
 			} finally {
-				loadInputs(product.getId());
+				loadInputs();
 			}
 		}
 	}
@@ -384,43 +382,45 @@ public class AssociateInputToProductUI extends JDialog {
 	/**
 	 * Loads booth linked and unlinked inputs for a give product into their
 	 * respective tables.
-	 * 
+	 *
 	 * @param productId the target product id.
 	 */
-	private void loadInputs(long productId) {
-		loadLinkedInputs(productId);
-		loadUnlinkedInputs(productId);
-	}
-
-	/**
-	 * Fetch all linked Inputs for a given product and stores it into
-	 * {@code #linkedTableModel}.
-	 * 
-	 * @param productId the target product id.
-	 */
-	private void loadLinkedInputs(long productId) {
+	private void loadInputs() {
 		try {
-			linkedTableModel.clear();
-			var s = inputsByProductController.fetchLinkedInputs(productId);
-			linkedTableModel.addRows(s);
+			loadLinkedInputs();
+			loadUnlinkedInputs();
 		} catch (IOException e) {
-			e.printStackTrace();
+			MessageDialog.showErrorDialog(this, getTitle(), Constants.FAILED_TO_FETCH_DATA);
 		}
 	}
 
 	/**
-	 * Fetch all unlinked Inputs for a given product and stores it into
-	 * {@code #unlinkedTableModel}.
-	 * 
-	 * @param productId the target product id.
+	 * Fetch all linked Inputs for the selected product and stores it into
+	 * {@code #linkedTableModel}.
+	 *
+	 * @throws IOException if an I / O error occurs
 	 */
-	private void loadUnlinkedInputs(long productId) {
+	private void loadLinkedInputs() throws IOException {
+		try {
+			linkedTableModel.clear();
+			var s = inputsByProductController.fetchLinkedInputs(getProductSelected().getId());
+			linkedTableModel.addRows(s);
+		} catch (NullPointerException ignored) {
+		}
+	}
+
+	/**
+	 * Fetch all unlinked Inputs for the selected product and stores it into
+	 * {@code #unlinkedTableModel}.
+	 *
+	 * @throws IOException if an I / O error occurs
+	 */
+	private void loadUnlinkedInputs() throws IOException {
 		try {
 			unlinkedTableModel.clear();
-			var s = inputsByProductController.fetchUnlinkedInputs(productId);
+			var s = inputsByProductController.fetchUnlinkedInputs(getProductSelected().getId());
 			unlinkedTableModel.addRows(s);
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (NullPointerException ignored) {
 		}
 	}
 

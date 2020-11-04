@@ -49,7 +49,7 @@ public class ProductionEntryUi extends JDialog {
 	private JPanel formPanel;
 
 	private Product product;
-	private Component parentComponent;
+	private final Component parentComponent;
 	private BottomActionPanel bottomActionPanel;
 
 	private ProductController productController;
@@ -251,7 +251,7 @@ public class ProductionEntryUi extends JDialog {
 			var quantity = (Double) spQuantity.getValue();
 			var inputs = inputsByProductController.fetchAll(product.getId());
 
-			neededInputs = inputEntryController.reserveForCheckOut(inputs, quantity, date);
+			neededInputs = inputEntryController.reserveForWithdraw(inputs, quantity, date);
 
 			target = new Production(product.getId(), quantity, date, neededInputs.getFirst() / quantity,
 					neededInputs.getFirst() / quantity); // TODO CALCULATE
@@ -295,7 +295,7 @@ public class ProductionEntryUi extends JDialog {
 			if (input == null)
 				return Constants.INVALID_PRODUCTION_DATE;
 			if (input.isAfter(LocalDate.now())) {
-				return Constants.DATE_CANNOT_BE_A_FUCTURE_DATE;
+				return Constants.DATE_CANNOT_BE_A_FUTURE_DATE;
 			}
 			return null;
 		};

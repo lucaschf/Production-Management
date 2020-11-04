@@ -12,12 +12,12 @@ import tsi.too.model.ProductInput;
 import tsi.too.util.Pair;
 
 public class ProductInputsController {
-	private final ProductInputFile prodcutInputsFile;
+	private final ProductInputFile productInputsFile;
 	private final InputController inputController;
 	private static ProductInputsController instance;
 
 	private ProductInputsController() throws FileNotFoundException {
-		prodcutInputsFile = ProductInputFile.getInstance();
+		productInputsFile = ProductInputFile.getInstance();
 		inputController = InputController.getInstance();
 	}
 
@@ -37,11 +37,11 @@ public class ProductInputsController {
 	 * @throws IOException if an I / O error occurs.
 	 */
 	public void link(ProductInput target) throws IOException {
-		prodcutInputsFile.writeAtEnd(target);
+		productInputsFile.writeAtEnd(target);
 	}
 
 	public void update(long pos, ProductInput newData) throws IOException {
-		prodcutInputsFile.update(pos, newData);
+		productInputsFile.update(pos, newData);
 	}
 
 	/**
@@ -52,25 +52,24 @@ public class ProductInputsController {
 	 * @throws IOException if an I / O error occurs.
 	 */
 	public void unLink(long productId, long inputId) throws IOException {
-		var target = prodcutInputsFile.fetch(p -> p.getInputId() == inputId && p.getProductId() == productId);
+		var target = productInputsFile.fetch(p -> p.getInputId() == inputId && p.getProductId() == productId);
 		if (target == null)
 			return;
 
-		prodcutInputsFile.removeRecord(target.getSecond());
+		productInputsFile.removeRecord(target.getSecond());
 	}
 
 	/**
 	 * Fetch all unlinked inputs for a given product.
 	 * 
 	 * @param productId   the target product id.
-	 * @param forQuantity
 	 * @return a list with all unlinked inputs.
 	 * @throws IOException if an I / O error occurs.
 	 */
 	public List<Input> fetchUnlinkedInputs(long productId) throws IOException {
-		List<Long> linkedids = fetchLinkedInputs(productId).stream().map(i -> i.getId()).collect(Collectors.toList());
+		List<Long> linkedIds = fetchLinkedInputs(productId).stream().map(Input::getId).collect(Collectors.toList());
 
-		return inputController.fetchInputs().stream().filter(i -> !linkedids.contains(i.getId()))
+		return inputController.fetchInputs().stream().filter(i -> !linkedIds.contains(i.getId()))
 				.collect(Collectors.toList());
 	}
 
@@ -78,12 +77,11 @@ public class ProductInputsController {
 	 * Fetch all unlinked inputs for a given product.
 	 * 
 	 * @param productId   the target product id.
-	 * @param forQuantity
 	 * @return a list with all linked inputs.
 	 * @throws IOException if an I / O error occurs.
 	 */
 	public List<Input> fetchLinkedInputs(long productId) throws IOException {
-		var linked = prodcutInputsFile.readAllFile(t -> t.getProductId() == productId);
+		var linked = productInputsFile.readAllFile(t -> t.getProductId() == productId);
 		var result = new ArrayList<Input>();
 
 		linked.forEach(item -> {
@@ -92,8 +90,9 @@ public class ProductInputsController {
 				var input = new Input(target.getName(), item.getInputQuantity(), item.getInputId(), 0);
 
 				result.add(input);
-			} catch (IOException e) {
-				e.printStackTrace();
+			} catch (NullPointerException | IOException e) {
+				System.out.println(item);
+				System.out.println(e.getMessage());
 			}
 		});
 
@@ -101,14 +100,14 @@ public class ProductInputsController {
 	}
 
 	public List<ProductInput> fetchAll(long productId) throws IOException {
-		return prodcutInputsFile.readAllFile(p -> p.getProductId() == productId);
+		return productInputsFile.readAllFile(p -> p.getProductId() == productId);
 	}
 
 	public Pair<ProductInput, Long> fetchByProductAndInput(long productId, long inputId) throws IOException {
-		return prodcutInputsFile.fetch(t -> t.getInputId() == inputId && t.getProductId() == productId);
+		return productInputsFile.fetch(t -> t.getInputId() == inputId && t.getProductId() == productId);
 	}
 
 	public List<ProductInput> fetchByProduct(long productId) throws IOException {
-		return prodcutInputsFile.readAllFile(p -> productId == p.getProductId());
+		return productInputsFile.readAllFile(p -> productId == p.getProductId());
 	}
 }
