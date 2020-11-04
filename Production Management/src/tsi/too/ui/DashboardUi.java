@@ -16,12 +16,15 @@ import javax.swing.UnsupportedLookAndFeelException;
 import tsi.too.Constants;
 import tsi.too.io.BinaryFile;
 import tsi.too.io.MessageDialog;
+import tsi.too.utils.LookAndFeelPreferences;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 @SuppressWarnings("serial")
 public class DashboardUi extends JFrame {
+	
+	private LookAndFeelPreferences lookAndFeelPreferences = new LookAndFeelPreferences();
 	
 	private final class WindowAdapterExtension extends WindowAdapter {
 		@Override
@@ -36,6 +39,9 @@ public class DashboardUi extends JFrame {
 
 	public DashboardUi() {
 		addWindowListener(new WindowAdapterExtension());
+		
+		setupLookAndFeel(lookAndFeelPreferences.getSavedLookAndFeelName());
+		
 		setTitle(Constants.APP_NAME);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -143,7 +149,7 @@ public class DashboardUi extends JFrame {
 
 		return mnConsultations;
 	}
-
+	
 	public void changeLookAndFeel() {
 		List<String> lookAndFeelsDisplay = new ArrayList<>();
 		List<String> lookAndFeelsRealNames = new ArrayList<>();
@@ -159,16 +165,23 @@ public class DashboardUi extends JFrame {
 		if (changeLook != null) {
 			for (int i = 0; i < lookAndFeelsDisplay.size(); i++) {
 				if (changeLook.equals(lookAndFeelsDisplay.get(i))) {
-					try {
-						UIManager.setLookAndFeel(lookAndFeelsRealNames.get(i));
-						repaint();
-						break;
-					} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-							| UnsupportedLookAndFeelException ex) {
-						ex.printStackTrace(System.err);
-					}
+					setupLookAndFeel(lookAndFeelsRealNames.get(i));
+					break;
 				}
 			}
 		}
 	}	
+	
+	private void setupLookAndFeel(String lookAndFeelName) {
+		if(lookAndFeelName == null)
+			return;
+		
+		try {
+			UIManager.setLookAndFeel(lookAndFeelName);
+			repaint();
+			lookAndFeelPreferences.saveLookAndFeel(lookAndFeelName);
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException ignored) {
+		}
+	}
 }

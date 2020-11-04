@@ -150,11 +150,12 @@ public class ProductRegistrationUi extends JDialog {
 		initBtnInputRegistration();
 
 		JLabel lblNewLabel = new JLabel("Tamanho:");
+		lblNewLabel.setHorizontalAlignment(SwingConstants.TRAILING);
 
 		lblName.setLabelFor(tfName);
 		tfName.setColumns(10);
 
-		cbUnit = new JComboBox<>(MeasureUnity.values());
+		cbUnit = new JComboBox<>();
 		lblUnity.setLabelFor(cbUnit);
 
 		spSize = new JSpinner(new SpinnerNumberModel(0.0, 0.0, null, 0.5));
@@ -164,56 +165,60 @@ public class ProductRegistrationUi extends JDialog {
 		lblProfitMargin.setLabelFor(spProfit);
 
 		GroupLayout gl_panel = new GroupLayout(fieldsPanel);
-		gl_panel.setHorizontalGroup(gl_panel.createParallelGroup(Alignment.LEADING).addGroup(gl_panel
-				.createSequentialGroup().addContainerGap()
-				.addGroup(gl_panel.createParallelGroup(Alignment.LEADING).addGroup(gl_panel
-						.createParallelGroup(Alignment.LEADING)
+		gl_panel.setHorizontalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap(20, Short.MAX_VALUE)
+					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_panel.createSequentialGroup()
-								.addPreferredGap(ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
-								.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING).addComponent(lblName)
-										.addComponent(lblUnity, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 125,
-												GroupLayout.PREFERRED_SIZE)
-										.addComponent(lblNewLabel))
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-										.addComponent(tfName, GroupLayout.PREFERRED_SIZE, 404,
-												GroupLayout.PREFERRED_SIZE)
-										.addComponent(cbUnit, GroupLayout.PREFERRED_SIZE, 199,
-												GroupLayout.PREFERRED_SIZE)
-										.addComponent(spSize, GroupLayout.PREFERRED_SIZE, 117,
-												GroupLayout.PREFERRED_SIZE))
-								.addContainerGap())
+							.addComponent(btnRegisterInputs, GroupLayout.PREFERRED_SIZE, 143, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap())
 						.addGroup(gl_panel.createSequentialGroup()
-								.addComponent(lblProfitMargin, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
-										Short.MAX_VALUE)
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(spProfit, GroupLayout.PREFERRED_SIZE, 117, GroupLayout.PREFERRED_SIZE)
-								.addGap(299)))
-						.addGroup(Alignment.TRAILING,
-								gl_panel.createSequentialGroup().addComponent(btnRegisterInputs,
-										GroupLayout.PREFERRED_SIZE, 143, GroupLayout.PREFERRED_SIZE)
-										.addContainerGap()))));
-		gl_panel.setVerticalGroup(gl_panel.createParallelGroup(Alignment.LEADING).addGroup(gl_panel
-				.createSequentialGroup().addContainerGap()
-				.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblName).addComponent(tfName,
-						GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblUnity).addComponent(cbUnit,
-						GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblNewLabel).addComponent(
-						spSize, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE).addComponent(lblProfitMargin).addComponent(
-						spProfit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-				.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-				.addComponent(btnRegisterInputs).addContainerGap()));
+							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+								.addComponent(lblProfitMargin)
+								.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+									.addComponent(lblName)
+									.addComponent(lblUnity, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE))
+								.addComponent(lblNewLabel))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addComponent(tfName, GroupLayout.PREFERRED_SIZE, 404, GroupLayout.PREFERRED_SIZE)
+								.addComponent(cbUnit, GroupLayout.PREFERRED_SIZE, 199, GroupLayout.PREFERRED_SIZE)
+								.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
+									.addComponent(spProfit, Alignment.LEADING)
+									.addComponent(spSize, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)))
+							.addContainerGap())))
+		);
+		gl_panel.setVerticalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblName)
+						.addComponent(tfName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblUnity)
+						.addComponent(cbUnit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(spSize, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 13, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblProfitMargin)
+						.addComponent(spProfit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(btnRegisterInputs)
+					.addContainerGap())
+		);
 
 		fieldsPanel.setLayout(gl_panel);
 	}
 
 	private void initBtnInputRegistration() {
 		btnRegisterInputs = new JButton(REGISTER_PRODUCTION_INPUTS);
+		btnRegisterInputs.setVisible(false);
 		enableInputsButton();
 		btnRegisterInputs.addActionListener(e -> {
 			if (product != null)
