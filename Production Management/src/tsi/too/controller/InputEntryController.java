@@ -116,8 +116,8 @@ public class InputEntryController {
 	 *         of the {@link InputEntry} with the new available values after the
 	 *         withdrawn.
 	 *         <p>
-	 *         <b>WARNING:</b>This method does not performs the withdrawn, if a
-	 *         withdrawn is required, use {@link #update(List) for the list of the
+	 *         <b>WARNING:</b> This method does not performs the withdrawn, if a
+	 *         withdrawn is required, use {@link #update(List)} for the list of the
 	 * returned Pair.</p>
 	 * @throws IOException                if an I / O error occurs.
 	 * @throws InsufficientStockException if any of the request {@link ProductInput}
